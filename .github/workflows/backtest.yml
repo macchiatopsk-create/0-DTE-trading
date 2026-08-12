@@ -1,0 +1,88 @@
+name: 0DTE actual-options backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: "Optional start date (YYYY-MM-DD); blank = last 92 calendar days"
+        required: false
+        type: string
+      end_date:
+        description: "Optional end date (YYYY-MM-DD); blank = yesterday ET"
+        required: false
+        type: string
+  schedule:
+    - cron: "20 16 1 * *"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 0dte-backtest
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - run: pip install -r requirements.txt
+
+      - name: Restore market-data cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/massive
+          key: massive-0dte-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            massive-0dte-${{ runner.os }}-
+
+      - name: Run 0DTE backtest
+        env:
+          MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
+          START_DATE: ${{ inputs.start_date }}
+          END_DATE: ${{ inputs.end_date }}
+        run: |
+          ARGS=""
+          if [ -n "$START_DATE" ]; then ARGS="$ARGS --start $START_DATE"; fi
+          if [ -n "$END_DATE" ]; then ARGS="$ARGS --end $END_DATE"; fi
+          python backtest_0dte.py $ARGS
+
+      - name: Persist reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash || true
+          git add results/
+          git commit -m "0DTE backtest $(date -u +%F_%H%M)" || echo "No report changes"
+          git push || echo "Push skipped"
+
+      - name: Prepare Pages site
+        run: |
+          mkdir -p _site
+          cp results/index.html _site/index.html
+          cp results/*.csv _site/ 2>/dev/null || true
+          cp results/summary.json _site/ 2>/dev/null || true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: backtest
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
