@@ -1,6 +1,13 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>0DTE Mock · QQQ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#06090d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="0DTE">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#06090d;--s:#0b1017;--b:#1a2230;--t:#e6edf5;--m:#6d7a8c;--d:#424c5c;--g:#dba642;--up:#34c77b;--dn:#e95656}
@@ -26,7 +33,7 @@ tr:last-child td{border-bottom:none}
 .rs{color:var(--d);font-size:10.5px}
 .rule{font-size:11.5px;color:var(--d);line-height:1.9;margin-top:16px;padding-top:14px;border-top:1px solid var(--b)}
 </style></head><body>
-<header><div><div class="eb">0DTE MOCK</div><h1>QQQ VWAP 밴드</h1></div><div class="ts">2026-08-12 06:48 ET</div></header>
+<header><div><div class="eb">0DTE MOCK</div><h1>QQQ VWAP 밴드</h1></div><div class="ts">2026-08-12 07:20 ET</div></header>
 <div class="live idle"><div class="k">오늘 상태</div><div class="v">대기</div><div class="s">기초 718.34 · VWAP 719.06 · 밴드폭 0.45% · 편차 -0.44σ · 갭 +0.35%</div></div>
 <div class="stats">
   <div class="st"><div class="k">TRADES</div><div class="v">0</div></div>
@@ -40,4 +47,14 @@ tr:last-child td{border-bottom:none}
 진입: VWAP ∓1σ 터치 · 익절: 반대편 1σ · 손절: 2σ · 마감: 15:45 ET · 하루 1회<br>
 백테스트(60일) 기준선: 밴드폭 넓은 구간 승률 78% (CI 72.5~82.6)<br>
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
-</div></body></html>
+</div>
+<script>
+(function(){
+  var f=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false});
+  function live(){var o={};f.formatToParts(new Date()).forEach(function(p){o[p.type]=p.value});
+    if(o.weekday==="Sat"||o.weekday==="Sun")return false;
+    var m=parseInt(o.hour,10)*60+parseInt(o.minute,10);return m>=570&&m<=960;}
+  if(live()) setTimeout(function(){location.reload()},300000);
+})();
+</script>
+</body></html>
