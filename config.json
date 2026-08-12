@@ -1,0 +1,24 @@
+{
+  "underlyings": [
+    "SPY",
+    "QQQ"
+  ],
+  "starting_capital": 1000.0,
+  "lookback_calendar_days": 92,
+  "opening_range_minutes": 30,
+  "entry_cutoff": "14:30",
+  "time_exit": "15:45",
+  "take_profit_pct": 0.6,
+  "stop_loss_pct": 0.35,
+  "option_slippage_pct": 0.02,
+  "commission_per_contract_each_side": 0.0,
+  "max_position_pct": 0.35,
+  "max_contracts": 3,
+  "first_otm_offset": 1,
+  "max_otm_offset": 5,
+  "min_option_price": 0.1,
+  "min_entry_bar_volume": 1,
+  "api_min_interval_seconds": 12.5,
+  "cache_dir": ".cache/massive",
+  "output_dir": "results"
+}
