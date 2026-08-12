@@ -304,13 +304,13 @@ tr:last-child td{{border-bottom:none}}
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
 </div>
 <script>
-(function(){
-  var f=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false});
-  function live(){var o={};f.formatToParts(new Date()).forEach(function(p){o[p.type]=p.value});
+(function(){{
+  var f=new Intl.DateTimeFormat("en-US",{{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false}});
+  function live(){{var o={{}};f.formatToParts(new Date()).forEach(function(p){{o[p.type]=p.value}});
     if(o.weekday==="Sat"||o.weekday==="Sun")return false;
-    var m=parseInt(o.hour,10)*60+parseInt(o.minute,10);return m>=570&&m<=960;}
-  if(live()) setTimeout(function(){location.reload()},300000);
-})();
+    var m=parseInt(o.hour,10)*60+parseInt(o.minute,10);return m>=570&&m<=960;}}
+  if(live()) setTimeout(function(){{location.reload()}},300000);
+}})();
 </script>
 </body></html>"""
 
