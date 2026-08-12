@@ -2,13 +2,13 @@
 """
 0DTE Mock Trading — QQQ VWAP 밴드 전략 (모의매매 · 실거래 아님)
 
-전략 (60일 백테스트 기반 · 밴드폭 넓을 때 승률 78%, CI 72.5~82.6):
-  방향  : 10:00 ET 기준 EMA9 > EMA21  AND  갭 방향 일치
-  게이트: 밴드폭(±1σ) >= 0.75%        ← 좁으면 진입 금지 (8월 붕괴 원인)
-  진입  : 가격이 VWAP -1σ 터치 (롱) / +1σ (숏)
-  익절  : 반대편 +1σ 도달
-  손절  : -2σ 이탈
-  마감  : 15:45 ET 강제청산
+전략 v2 (방향 신호 즉시 진입 — 밴드 대기 폐지):
+  판단  : 10:00 ET · DTE 점수 = 갭 + EMA9/21 + VWAP위치 + RSI (각 ±1, 합 -4~+4)
+  진입  : 점수 >= +3 → CALL / 점수 <= -3 → PUT (즉시 ATM 매수)
+  익절  : 프리미엄 +40%
+  손절  : 프리미엄 -30%
+  마감  : 14:30 ET 강제청산 (세타 급가속 구간 회피)
+  백테스트: 강한 롱 71.4% 상승 / 강한 숏 66.7% 하락 (QQQ 60일, 기초자산 기준)
 
 기록: 스트라이크 · 진입/청산 시각 · 프리미엄 · 손익률
 주의: 모의매매입니다. 실거래 아님. 검증 전 참고용.
@@ -29,10 +29,12 @@ LOG = os.path.join(BASE, "odte_log.json")
 OUT = os.path.join(BASE, "index.html")
 
 TICKER   = "QQQ"
-BAND_MIN = 0.75      # 밴드폭 최소 % (게이트)
-CUTOFF   = dt.time(15, 45)
-MAX_PER_DAY = 4      # 하루 최대 진입 (동시 보유는 항상 1개)
-REENTRY_MIN = 20     # 직전 청산 후 재진입 대기 (분) — 같은 자리 연속 진입 방지
+SCORE_MIN = 3        # |DTE 점수| 이 값 이상일 때만 진입
+TP_PCT   = 40.0      # 프리미엄 익절 %
+SL_PCT   = -30.0     # 프리미엄 손절 %
+CUTOFF   = dt.time(14, 30)   # 세타 급가속 전 청산
+MAX_PER_DAY = 1      # 방향 베팅이라 하루 1회
+VERSION_NOTE = "direction-v2"
 VERSION  = "vwap-1.0"
 
 # ───────────────────────── 데이터 ─────────────────────────
@@ -91,14 +93,24 @@ def session_state(df):
     gap = (O[0] / float(prev["Close"].iloc[-1]) - 1) * 100
     hist = [float(x) for x in df["Close"]][-61:]
     e9, e21 = ema(hist, 9), ema(hist, 21)
-    direction = 1 if e9 > e21 else -1
-    if (direction > 0 and gap <= 0) or (direction < 0 and gap >= 0):
-        direction = 0                      # 갭 방향 불일치 → 관망
+    # RSI(14) on 5m closes
+    g = l = 0.0
+    for i in range(len(hist) - 14, len(hist)):
+        d2 = hist[i] - hist[i-1]
+        if d2 > 0: g += d2
+        else: l -= d2
+    rsi = 100.0 if l == 0 else 100 - 100 / (1 + (g/14) / (l/14))
 
     bw = (2 * sd / vwap * 100) if vwap else 0.0
     px = C[-1]
     dev = (px - vwap) / sd if sd > 1e-9 else 0.0
-    return dict(px=px, vwap=vwap, sd=sd, bw=bw, dev=dev, gap=gap,
+    score = 0
+    score += 1 if gap >= 0.3 else (-1 if gap <= -0.3 else 0)
+    score += 1 if e9 > e21 else -1
+    score += 1 if px > vwap else -1
+    score += 1 if rsi > 60 else (-1 if rsi < 40 else 0)
+    direction = 1 if score >= SCORE_MIN else (-1 if score <= -SCORE_MIN else 0)
+    return dict(px=px, vwap=vwap, sd=sd, bw=bw, dev=dev, gap=gap, rsi=rsi, score=score,
                 direction=direction, e9=e9, e21=e21,
                 band_lo=vwap - sd, band_hi=vwap + sd,
                 stop_lo=vwap - 2 * sd, stop_hi=vwap + 2 * sd,
@@ -148,29 +160,26 @@ def step():
     # ── 1) 보유 중이면 청산 체크 ──
     if open_pos and open_pos.get("date") == dstr:
         side = open_pos["side"]; reason = None
-        if side == "call":
-            if st["px"] >= st["band_hi"]: reason = "TARGET(+1σ)"
-            elif st["px"] <= st["stop_lo"]: reason = "STOP(-2σ)"
-        else:
-            if st["px"] <= st["band_lo"]: reason = "TARGET(-1σ)"
-            elif st["px"] >= st["stop_hi"]: reason = "STOP(+2σ)"
+        # 현재 프리미엄 조회 후 손익 기준으로 청산 판단
+        cur_prem = None
+        try:
+            ch = yf.Ticker(TICKER).option_chain(today_expiry(today))
+            tbl = ch.calls if side == "call" else ch.puts
+            row = tbl[tbl["strike"] == open_pos["strike"]]
+            if not row.empty:
+                r = row.iloc[0]
+                b = float(r.get("bid") or 0); a = float(r.get("ask") or 0)
+                cur_prem = round((b + a) / 2 if (b > 0 and a > 0) else float(r.get("lastPrice") or 0), 2)
+        except Exception:
+            pass
+        if cur_prem and cur_prem > 0:
+            chg = (cur_prem / open_pos["premium"] - 1) * 100
+            if chg >= TP_PCT: reason = f"TARGET(+{TP_PCT:.0f}%)"
+            elif chg <= SL_PCT: reason = f"STOP({SL_PCT:.0f}%)"
         if now.time() >= CUTOFF and reason is None:
-            reason = "CUTOFF(15:45)"
+            reason = "CUTOFF(14:30)"
         if reason:
-            opt = atm_option(st["px"], side, today_expiry(today))
-            exit_prem = None
-            if opt:
-                # 같은 스트라이크의 현재가를 다시 조회
-                try:
-                    ch = yf.Ticker(TICKER).option_chain(today_expiry(today))
-                    tbl = ch.calls if side == "call" else ch.puts
-                    row = tbl[tbl["strike"] == open_pos["strike"]]
-                    if not row.empty:
-                        r = row.iloc[0]
-                        b = float(r.get("bid") or 0); a = float(r.get("ask") or 0)
-                        exit_prem = round((b + a) / 2 if (b > 0 and a > 0) else float(r.get("lastPrice") or 0), 2)
-                except Exception:
-                    pass
+            exit_prem = cur_prem
             if exit_prem is None or exit_prem <= 0:
                 exit_prem = open_pos["premium"]        # 조회 실패 시 보수적으로 본전 처리
             pnl_pct = (exit_prem / open_pos["premium"] - 1) * 100
@@ -191,24 +200,8 @@ def step():
     if done_today >= MAX_PER_DAY:
         print(f"  오늘 {done_today}회 완료 (상한 {MAX_PER_DAY}) — 종료"); save_log(log); return log, st
 
-    last = [t for t in log.get("trades", []) if t.get("date") == dstr]
-    if last:
-        try:
-            lt = dt.datetime.strptime(last[-1]["exit_time"], "%H:%M").time()
-            mins = (now.hour * 60 + now.minute) - (lt.hour * 60 + lt.minute)
-            if 0 <= mins < REENTRY_MIN:
-                print(f"  재진입 대기 ({REENTRY_MIN - mins}분 남음)")
-                save_log(log); return log, st
-        except Exception:
-            pass
     if st["direction"] == 0:
-        status = "NO TRADE · 방향 불일치(EMA vs 갭)"
-    elif st["bw"] < BAND_MIN:
-        status = f"NO TRADE · 밴드폭 {st['bw']:.2f}% < {BAND_MIN}%"
-    elif st["direction"] > 0 and st["dev"] > -1.0:
-        status = f"대기 · -1σ 터치 필요 (현재 {st['dev']:+.2f}σ)"
-    elif st["direction"] < 0 and st["dev"] < 1.0:
-        status = f"대기 · +1σ 터치 필요 (현재 {st['dev']:+.2f}σ)"
+        status = f"NO TRADE · 점수 {st['score']:+d} (|{SCORE_MIN}| 미만)"
     else:
         side = "call" if st["direction"] > 0 else "put"
         opt = atm_option(st["px"], side, today_expiry(today))
@@ -218,13 +211,13 @@ def step():
             log["open"] = dict(date=dstr, side=side, strike=opt["strike"],
                                premium=opt["premium"], iv=opt["iv"], symbol=opt["symbol"],
                                entry_time=now.strftime("%H:%M"), entry_px=round(st["px"], 2),
-                               entry_dev=round(st["dev"], 2), bw=round(st["bw"], 2),
-                               target=round(st["band_hi"] if side == "call" else st["band_lo"], 2),
-                               stop=round(st["stop_lo"] if side == "call" else st["stop_hi"], 2),
+                               score=st["score"], gap=round(st["gap"], 2), rsi=round(st["rsi"], 1),
+                               target=round(opt["premium"] * (1 + TP_PCT/100), 2),
+                               stop=round(opt["premium"] * (1 + SL_PCT/100), 2),
                                version=VERSION)
             status = f"진입 · {side.upper()} {opt['strike']:.0f} @ ${opt['premium']}"
             print(f"  {status}")
-    log["days"][dstr] = dict(status=status, bw=round(st["bw"], 2), dev=round(st["dev"], 2),
+    log["days"][dstr] = dict(status=status, score=st["score"], rsi=round(st["rsi"], 1),
                              direction=st["direction"], gap=round(st["gap"], 2),
                              px=round(st["px"], 2), vwap=round(st["vwap"], 2),
                              at=now.strftime("%H:%M"))
@@ -245,14 +238,14 @@ def render(log, st):
     if op:
         cur = (f'<div class="live"><div class="k">보유 중</div>'
                f'<div class="v">{op["side"].upper()} {op["strike"]:.0f} @ ${op["premium"]}</div>'
-               f'<div class="s">진입 {op["entry_time"]} · 기초 {op["entry_px"]} ({op["entry_dev"]}σ) '
-               f'· 목표 {op["target"]} · 손절 {op["stop"]}</div></div>')
+               f'<div class="s">진입 {op["entry_time"]} · 점수 {op.get("score", 0):+d} · 기초 {op["entry_px"]} '
+               f'· 익절 ${op["target"]} · 손절 ${op["stop"]}</div></div>')
     elif st:
         d = log.get("days", {}).get(str(dt.datetime.now(NY).date()), {})
         cur = (f'<div class="live idle"><div class="k">오늘 상태</div>'
                f'<div class="v">{d.get("status", "대기")}</div>'
-               f'<div class="s">기초 {st["px"]:.2f} · VWAP {st["vwap"]:.2f} · 밴드폭 {st["bw"]:.2f}% '
-               f'· 편차 {st["dev"]:+.2f}σ · 갭 {st["gap"]:+.2f}%</div></div>')
+               f'<div class="s">점수 {st["score"]:+d} · 기초 {st["px"]:.2f} · VWAP {st["vwap"]:.2f} '
+               f'· RSI {st["rsi"]:.0f} · 갭 {st["gap"]:+.2f}%</div></div>')
     else:
         cur = '<div class="live idle"><div class="k">오늘 상태</div><div class="v">장 시작 대기</div></div>'
 
@@ -342,9 +335,9 @@ tr:last-child td{{border-bottom:none}}
 <div class="sec">전체 기록</div>
 <table><tr><th>날짜</th><th>포지션</th><th>시각</th><th>프리미엄</th><th>손익</th><th>청산</th></tr>{rows}</table>
 <div class="rule">
-<b>전략 {VERSION}</b> — 방향: EMA9&gt;21 + 갭 일치 · 게이트: 밴드폭 ≥{BAND_MIN}% ·
-진입: VWAP ∓1σ 터치 · 익절: 반대편 1σ · 손절: 2σ · 마감: 15:45 ET · 하루 최대 {MAX_PER_DAY}회(재진입 {REENTRY_MIN}분 대기)<br>
-백테스트(60일) 기준선: 밴드폭 넓은 구간 승률 78% (CI 72.5~82.6)<br>
+<b>전략 {VERSION_NOTE}</b> — 10:00 ET 점수(갭·EMA9/21·VWAP·RSI, -4~+4) ·
+|점수|≥{SCORE_MIN} 이면 ATM 즉시 진입 · 익절 +{TP_PCT:.0f}% · 손절 {SL_PCT:.0f}% · 마감 14:30 ET · 하루 1회<br>
+백테스트(60일·기초자산): 강한 롱 71.4% 상승 / 강한 숏 66.7% 하락 — 옵션 손익은 별개이며 이 기록으로 검증 중<br>
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
 </div>
 <script>
