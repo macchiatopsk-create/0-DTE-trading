@@ -3,14 +3,14 @@
  "trades": [],
  "days": {
   "2026-08-11": {
-   "status": "NO TRADE · 밴드폭 0.45% < 0.75%",
-   "bw": 0.45,
-   "dev": -0.44,
-   "direction": 1,
+   "status": "NO TRADE · 점수 +2 (|3| 미만)",
+   "score": 2,
+   "rsi": 62.7,
+   "direction": 0,
    "gap": 0.35,
    "px": 718.34,
    "vwap": 719.06,
-   "at": "07:25"
+   "at": "08:17"
   }
  }
 }
