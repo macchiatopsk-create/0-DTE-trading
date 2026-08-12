@@ -256,6 +256,13 @@ def render(log, st):
     return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>0DTE Mock · QQQ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#06090d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="0DTE">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{{--bg:#06090d;--s:#0b1017;--b:#1a2230;--t:#e6edf5;--m:#6d7a8c;--d:#424c5c;--g:#dba642;--up:#34c77b;--dn:#e95656}}
@@ -295,7 +302,39 @@ tr:last-child td{{border-bottom:none}}
 진입: VWAP ∓1σ 터치 · 익절: 반대편 1σ · 손절: 2σ · 마감: 15:45 ET · 하루 1회<br>
 백테스트(60일) 기준선: 밴드폭 넓은 구간 승률 78% (CI 72.5~82.6)<br>
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
-</div></body></html>"""
+</div>
+<script>
+(function(){
+  var f=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false});
+  function live(){var o={};f.formatToParts(new Date()).forEach(function(p){o[p.type]=p.value});
+    if(o.weekday==="Sat"||o.weekday==="Sun")return false;
+    var m=parseInt(o.hour,10)*60+parseInt(o.minute,10);return m>=570&&m<=960;}
+  if(live()) setTimeout(function(){location.reload()},300000);
+})();
+</script>
+</body></html>"""
+
+def write_pwa():
+    """홈 화면 설치용 매니페스트 + 아이콘 (SMC 대시보드와 동일 방식)."""
+    icon = ("""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+<rect width="192" height="192" rx="34" fill="#06090d"/>
+<circle cx="96" cy="96" r="62" fill="none" stroke="#dba642" stroke-width="6"/>
+<path d="M34 118 L70 92 L104 108 L158 62" fill="none" stroke="#34c77b" stroke-width="9"
+      stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="34" y1="96" x2="158" y2="96" stroke="#2a3648" stroke-width="3" stroke-dasharray="7 7"/>
+<text x="96" y="166" text-anchor="middle" fill="#dba642"
+      font-family="monospace" font-size="26" font-weight="bold">0DTE</text></svg>""")
+    with open(os.path.join(BASE, "icon.svg"), "w", encoding="utf-8") as f:
+        f.write(icon)
+    manifest = {
+        "name": "0DTE Mock · QQQ", "short_name": "0DTE",
+        "start_url": ".", "scope": ".", "display": "standalone",
+        "background_color": "#06090d", "theme_color": "#06090d",
+        "description": "QQQ VWAP 밴드 0DTE 모의매매",
+        "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}],
+    }
+    with open(os.path.join(BASE, "manifest.webmanifest"), "w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=1)
 
 def main():
     print(f"0DTE Mock — {dt.datetime.now(NY).strftime('%Y-%m-%d %H:%M ET')}")
@@ -305,6 +344,7 @@ def main():
     except Exception as ex:
         print(f"  오류: {type(ex).__name__}: {ex}")
         log = load_log()
+    write_pwa()
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(render(log, st))
     print(f"  생성: {OUT} · 누적 {len(log.get('trades', []))}건")
