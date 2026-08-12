@@ -256,6 +256,26 @@ def render(log, st):
     else:
         cur = '<div class="live idle"><div class="k">오늘 상태</div><div class="v">장 시작 대기</div></div>'
 
+    # 일별 요약
+    byday = {}
+    for t in trades:
+        d = t["date"]
+        b = byday.setdefault(d, {"n":0,"w":0,"pnl":0.0,"items":[]})
+        b["n"] += 1; b["pnl"] += t["pnl_pct"]
+        if t["pnl_pct"] > 0: b["w"] += 1
+        b["items"].append(t)
+    daily = ""
+    for d in sorted(byday, reverse=True)[:20]:
+        b = byday[d]
+        c = "#34c77b" if b["pnl"] > 0 else "#e95656"
+        det = " · ".join(f'{t["side"][0].upper()}{t["strike"]:.0f} {t["pnl_pct"]:+.0f}%' for t in b["items"])
+        daily += (f'<div class="dayrow"><span class="dd">{d[5:]}</span>'
+                  f'<span class="dn">{b["w"]}/{b["n"]}</span>'
+                  f'<span class="dp" style="color:{c}">{b["pnl"]:+.1f}%</span>'
+                  f'<div class="dx">{det}</div></div>')
+    if not daily:
+        daily = '<div class="dayrow"><span class="dx">아직 거래 없음</span></div>'
+
     rows = ""
     for t in reversed(trades[-40:]):
         c = "#34c77b" if t["pnl_pct"] > 0 else "#e95656"
@@ -299,6 +319,14 @@ th{{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;co
 td{{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:9px 8px;border-bottom:1px solid var(--b)}}
 tr:last-child td{{border-bottom:none}}
 .rs{{color:var(--d);font-size:10.5px}}
+.sec{{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase;margin:20px 0 8px}}
+.days{{background:var(--s);border:1px solid var(--b)}}
+.dayrow{{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;padding:10px 12px;border-bottom:1px solid var(--b)}}
+.dayrow:last-child{{border-bottom:none}}
+.dd{{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t);width:44px}}
+.dn{{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--m)}}
+.dp{{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;margin-left:auto}}
+.dx{{flex-basis:100%;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--d)}}
 .rule{{font-size:11.5px;color:var(--d);line-height:1.9;margin-top:16px;padding-top:14px;border-top:1px solid var(--b)}}
 </style></head><body>
 <header><div><div class="eb">0DTE MOCK</div><h1>QQQ VWAP 밴드</h1></div><div class="ts">{now}</div></header>
@@ -309,6 +337,9 @@ tr:last-child td{{border-bottom:none}}
   <div class="st"><div class="k">AVG</div><div class="v" style="color:{'#34c77b' if (avg or 0)>0 else '#e95656'}">{f"{avg:+.1f}%" if avg is not None else "—"}</div></div>
   <div class="st"><div class="k">TOTAL</div><div class="v" style="color:{'#34c77b' if tot>0 else '#e95656'}">{tot:+.0f}%</div></div>
 </div>
+<div class="sec">일별 성적</div>
+<div class="days">{daily}</div>
+<div class="sec">전체 기록</div>
 <table><tr><th>날짜</th><th>포지션</th><th>시각</th><th>프리미엄</th><th>손익</th><th>청산</th></tr>{rows}</table>
 <div class="rule">
 <b>전략 {VERSION}</b> — 방향: EMA9&gt;21 + 갭 일치 · 게이트: 밴드폭 ≥{BAND_MIN}% ·
