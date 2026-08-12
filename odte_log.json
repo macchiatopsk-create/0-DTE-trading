@@ -1,21 +1,28 @@
 {
- "open": {
-  "date": "2026-08-12",
-  "side": "call",
-  "strike": 725.0,
-  "premium": 0.81,
-  "iv": 5.2,
-  "symbol": "QQQ260812C00725000",
-  "entry_time": "13:35",
-  "entry_px": 725.08,
-  "score": 4,
-  "gap": 1.2,
-  "rsi": 63.6,
-  "target": 1.13,
-  "stop": 0.57,
-  "version": "vwap-1.0"
- },
- "trades": [],
+ "open": null,
+ "trades": [
+  {
+   "date": "2026-08-12",
+   "side": "call",
+   "strike": 725.0,
+   "premium": 0.81,
+   "iv": 5.2,
+   "symbol": "QQQ260812C00725000",
+   "entry_time": "13:35",
+   "entry_px": 725.08,
+   "score": 4,
+   "gap": 1.2,
+   "rsi": 63.6,
+   "target": 1.13,
+   "stop": 0.57,
+   "version": "vwap-1.0",
+   "exit_time": "14:37",
+   "exit_px": 725.11,
+   "exit_premium": 0.66,
+   "pnl_pct": -18.5,
+   "reason": "CUTOFF(14:30)"
+  }
+ ],
  "days": {
   "2026-08-11": {
    "status": "NO TRADE · 점수 +2 (|3| 미만)",
