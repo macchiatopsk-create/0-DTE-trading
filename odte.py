@@ -31,6 +31,8 @@ OUT = os.path.join(BASE, "index.html")
 TICKER   = "QQQ"
 BAND_MIN = 0.75      # 밴드폭 최소 % (게이트)
 CUTOFF   = dt.time(15, 45)
+MAX_PER_DAY = 4      # 하루 최대 진입 (동시 보유는 항상 1개)
+REENTRY_MIN = 20     # 직전 청산 후 재진입 대기 (분) — 같은 자리 연속 진입 방지
 VERSION  = "vwap-1.0"
 
 # ───────────────────────── 데이터 ─────────────────────────
@@ -185,9 +187,20 @@ def step():
     # ── 2) 신규 진입 체크 ──
     if now.time() >= CUTOFF:
         print("  15:45 이후 — 신규 진입 없음"); save_log(log); return log, st
-    if any(t.get("date") == dstr for t in log.get("trades", [])):
-        print("  오늘 이미 1회 완료 — 종료"); save_log(log); return log, st
+    done_today = sum(1 for t in log.get("trades", []) if t.get("date") == dstr)
+    if done_today >= MAX_PER_DAY:
+        print(f"  오늘 {done_today}회 완료 (상한 {MAX_PER_DAY}) — 종료"); save_log(log); return log, st
 
+    last = [t for t in log.get("trades", []) if t.get("date") == dstr]
+    if last:
+        try:
+            lt = dt.datetime.strptime(last[-1]["exit_time"], "%H:%M").time()
+            mins = (now.hour * 60 + now.minute) - (lt.hour * 60 + lt.minute)
+            if 0 <= mins < REENTRY_MIN:
+                print(f"  재진입 대기 ({REENTRY_MIN - mins}분 남음)")
+                save_log(log); return log, st
+        except Exception:
+            pass
     if st["direction"] == 0:
         status = "NO TRADE · 방향 불일치(EMA vs 갭)"
     elif st["bw"] < BAND_MIN:
@@ -299,7 +312,7 @@ tr:last-child td{{border-bottom:none}}
 <table><tr><th>날짜</th><th>포지션</th><th>시각</th><th>프리미엄</th><th>손익</th><th>청산</th></tr>{rows}</table>
 <div class="rule">
 <b>전략 {VERSION}</b> — 방향: EMA9&gt;21 + 갭 일치 · 게이트: 밴드폭 ≥{BAND_MIN}% ·
-진입: VWAP ∓1σ 터치 · 익절: 반대편 1σ · 손절: 2σ · 마감: 15:45 ET · 하루 1회<br>
+진입: VWAP ∓1σ 터치 · 익절: 반대편 1σ · 손절: 2σ · 마감: 15:45 ET · 하루 최대 {MAX_PER_DAY}회(재진입 {REENTRY_MIN}분 대기)<br>
 백테스트(60일) 기준선: 밴드폭 넓은 구간 승률 78% (CI 72.5~82.6)<br>
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
 </div>
