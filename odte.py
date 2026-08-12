@@ -261,8 +261,8 @@ def render(log, st):
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="0DTE">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{{--bg:#06090d;--s:#0b1017;--b:#1a2230;--t:#e6edf5;--m:#6d7a8c;--d:#424c5c;--g:#dba642;--up:#34c77b;--dn:#e95656}}
@@ -304,6 +304,7 @@ tr:last-child td{{border-bottom:none}}
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
 </div>
 <script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){{}});
 (function(){{
   var f=new Intl.DateTimeFormat("en-US",{{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false}});
   function live(){{var o={{}};f.formatToParts(new Date()).forEach(function(p){{o[p.type]=p.value}});
@@ -331,10 +332,28 @@ def write_pwa():
         "start_url": ".", "scope": ".", "display": "standalone",
         "background_color": "#06090d", "theme_color": "#06090d",
         "description": "QQQ VWAP 밴드 0DTE 모의매매",
-        "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}],
+        "icons": [
+            {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
     }
     with open(os.path.join(BASE, "manifest.webmanifest"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=1)
+    # 설치 요건 충족용 최소 서비스워커 (네트워크 우선, 오프라인 시 캐시)
+    sw = """self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => self.clients.claim());
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    fetch(e.request).then(r => {
+      const c = r.clone();
+      caches.open('odte-v1').then(k => k.put(e.request, c)).catch(()=>{});
+      return r;
+    }).catch(() => caches.match(e.request))
+  );
+});"""
+    with open(os.path.join(BASE, "sw.js"), "w", encoding="utf-8") as f:
+        f.write(sw)
 
 def main():
     print(f"0DTE Mock — {dt.datetime.now(NY).strftime('%Y-%m-%d %H:%M ET')}")
