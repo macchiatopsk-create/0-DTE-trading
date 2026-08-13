@@ -1,20 +1,5 @@
 {
- "open": {
-  "date": "2026-08-13",
-  "side": "call",
-  "strike": 732.0,
-  "premium": 1.48,
-  "iv": 8.5,
-  "symbol": "QQQ260813C00732000",
-  "entry_time": "10:23",
-  "entry_px": 732.33,
-  "score": 3,
-  "gap": 0.2,
-  "rsi": 89.2,
-  "target": 2.07,
-  "stop": 1.04,
-  "version": "vwap-1.0"
- },
+ "open": null,
  "trades": [
   {
    "date": "2026-08-12",
@@ -36,6 +21,27 @@
    "exit_premium": 0.66,
    "pnl_pct": -18.5,
    "reason": "CUTOFF(14:30)"
+  },
+  {
+   "date": "2026-08-13",
+   "side": "call",
+   "strike": 732.0,
+   "premium": 1.48,
+   "iv": 8.5,
+   "symbol": "QQQ260813C00732000",
+   "entry_time": "10:23",
+   "entry_px": 732.33,
+   "score": 3,
+   "gap": 0.2,
+   "rsi": 89.2,
+   "target": 2.07,
+   "stop": 1.04,
+   "version": "vwap-1.0",
+   "exit_time": "12:37",
+   "exit_px": 731.85,
+   "exit_premium": 0.69,
+   "pnl_pct": -53.4,
+   "reason": "STOP(-30%)"
   }
  ],
  "days": {
