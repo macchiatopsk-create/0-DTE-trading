@@ -30,12 +30,18 @@ OUT = os.path.join(BASE, "index.html")
 
 TICKER   = "QQQ"
 SCORE_MIN = 3        # |DTE 점수| 이 값 이상일 때만 진입
-TP_PCT   = 40.0      # 프리미엄 익절 %
-SL_PCT   = -30.0     # 프리미엄 손절 %
+# 청산은 프리미엄 %가 아니라 기초자산 트리거 (v10 검증 C안)
+#   TP1: VWAP 도달 -> 가치 50% 청산 기록 / 러너: +1σ 전량 / 손절: 당일저점 / 14:30 시간청산
+# (1계약이라 물리적 분할 불가 -> mock상 0.5*TP1가 + 0.5*최종가로 기록)
 CUTOFF   = dt.time(14, 30)   # 세타 급가속 전 청산
 MAX_PER_DAY = 1      # 방향 베팅이라 하루 1회
-VERSION_NOTE = "3layer-v9"
-VERSION  = "vwap-1.2"
+VERSION_NOTE = "3layer-itm-forward"
+VERSION  = "itm-2.0"
+
+# ── ITM 포워드 테스트 (2026-08-14 시작) ──
+CAPITAL_START = 1000.0   # mock 자본. 로그의 trades에서 동적 집계 (헌법 7조)
+DELTA_LO, DELTA_HI = 0.70, 0.80   # ITM 콜 델타 밴드
+ENTRY_BAND_SIG = 1.0     # VWAP -1σ 터치 대기 (v10: 진입대기가 09:30 즉시진입보다 우수)
 
 # ── VIX 기간구조 게이트 ────────────────────────────────────
 # 전날 종가 ^VIX9D/^VIX3M 의 252일 rolling 백분위.
@@ -181,6 +187,7 @@ def session_state(df):
     rsi = 100.0 if l == 0 else 100 - 100 / (1 + (g/14) / (l/14))
 
     bw = (2 * sd / vwap * 100) if vwap else 0.0
+    day_lo = min(L)
     px = C[-1]
     dev = (px - vwap) / sd if sd > 1e-9 else 0.0
     score = 0
@@ -189,13 +196,43 @@ def session_state(df):
     score += 1 if px > vwap else -1
     score += 1 if rsi > 60 else (-1 if rsi < 40 else 0)
     direction = 1 if score >= SCORE_MIN else (-1 if score <= -SCORE_MIN else 0)
-    return dict(px=px, vwap=vwap, sd=sd, bw=bw, dev=dev, gap=gap, rsi=rsi, score=score,
+    return dict(px=px, vwap=vwap, sd=sd, bw=bw, dev=dev, gap=gap, rsi=rsi, score=score, day_lo=day_lo,
                 direction=direction, e9=e9, e21=e21,
                 band_lo=vwap - sd, band_hi=vwap + sd,
                 stop_lo=vwap - 2 * sd, stop_hi=vwap + 2 * sd,
                 ts=day.index[-1].strftime("%H:%M")), today, len(day)
 
 # ───────────────────────── 옵션 ─────────────────────────
+def itm_call(spot, expiry):
+    """델타 0.70~0.80 최근접 ITM 콜. yfinance 체인의 ITM 콜에서 스팟-스트라이크 거리로 근사 선택
+    (yfinance는 그리스 미제공 -> 거리 기반: 델타 0.75 ~= 스팟-0.7%~0.9% 아래 스트라이크)."""
+    try:
+        tk = yf.Ticker(TICKER)
+        ch = tk.option_chain(expiry)
+        calls = ch.calls
+        itm = calls[calls["strike"] < spot].copy()
+        if itm.empty:
+            return None
+        # 목표 스트라이크: 스팟의 -0.6% ~ -1.0% 구간 중심 (-0.8%)
+        target = spot * 0.992
+        itm["dist"] = (itm["strike"] - target).abs()
+        itm = itm.sort_values("dist")
+        for _, r in itm.iterrows():
+            b = float(r.get("bid") or 0); a = float(r.get("ask") or 0)
+            prem = round((b + a) / 2, 2) if (b > 0 and a > 0) else round(float(r.get("lastPrice") or 0), 2)
+            if prem <= 0:
+                continue
+            if prem * 100 > CAPITAL_START:      # 자본 초과 계약은 스킵
+                continue
+            return dict(strike=float(r["strike"]), premium=prem,
+                        iv=round(float(r.get("impliedVolatility") or 0), 4),
+                        symbol=str(r.get("contractSymbol") or ""))
+        return None
+    except Exception as e:
+        print(f"  ITM 콜 조회 실패: {e}")
+        return None
+
+
 def atm_option(spot, side, expiry):
     """0DTE ATM 옵션의 현재 프리미엄 (mid) · 스트라이크."""
     try:
@@ -259,24 +296,40 @@ def step():
                 cur_prem = round((b + a) / 2 if (b > 0 and a > 0) else float(r.get("lastPrice") or 0), 2)
         except Exception:
             pass
-        if cur_prem and cur_prem > 0:
-            chg = (cur_prem / open_pos["premium"] - 1) * 100
-            if chg >= TP_PCT: reason = f"TARGET(+{TP_PCT:.0f}%)"
-            elif chg <= SL_PCT: reason = f"STOP({SL_PCT:.0f}%)"
-        if now.time() >= CUTOFF and reason is None:
+        # ── 기초자산 트리거 (v10 검증 C안) ──
+        px = st["px"]; w = st["vwap"]; s_ = st["sd"]
+        # TP1: VWAP 도달 -> 가치 50% 청산 기록 (1계약 mock)
+        if not open_pos.get("tp1_prem") and px >= w and cur_prem and cur_prem > 0:
+            open_pos["tp1_prem"] = cur_prem
+            open_pos["tp1_time"] = now.strftime("%H:%M")
+            log["open"] = open_pos
+            print(f"  TP1 도달(VWAP {w:.2f}) · 프리미엄 ${cur_prem} 에서 50% 가치 청산 기록")
+        # 러너 목표: +1σ / 손절: 당일저점 이탈 / 시간청산
+        runner_hit = px >= w + s_ if s_ > 1e-9 else False
+        stop_hit = px <= open_pos.get("stop_px", 0)
+        if stop_hit:
+            reason = "STOP(당일저점)" if not open_pos.get("tp1_prem") else "STOP_AFTER_TP1"
+        elif open_pos.get("tp1_prem") and runner_hit:
+            reason = "RUNNER(+1σ)"
+        elif now.time() >= CUTOFF:
             reason = "CUTOFF(14:30)"
         if reason:
             exit_prem = cur_prem
             if exit_prem is None or exit_prem <= 0:
                 exit_prem = open_pos["premium"]        # 조회 실패 시 보수적으로 본전 처리
-            pnl_pct = (exit_prem / open_pos["premium"] - 1) * 100
+            t1 = open_pos.get("tp1_prem")
+            eff_exit = round(0.5 * t1 + 0.5 * exit_prem, 2) if t1 else exit_prem
+            pnl_pct = (eff_exit / open_pos["premium"] - 1) * 100
+            pnl_usd = round((eff_exit - open_pos["premium"]) * 100, 2)
             tr = dict(open_pos)
-            tr.update(exit_time=now.strftime("%H:%M"), exit_px=round(st["px"], 2),
-                      exit_premium=exit_prem, pnl_pct=round(pnl_pct, 1), reason=reason)
+            tr.update(exit_time=now.strftime("%H:%M"), exit_px=round(px, 2),
+                      exit_premium=exit_prem, eff_exit=eff_exit,
+                      pnl_pct=round(pnl_pct, 1), pnl_usd=pnl_usd, reason=reason)
             log.setdefault("trades", []).append(tr)
             log["open"] = None
-            print(f"  청산: {reason} 프리미엄 {open_pos['premium']}→{exit_prem} ({pnl_pct:+.1f}%)")
+            print(f"  청산: {reason} 유효단가 {open_pos['premium']}→{eff_exit} ({pnl_pct:+.1f}% / ${pnl_usd:+.2f})")
             save_log(log); return log, st
+        log["open"] = open_pos
         print("  보유 중 — 조건 미달")
         save_log(log); return log, st
 
@@ -293,25 +346,27 @@ def step():
     elif PM_GATE_ON and pmv and not pmv["ok"] and st["direction"] > 0:
         status = f"NO TRADE · 프리마켓 위치 {pmv['pos']:.2f} <= {PM_POS_MIN} (롱 엣지 없음)"
         print(f"  {status}")
-    elif st["direction"] == 0:
-        status = f"NO TRADE · 점수 {st['score']:+d} (|{SCORE_MIN}| 미만)"
+    elif st["dev"] > -ENTRY_BAND_SIG:
+        status = (f"WAIT · 3층 통과 (VIX {vg['pct']:.0f}% · PM {pmv['pos']:.2f}) "
+                  f"· VWAP -1σ 터치 대기 (현재 {st['dev']:+.2f}σ)")
     else:
-        side = "call" if st["direction"] > 0 else "put"
-        opt = atm_option(st["px"], side, today_expiry(today))
+        cap = CAPITAL_START + sum(t.get("pnl_usd", 0) for t in log.get("trades", []))
+        opt = itm_call(st["px"], today_expiry(today))
         if not opt:
-            status = "진입 조건 충족 · 옵션 데이터 없음"
+            status = "진입 조건 충족 · ITM 콜 데이터 없음"
+        elif opt["premium"] * 100 > cap:
+            status = f"SKIP_FUND · 프리미엄 ${opt['premium']*100:.0f} > 잔고 ${cap:.0f}"
         else:
-            log["open"] = dict(date=dstr, side=side, strike=opt["strike"],
+            log["open"] = dict(date=dstr, side="call", strike=opt["strike"],
                                premium=opt["premium"], iv=opt["iv"], symbol=opt["symbol"],
                                entry_time=now.strftime("%H:%M"), entry_px=round(st["px"], 2),
                                score=st["score"], gap=round(st["gap"], 2), rsi=round(st["rsi"], 1),
-                               target=round(opt["premium"] * (1 + TP_PCT/100), 2),
-                               stop=round(opt["premium"] * (1 + SL_PCT/100), 2),
+                               stop_px=round(st.get("day_lo", st["px"]) * 0.9995, 2),
                                version=VERSION,
                                vix_pct=(vg["pct"] if vg else None),
                                vix_state=(vg["state"] if vg else None),
                                pm_pos=(pmv["pos"] if pmv else None))
-            status = f"진입 · {side.upper()} {opt['strike']:.0f} @ ${opt['premium']}"
+            status = f"진입 · ITM CALL {opt['strike']:.0f} @ ${opt['premium']} (잔고 ${cap:.0f})"
             print(f"  {status}")
     log["days"][dstr] = dict(status=status, score=st["score"], rsi=round(st["rsi"], 1),
                              direction=st["direction"], gap=round(st["gap"], 2),
@@ -354,8 +409,8 @@ def render(log, st):
     if op:
         cur = (f'<div class="live"><div class="k">보유 중</div>'
                f'<div class="v">{op["side"].upper()} {op["strike"]:.0f} @ ${op["premium"]}</div>'
-               f'<div class="s">진입 {op["entry_time"]} · 점수 {op.get("score", 0):+d} · 기초 {op["entry_px"]} '
-               f'· 익절 ${op["target"]} · 손절 ${op["stop"]}</div></div>')
+               f'<div class="s">진입 {op["entry_time"]} · 기초 {op["entry_px"]} · 손절가(기초) {op.get("stop_px","-")} '
+               f'{("· TP1 완료 $" + str(op.get("tp1_prem"))) if op.get("tp1_prem") else "· TP1 대기(VWAP)"}</div></div>')
     elif st:
         d = log.get("days", {}).get(str(dt.datetime.now(NY).date()), {})
         cur = (f'<div class="live idle"><div class="k">오늘 상태</div>'
@@ -462,7 +517,8 @@ tr:last-child td{{border-bottom:none}}
 <table><tr><th>날짜</th><th>포지션</th><th>시각</th><th>프리미엄</th><th>손익</th><th>청산</th></tr>{rows}</table>
 <div class="rule">
 <b>전략 {VERSION_NOTE}</b> — 10:00 ET 점수(갭·EMA9/21·VWAP·RSI, -4~+4) ·
-|점수|≥{SCORE_MIN} 이면 ATM 즉시 진입 · 익절 +{TP_PCT:.0f}% · 손절 {SL_PCT:.0f}% · 마감 14:30 ET · 하루 1회<br>
+3층: VIX≥50% · PM위치>0.5 · VWAP -1σ 터치 → ITM CALL(Δ0.7~0.8) 1계약<br>
+청산: TP1 VWAP 50% → 러너 +1σ · 손절 당일저점 · 마감 14:30 ET · 하루 1회 · mock $1,000<br>
 백테스트(60일·기초자산): 강한 롱 71.4% 상승 / 강한 숏 66.7% 하락 — 옵션 손익은 별개이며 이 기록으로 검증 중<br>
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
 </div>
