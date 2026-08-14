@@ -34,8 +34,17 @@ TP_PCT   = 40.0      # 프리미엄 익절 %
 SL_PCT   = -30.0     # 프리미엄 손절 %
 CUTOFF   = dt.time(14, 30)   # 세타 급가속 전 청산
 MAX_PER_DAY = 1      # 방향 베팅이라 하루 1회
-VERSION_NOTE = "direction-v2"
-VERSION  = "vwap-1.0"
+VERSION_NOTE = "direction-v2+vixgate"
+VERSION  = "vwap-1.1"
+
+# ── VIX 기간구조 게이트 ────────────────────────────────────
+# 전날 종가 ^VIX9D/^VIX3M 의 252일 rolling 백분위.
+# 하위 20% = 콘탱고 과도 = 다음날 안 움직이는 날 -> 0DTE 방향베팅 금지.
+# 근거(3년, look-ahead 없음): 하위20 큰날비율 11.9% vs 상위20 72.2%,
+#   SPY 레인지 중앙값 0.676% vs 1.442%, 반반검증 통과(12.7/11.1 · 75.5/67.6).
+VIX_GATE_ON   = True     # False 로 두면 표시만 하고 진입은 막지 않음
+VIX_GATE_PCT  = 20.0     # 이 백분위 미만이면 매매 금지
+VIX_LOOKBACK  = 252
 
 # ───────────────────────── 데이터 ─────────────────────────
 def load_log():
@@ -55,6 +64,28 @@ def ema(vals, n):
     for v in vals:
         e = v if e is None else v * k + e * (1 - k)
     return e
+
+def vix_gate():
+    """전날 종가 기준 VIX 기간구조 백분위. 실패하면 None (게이트 미적용)."""
+    try:
+        a = yf.Ticker("^VIX9D").history(period="2y")["Close"].dropna()
+        b = yf.Ticker("^VIX3M").history(period="2y")["Close"].dropna()
+        if len(a) < VIX_LOOKBACK + 5 or len(b) < VIX_LOOKBACK + 5:
+            return None
+        for x in (a, b):
+            try: x.index = x.index.tz_localize(None)
+            except (TypeError, AttributeError): pass
+        ts = (a / b.reindex(a.index).ffill()).dropna()
+        w = ts.tail(VIX_LOOKBACK).values
+        cur = float(w[-1])
+        pct = float((w[:-1] < cur).sum()) / (len(w) - 1) * 100
+        state = "DEAD" if pct < VIX_GATE_PCT else ("LIVE" if pct >= 80 else "MID")
+        return dict(ratio=round(cur, 4), pct=round(pct, 1), state=state,
+                    asof=str(ts.index[-1].date()))
+    except Exception as e:
+        print(f"  VIX 게이트 조회 실패: {e}")
+        return None
+
 
 def intraday():
     df = yf.Ticker(TICKER).history(period="3d", interval="5m")
@@ -147,6 +178,9 @@ def step():
     df = intraday()
     st, today, nbars = session_state(df)
     dstr = str(today)
+    vg = vix_gate()
+    if vg:
+        print(f"  VIX게이트 {vg['state']} · 백분위 {vg['pct']:.1f}% · 비율 {vg['ratio']:.4f} (기준일 {vg['asof']})")
 
     if st is None:
         print(f"  10:00 이전 (봉 {nbars}) — 대기")
@@ -200,7 +234,10 @@ def step():
     if done_today >= MAX_PER_DAY:
         print(f"  오늘 {done_today}회 완료 (상한 {MAX_PER_DAY}) — 종료"); save_log(log); return log, st
 
-    if st["direction"] == 0:
+    if VIX_GATE_ON and vg and vg["state"] == "DEAD":
+        status = f"NO TRADE · VIX게이트 DEAD (백분위 {vg['pct']:.0f}%)"
+        print(f"  {status}")
+    elif st["direction"] == 0:
         status = f"NO TRADE · 점수 {st['score']:+d} (|{SCORE_MIN}| 미만)"
     else:
         side = "call" if st["direction"] > 0 else "put"
@@ -214,18 +251,38 @@ def step():
                                score=st["score"], gap=round(st["gap"], 2), rsi=round(st["rsi"], 1),
                                target=round(opt["premium"] * (1 + TP_PCT/100), 2),
                                stop=round(opt["premium"] * (1 + SL_PCT/100), 2),
-                               version=VERSION)
+                               version=VERSION,
+                               vix_pct=(vg["pct"] if vg else None),
+                               vix_state=(vg["state"] if vg else None))
             status = f"진입 · {side.upper()} {opt['strike']:.0f} @ ${opt['premium']}"
             print(f"  {status}")
     log["days"][dstr] = dict(status=status, score=st["score"], rsi=round(st["rsi"], 1),
                              direction=st["direction"], gap=round(st["gap"], 2),
                              px=round(st["px"], 2), vwap=round(st["vwap"], 2),
-                             at=now.strftime("%H:%M"))
+                             at=now.strftime("%H:%M"),
+                             vix_pct=(vg["pct"] if vg else None),
+                             vix_state=(vg["state"] if vg else None))
     print(f"  {status}")
+    log["vix"] = vg
     save_log(log); return log, st
 
 # ───────────────────────── 화면 ─────────────────────────
 def render(log, st):
+    vg = log.get("vix")
+    if vg:
+        _c = {"DEAD": "dead", "LIVE": "livegate", "MID": "mid"}[vg["state"]]
+        _t = {"DEAD": "오늘 매매 금지 · 안 움직이는 날",
+              "LIVE": "변동성 확장 구간 · 칠 날",
+              "MID":  "보통 구간"}[vg["state"]]
+        vixbar = (f'<div class="vixgate {_c}">'
+                  f'<div class="k">VIX 기간구조 게이트</div>'
+                  f'<div class="v">{vg["state"]} · 백분위 {vg["pct"]:.0f}%</div>'
+                  f'<div class="s">{_t}<br>VIX9D/VIX3M {vg["ratio"]:.4f} · 기준 {vg["asof"]} 종가 '
+                  f'· 하위20%={{안 움직임}} 상위20%={{큰 날}}</div></div>')
+    else:
+        vixbar = ('<div class="vixgate mid"><div class="k">VIX 기간구조 게이트</div>'
+                  '<div class="v">데이터 없음</div>'
+                  '<div class="s">조회 실패 — 게이트 미적용</div></div>')
     trades = log.get("trades", [])
     n = len(trades)
     wins = sum(1 for t in trades if t["pnl_pct"] > 0)
@@ -300,6 +357,15 @@ h1{{font-family:'Poppins',sans-serif;font-size:21px;font-weight:700}}
 .ts{{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--d)}}
 .live{{background:var(--s);border:1px solid var(--b);border-left:4px solid var(--g);padding:16px;margin:16px 0}}
 .live.idle{{border-left-color:var(--d)}}
+.vixgate{{background:var(--s);border:1px solid var(--b);border-left:4px solid var(--d);padding:14px 16px;margin:16px 0}}
+.vixgate.dead{{border-left-color:var(--r);background:rgba(233,86,86,.07)}}
+.vixgate.livegate{{border-left-color:var(--g);background:rgba(52,199,123,.07)}}
+.vixgate.mid{{border-left-color:var(--d)}}
+.vixgate .k{{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase}}
+.vixgate .v{{font-family:'Poppins',sans-serif;font-size:18px;font-weight:600;margin:6px 0 4px}}
+.vixgate.dead .v{{color:var(--r)}}
+.vixgate.livegate .v{{color:var(--g)}}
+.vixgate .s{{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--m);line-height:1.7}}
 .live .k{{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase}}
 .live .v{{font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;margin:6px 0 4px}}
 .live .s{{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--m);line-height:1.7}}
@@ -323,6 +389,7 @@ tr:last-child td{{border-bottom:none}}
 .rule{{font-size:11.5px;color:var(--d);line-height:1.9;margin-top:16px;padding-top:14px;border-top:1px solid var(--b)}}
 </style></head><body>
 <header><div><div class="eb">0DTE MOCK</div><h1>QQQ VWAP 밴드</h1></div><div class="ts">{now}</div></header>
+{vixbar}
 {cur}
 <div class="stats">
   <div class="st"><div class="k">TRADES</div><div class="v">{n}</div></div>
