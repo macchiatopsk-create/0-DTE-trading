@@ -67,11 +67,28 @@ def ema(vals, n):
         e = v if e is None else v * k + e * (1 - k)
     return e
 
+def _grab_close(tk, tries=4):
+    """레이트리밋 대응: 지수 백오프 재시도."""
+    import time
+    for i in range(tries):
+        try:
+            s = yf.Ticker(tk).history(period="2y")["Close"].dropna()
+            if len(s) >= VIX_LOOKBACK + 5:
+                return s
+        except Exception:
+            pass
+        time.sleep(5 * (2 ** i))          # 5, 10, 20, 40초
+    return None
+
+
 def vix_gate():
-    """전날 종가 기준 VIX 기간구조 백분위. 실패하면 None (게이트 미적용)."""
+    """전날 종가 기준 VIX 기간구조 백분위. 실패하면 ERR (게이트 미적용)."""
     try:
-        a = yf.Ticker("^VIX9D").history(period="2y")["Close"].dropna()
-        b = yf.Ticker("^VIX3M").history(period="2y")["Close"].dropna()
+        a = _grab_close("^VIX9D")
+        b = _grab_close("^VIX3M")
+        if a is None or b is None:
+            return dict(state="ERR", msg=f"수집실패 9D={a is not None} 3M={b is not None}",
+                        pct=0.0, ratio=0.0, asof="-")
         if len(a) < VIX_LOOKBACK + 5 or len(b) < VIX_LOOKBACK + 5:
             return dict(state="ERR", msg=f"표본부족 VIX9D={len(a)} VIX3M={len(b)}",
                         pct=0.0, ratio=0.0, asof="-")
