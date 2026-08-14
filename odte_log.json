@@ -77,20 +77,20 @@
   },
   "2026-08-14": {
    "status": "NO TRADE · VIX게이트 (백분위 2% < 50)",
-   "score": -2,
-   "rsi": 50.6,
-   "direction": 0,
+   "score": -3,
+   "rsi": 35.5,
+   "direction": -1,
    "gap": 0.16,
-   "px": 729.87,
-   "vwap": 731.29,
-   "at": "12:24",
+   "px": 729.1,
+   "vwap": 730.98,
+   "at": "13:30",
    "vix_pct": 2.0,
    "vix_state": "DEAD",
    "pm_pos": 0.685
   }
  },
  "vix": {
-  "ratio": 0.5974,
+  "ratio": 0.5969,
   "pct": 2.0,
   "state": "DEAD",
   "asof": "2026-08-14"
