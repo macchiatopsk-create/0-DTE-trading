@@ -34,8 +34,8 @@ TP_PCT   = 40.0      # 프리미엄 익절 %
 SL_PCT   = -30.0     # 프리미엄 손절 %
 CUTOFF   = dt.time(14, 30)   # 세타 급가속 전 청산
 MAX_PER_DAY = 1      # 방향 베팅이라 하루 1회
-VERSION_NOTE = "direction-v2+vixgate"
-VERSION  = "vwap-1.1"
+VERSION_NOTE = "3layer-v9"
+VERSION  = "vwap-1.2"
 
 # ── VIX 기간구조 게이트 ────────────────────────────────────
 # 전날 종가 ^VIX9D/^VIX3M 의 252일 rolling 백분위.
@@ -43,8 +43,10 @@ VERSION  = "vwap-1.1"
 # 근거(3년, look-ahead 없음): 하위20 큰날비율 11.9% vs 상위20 72.2%,
 #   SPY 레인지 중앙값 0.676% vs 1.442%, 반반검증 통과(12.7/11.1 · 75.5/67.6).
 VIX_GATE_ON   = True     # False 로 두면 표시만 하고 진입은 막지 않음
-VIX_GATE_PCT  = 20.0     # 이 백분위 미만이면 매매 금지
+VIX_GATE_PCT  = 50.0     # v9 검증(501일): 이 백분위 이상에서만 엣지 확인됨
 VIX_LOOKBACK  = 252
+PM_GATE_ON    = True     # 프리마켓 위치 게이트 (v9: pos>0.5 롱만 PF 1.69)
+PM_POS_MIN    = 0.5
 
 # ───────────────────────── 데이터 ─────────────────────────
 def load_log():
@@ -80,13 +82,40 @@ def vix_gate():
         w = ts.tail(VIX_LOOKBACK).values
         cur = float(w[-1])
         pct = float((w[:-1] < cur).sum()) / (len(w) - 1) * 100
-        state = "DEAD" if pct < VIX_GATE_PCT else ("LIVE" if pct >= 80 else "MID")
+        state = "LIVE" if pct >= VIX_GATE_PCT else "DEAD"
         return dict(ratio=round(cur, 4), pct=round(pct, 1), state=state,
                     asof=str(ts.index[-1].date()))
     except Exception as e:
         print(f"  VIX 게이트 조회 실패: {type(e).__name__}: {e}")
         return dict(state="ERR", msg=f"{type(e).__name__}: {e}"[:200],
                     pct=0.0, ratio=0.0, asof="-")
+
+
+def premarket_pos():
+    """프리마켓(04:00~09:30) 레인지 내 09:30 시가 위치. v9 검증: >0.5 롱만 엣지."""
+    try:
+        df = yf.download(TICKER, period="2d", interval="1h", prepost=True,
+                         auto_adjust=False, progress=False)
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        df = df.dropna()
+        df.index = df.index.tz_convert(NY)
+        today = sorted(set(df.index.date))[-1]
+        g = df[df.index.date == today]
+        pm = g[(g.index.time >= dt.time(4, 0)) & (g.index.time < dt.time(9, 30))]
+        rt = g[g.index.time >= dt.time(9, 30)]
+        if len(pm) < 3 or len(rt) < 1:
+            return None
+        pmh, pml = float(pm["High"].max()), float(pm["Low"].min())
+        if pmh <= pml:
+            return None
+        op = float(rt["Open"].iloc[0])
+        pos = (op - pml) / (pmh - pml)
+        return dict(pos=round(pos, 3), pm_hi=round(pmh, 2), pm_lo=round(pml, 2),
+                    ok=pos > PM_POS_MIN)
+    except Exception as e:
+        print(f"  프리마켓 조회 실패: {e}")
+        return None
 
 
 def intraday():
@@ -181,7 +210,9 @@ def step():
     st, today, nbars = session_state(df)
     dstr = str(today)
     vg = vix_gate()
+    pmv = premarket_pos()
     log["vix"] = vg                      # early return 경로에서도 화면에 남도록 즉시 저장
+    log["pm"] = pmv
     if vg:
         print(f"  VIX게이트 {vg['state']} · 백분위 {vg['pct']:.1f}% · 비율 {vg['ratio']:.4f} (기준일 {vg['asof']})")
     else:
@@ -240,7 +271,10 @@ def step():
         print(f"  오늘 {done_today}회 완료 (상한 {MAX_PER_DAY}) — 종료"); save_log(log); return log, st
 
     if VIX_GATE_ON and vg and vg["state"] == "DEAD":
-        status = f"NO TRADE · VIX게이트 DEAD (백분위 {vg['pct']:.0f}%)"
+        status = f"NO TRADE · VIX게이트 (백분위 {vg['pct']:.0f}% < {VIX_GATE_PCT:.0f})"
+        print(f"  {status}")
+    elif PM_GATE_ON and pmv and not pmv["ok"] and st["direction"] > 0:
+        status = f"NO TRADE · 프리마켓 위치 {pmv['pos']:.2f} <= {PM_POS_MIN} (롱 엣지 없음)"
         print(f"  {status}")
     elif st["direction"] == 0:
         status = f"NO TRADE · 점수 {st['score']:+d} (|{SCORE_MIN}| 미만)"
@@ -258,7 +292,8 @@ def step():
                                stop=round(opt["premium"] * (1 + SL_PCT/100), 2),
                                version=VERSION,
                                vix_pct=(vg["pct"] if vg else None),
-                               vix_state=(vg["state"] if vg else None))
+                               vix_state=(vg["state"] if vg else None),
+                               pm_pos=(pmv["pos"] if pmv else None))
             status = f"진입 · {side.upper()} {opt['strike']:.0f} @ ${opt['premium']}"
             print(f"  {status}")
     log["days"][dstr] = dict(status=status, score=st["score"], rsi=round(st["rsi"], 1),
@@ -266,23 +301,26 @@ def step():
                              px=round(st["px"], 2), vwap=round(st["vwap"], 2),
                              at=now.strftime("%H:%M"),
                              vix_pct=(vg["pct"] if vg else None),
-                             vix_state=(vg["state"] if vg else None))
+                             vix_state=(vg["state"] if vg else None),
+                             pm_pos=(pmv["pos"] if pmv else None))
     print(f"  {status}")
     save_log(log); return log, st
 
 # ───────────────────────── 화면 ─────────────────────────
 def render(log, st):
     vg = log.get("vix")
+    pmv = log.get("pm")
+    pm_str = (f' · PM위치 {pmv["pos"]:.2f}' + ('(롱OK)' if pmv.get("ok") else '(롱금지)')) if pmv else ''
+
     if vg:
         _c = {"DEAD": "dead", "LIVE": "livegate", "MID": "mid"}.get(vg["state"], "mid")
-        _t = {"DEAD": "오늘 매매 금지 · 안 움직이는 날",
-              "LIVE": "변동성 확장 구간 · 칠 날",
-              "MID":  "보통 구간"}.get(vg["state"], "조회 실패: " + str(vg.get("msg", "")))
+        _t = {"DEAD": "엣지 없는 구간 · 오늘 매매 금지",
+              "LIVE": "엣지 구간 (백분위 >=50)"}.get(vg["state"], "조회 실패: " + str(vg.get("msg", "")))
         vixbar = (f'<div class="vixgate {_c}">'
                   f'<div class="k">VIX 기간구조 게이트</div>'
                   f'<div class="v">{vg["state"]} · 백분위 {vg["pct"]:.0f}%</div>'
                   f'<div class="s">{_t}<br>VIX9D/VIX3M {vg["ratio"]:.4f} · 기준 {vg["asof"]} 종가 '
-                  f'· 하위20%={{안 움직임}} 상위20%={{큰 날}}</div></div>')
+                  f'{pm_str}</div></div>')
     else:
         vixbar = ('<div class="vixgate mid"><div class="k">VIX 기간구조 게이트</div>'
                   '<div class="v">데이터 없음</div>'
