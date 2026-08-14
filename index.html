@@ -19,6 +19,15 @@ h1{font-family:'Poppins',sans-serif;font-size:21px;font-weight:700}
 .ts{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--d)}
 .live{background:var(--s);border:1px solid var(--b);border-left:4px solid var(--g);padding:16px;margin:16px 0}
 .live.idle{border-left-color:var(--d)}
+.vixgate{background:var(--s);border:1px solid var(--b);border-left:4px solid var(--d);padding:14px 16px;margin:16px 0}
+.vixgate.dead{border-left-color:var(--r);background:rgba(233,86,86,.07)}
+.vixgate.livegate{border-left-color:var(--g);background:rgba(52,199,123,.07)}
+.vixgate.mid{border-left-color:var(--d)}
+.vixgate .k{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase}
+.vixgate .v{font-family:'Poppins',sans-serif;font-size:18px;font-weight:600;margin:6px 0 4px}
+.vixgate.dead .v{color:var(--r)}
+.vixgate.livegate .v{color:var(--g)}
+.vixgate .s{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--m);line-height:1.7}
 .live .k{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase}
 .live .v{font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;margin:6px 0 4px}
 .live .s{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--m);line-height:1.7}
@@ -41,7 +50,8 @@ tr:last-child td{border-bottom:none}
 .dx{flex-basis:100%;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--d)}
 .rule{font-size:11.5px;color:var(--d);line-height:1.9;margin-top:16px;padding-top:14px;border-top:1px solid var(--b)}
 </style></head><body>
-<header><div><div class="eb">0DTE MOCK</div><h1>QQQ VWAP 밴드</h1></div><div class="ts">2026-08-13 16:47 ET</div></header>
+<header><div><div class="eb">0DTE MOCK</div><h1>QQQ VWAP 밴드</h1></div><div class="ts">2026-08-13 21:56 ET</div></header>
+<div class="vixgate mid"><div class="k">VIX 기간구조 게이트</div><div class="v">데이터 없음</div><div class="s">조회 실패 — 게이트 미적용</div></div>
 <div class="live idle"><div class="k">오늘 상태</div><div class="v">진입 · CALL 732 @ $1.48</div><div class="s">점수 -1 · 기초 732.06 · VWAP 731.32 · RSI 31 · 갭 +0.20%</div></div>
 <div class="stats">
   <div class="st"><div class="k">TRADES</div><div class="v">2</div></div>
@@ -54,7 +64,7 @@ tr:last-child td{border-bottom:none}
 <div class="sec">전체 기록</div>
 <table><tr><th>날짜</th><th>포지션</th><th>시각</th><th>프리미엄</th><th>손익</th><th>청산</th></tr><tr><td>08-13</td><td>CALL 732</td><td>10:23→12:37</td><td>$1.48→$0.69</td><td style="color:#e95656">-53.4%</td><td class="rs">STOP(-30%)</td></tr><tr><td>08-12</td><td>CALL 725</td><td>13:35→14:37</td><td>$0.81→$0.66</td><td style="color:#e95656">-18.5%</td><td class="rs">CUTOFF(14:30)</td></tr></table>
 <div class="rule">
-<b>전략 direction-v2</b> — 10:00 ET 점수(갭·EMA9/21·VWAP·RSI, -4~+4) ·
+<b>전략 direction-v2+vixgate</b> — 10:00 ET 점수(갭·EMA9/21·VWAP·RSI, -4~+4) ·
 |점수|≥3 이면 ATM 즉시 진입 · 익절 +40% · 손절 -30% · 마감 14:30 ET · 하루 1회<br>
 백테스트(60일·기초자산): 강한 롱 71.4% 상승 / 강한 숏 66.7% 하락 — 옵션 손익은 별개이며 이 기록으로 검증 중<br>
 <b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
