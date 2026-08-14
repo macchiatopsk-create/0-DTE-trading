@@ -77,9 +77,16 @@
   }
  },
  "vix": {
-  "ratio": 0.611,
-  "pct": 2.8,
-  "state": "DEAD",
-  "asof": "2026-08-13"
+  "state": "ERR",
+  "msg": "표본부족 VIX9D=1 VIX3M=1",
+  "pct": 0.0,
+  "ratio": 0.0,
+  "asof": "-"
+ },
+ "pm": {
+  "pos": 0.862,
+  "pm_hi": 725.5,
+  "pm_lo": 722.8,
+  "ok": true
  }
 }
