@@ -179,8 +179,11 @@ def step():
     st, today, nbars = session_state(df)
     dstr = str(today)
     vg = vix_gate()
+    log["vix"] = vg                      # early return 경로에서도 화면에 남도록 즉시 저장
     if vg:
         print(f"  VIX게이트 {vg['state']} · 백분위 {vg['pct']:.1f}% · 비율 {vg['ratio']:.4f} (기준일 {vg['asof']})")
+    else:
+        print("  VIX게이트: 조회 실패 — 미적용")
 
     if st is None:
         print(f"  10:00 이전 (봉 {nbars}) — 대기")
@@ -263,7 +266,6 @@ def step():
                              vix_pct=(vg["pct"] if vg else None),
                              vix_state=(vg["state"] if vg else None))
     print(f"  {status}")
-    log["vix"] = vg
     save_log(log); return log, st
 
 # ───────────────────────── 화면 ─────────────────────────
