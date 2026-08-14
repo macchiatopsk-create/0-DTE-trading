@@ -71,7 +71,8 @@ def vix_gate():
         a = yf.Ticker("^VIX9D").history(period="2y")["Close"].dropna()
         b = yf.Ticker("^VIX3M").history(period="2y")["Close"].dropna()
         if len(a) < VIX_LOOKBACK + 5 or len(b) < VIX_LOOKBACK + 5:
-            return None
+            return dict(state="ERR", msg=f"표본부족 VIX9D={len(a)} VIX3M={len(b)}",
+                        pct=0.0, ratio=0.0, asof="-")
         for x in (a, b):
             try: x.index = x.index.tz_localize(None)
             except (TypeError, AttributeError): pass
@@ -83,8 +84,9 @@ def vix_gate():
         return dict(ratio=round(cur, 4), pct=round(pct, 1), state=state,
                     asof=str(ts.index[-1].date()))
     except Exception as e:
-        print(f"  VIX 게이트 조회 실패: {e}")
-        return None
+        print(f"  VIX 게이트 조회 실패: {type(e).__name__}: {e}")
+        return dict(state="ERR", msg=f"{type(e).__name__}: {e}"[:200],
+                    pct=0.0, ratio=0.0, asof="-")
 
 
 def intraday():
@@ -272,10 +274,10 @@ def step():
 def render(log, st):
     vg = log.get("vix")
     if vg:
-        _c = {"DEAD": "dead", "LIVE": "livegate", "MID": "mid"}[vg["state"]]
+        _c = {"DEAD": "dead", "LIVE": "livegate", "MID": "mid"}.get(vg["state"], "mid")
         _t = {"DEAD": "오늘 매매 금지 · 안 움직이는 날",
               "LIVE": "변동성 확장 구간 · 칠 날",
-              "MID":  "보통 구간"}[vg["state"]]
+              "MID":  "보통 구간"}.get(vg["state"], "조회 실패: " + str(vg.get("msg", "")))
         vixbar = (f'<div class="vixgate {_c}">'
                   f'<div class="k">VIX 기간구조 게이트</div>'
                   f'<div class="v">{vg["state"]} · 백분위 {vg["pct"]:.0f}%</div>'
