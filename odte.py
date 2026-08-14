@@ -380,148 +380,175 @@ def step():
 
 # ───────────────────────── 화면 ─────────────────────────
 def render(log, st):
-    vg = log.get("vix")
-    pmv = log.get("pm")
-    pm_str = (f' · PM위치 {pmv["pos"]:.2f}' + ('(롱OK)' if pmv.get("ok") else '(롱금지)')) if pmv else ''
-
-    if vg:
-        _c = {"DEAD": "dead", "LIVE": "livegate", "MID": "mid"}.get(vg["state"], "mid")
-        _t = {"DEAD": "엣지 없는 구간 · 오늘 매매 금지",
-              "LIVE": "엣지 구간 (백분위 >=50)"}.get(vg["state"], "조회 실패: " + str(vg.get("msg", "")))
-        vixbar = (f'<div class="vixgate {_c}">'
-                  f'<div class="k">VIX 기간구조 게이트</div>'
-                  f'<div class="v">{vg["state"]} · 백분위 {vg["pct"]:.0f}%</div>'
-                  f'<div class="s">{_t}<br>VIX9D/VIX3M {vg["ratio"]:.4f} · 기준 {vg["asof"]} 종가 '
-                  f'{pm_str}</div></div>')
-    else:
-        vixbar = ('<div class="vixgate mid"><div class="k">VIX 기간구조 게이트</div>'
-                  '<div class="v">데이터 없음</div>'
-                  '<div class="s">조회 실패 — 게이트 미적용</div></div>')
+    vg = log.get("vix"); pmv = log.get("pm"); op = log.get("open")
     trades = log.get("trades", [])
-    n = len(trades)
-    wins = sum(1 for t in trades if t["pnl_pct"] > 0)
+    itm = [t for t in trades if str(t.get("version","")).startswith("itm")]
+    n = len(itm)
+    wins = sum(1 for t in itm if t["pnl_pct"] > 0)
     wr = round(wins / n * 100, 1) if n else None
-    avg = round(sum(t["pnl_pct"] for t in trades) / n, 1) if n else None
-    tot = round(sum(t["pnl_pct"] for t in trades), 1) if n else 0
+    tot_usd = round(sum(t.get("pnl_usd", 0) for t in itm), 2)
+    bal = round(CAPITAL_START + tot_usd, 2)
     now = dt.datetime.now(NY).strftime("%Y-%m-%d %H:%M ET")
-    op = log.get("open")
+
+    # ── L1/L2/L3 게이트 판정 ──
+    def lamp(state):  # go / nogo / stby
+        return f'<span class="lamp {state}"></span>'
+    if vg and vg.get("state") == "LIVE":
+        l1, l1s = "go", f'GO&nbsp;&nbsp;&nbsp;· 백분위 {vg["pct"]:.0f}% · TS {vg["ratio"]:.3f}'
+    elif vg and vg.get("state") == "DEAD":
+        l1, l1s = "nogo", f'NO-GO · 백분위 {vg["pct"]:.0f}% &lt; 50 · 기준 {vg["asof"]}'
+    else:
+        l1, l1s = "stby", "STANDBY · 데이터 수집 실패 — 게이트 미적용"
+    if pmv and pmv.get("ok"):
+        l2, l2s = "go", f'GO&nbsp;&nbsp;&nbsp;· PM위치 {pmv["pos"]:.2f} &gt; 0.5 ({pmv["pm_lo"]}~{pmv["pm_hi"]})'
+    elif pmv:
+        l2, l2s = "nogo", f'NO-GO · PM위치 {pmv["pos"]:.2f} ≤ 0.5 — 롱 엣지 없음'
+    else:
+        l2, l2s = "stby", "STANDBY · 프리마켓 데이터 없음"
+    if st is None:
+        l3, l3s = "stby", "STANDBY · 장외 / 세션 준비 중"
+    elif op:
+        l3, l3s = "go", "ENGAGED · 포지션 보유 중"
+    elif st["dev"] <= -ENTRY_BAND_SIG:
+        l3, l3s = "go", f'GO&nbsp;&nbsp;&nbsp;· VWAP -1σ 터치 ({st["dev"]:+.2f}σ)'
+    else:
+        l3, l3s = "stby", f'STANDBY · -1σ 대기 (현재 {st["dev"]:+.2f}σ)'
 
     if op:
-        cur = (f'<div class="live"><div class="k">보유 중</div>'
-               f'<div class="v">{op["side"].upper()} {op["strike"]:.0f} @ ${op["premium"]}</div>'
-               f'<div class="s">진입 {op["entry_time"]} · 기초 {op["entry_px"]} · 손절가(기초) {op.get("stop_px","-")} '
-               f'{("· TP1 완료 $" + str(op.get("tp1_prem"))) if op.get("tp1_prem") else "· TP1 대기(VWAP)"}</div></div>')
-    elif st:
-        d = log.get("days", {}).get(str(dt.datetime.now(NY).date()), {})
-        cur = (f'<div class="live idle"><div class="k">오늘 상태</div>'
-               f'<div class="v">{d.get("status", "대기")}</div>'
-               f'<div class="s">점수 {st["score"]:+d} · 기초 {st["px"]:.2f} · VWAP {st["vwap"]:.2f} '
-               f'· RSI {st["rsi"]:.0f} · 갭 {st["gap"]:+.2f}%</div></div>')
+        verdict, vc = "POSITION ACTIVE", "go"
+    elif l1 == "nogo" or l2 == "nogo":
+        verdict, vc = "HOLD — NO ENTRY TODAY", "nogo"
+    elif l1 == "go" and l2 == "go" and l3 == "go":
+        verdict, vc = "ENTRY WINDOW OPEN", "go"
     else:
-        cur = '<div class="live idle"><div class="k">오늘 상태</div><div class="v">장 시작 대기</div></div>'
+        verdict, vc = "STANDBY — MONITORING", "stby"
 
-    # 일별 요약
-    byday = {}
-    for t in trades:
-        d = t["date"]
-        b = byday.setdefault(d, {"n":0,"w":0,"pnl":0.0,"items":[]})
-        b["n"] += 1; b["pnl"] += t["pnl_pct"]
-        if t["pnl_pct"] > 0: b["w"] += 1
-        b["items"].append(t)
-    daily = ""
-    for d in sorted(byday, reverse=True)[:20]:
-        b = byday[d]
-        c = "#34c77b" if b["pnl"] > 0 else "#e95656"
-        det = " · ".join(f'{t["side"][0].upper()}{t["strike"]:.0f} {t["pnl_pct"]:+.0f}%' for t in b["items"])
-        daily += (f'<div class="dayrow"><span class="dd">{d[5:]}</span>'
-                  f'<span class="dn">{b["w"]}/{b["n"]}</span>'
-                  f'<span class="dp" style="color:{c}">{b["pnl"]:+.1f}%</span>'
-                  f'<div class="dx">{det}</div></div>')
-    if not daily:
-        daily = '<div class="dayrow"><span class="dx">아직 거래 없음</span></div>'
+    gate = (f'<div class="panel"><div class="ph">MISSION STATUS · 3-LAYER GATE</div>'
+            f'<div class="gr">{lamp(l1)}<span class="gl">L1 VOLATILITY</span><span class="gs">{l1s}</span></div>'
+            f'<div class="gr">{lamp(l2)}<span class="gl">L2 DIRECTION</span><span class="gs">{l2s}</span></div>'
+            f'<div class="gr">{lamp(l3)}<span class="gl">L3 TRIGGER</span><span class="gs">{l3s}</span></div>'
+            f'<div class="verdict {vc}">▶ {verdict}</div></div>')
 
+    # ── 포지션 패널 ──
+    if op:
+        t1 = op.get("tp1_prem")
+        pos_html = (f'<div class="panel hot"><div class="ph">ACTIVE POSITION</div>'
+                    f'<div class="big">ITM CALL {op["strike"]:.0f} <span class="dim">@ ${op["premium"]}</span></div>'
+                    f'<div class="meta">진입 {op["entry_time"]} · 기초 {op["entry_px"]} · 손절(기초) {op.get("stop_px","-")}<br>'
+                    f'{("TP1 완료 $" + str(t1) + " (" + str(op.get("tp1_time","")) + ") · 러너 +1σ 추적 중") if t1 else "TP1 대기 — VWAP 도달 시 50% 청산"}</div></div>')
+    else:
+        d = log.get("days", {}).get(str(dt.datetime.now(NY).date()), {})
+        pos_html = (f'<div class="panel"><div class="ph">ACTIVE POSITION</div>'
+                    f'<div class="big dim2">NONE</div>'
+                    f'<div class="meta">{d.get("status", "세션 대기")}</div></div>')
+
+    # ── 원장 ──
     rows = ""
-    for t in reversed(trades[-40:]):
-        c = "#34c77b" if t["pnl_pct"] > 0 else "#e95656"
-        rows += (f'<tr><td>{t["date"][5:]}</td><td>{t["side"].upper()} {t["strike"]:.0f}</td>'
+    for t in reversed(itm[-40:]):
+        c = "pos" if t["pnl_pct"] > 0 else "neg"
+        rows += (f'<tr><td>{t["date"][5:]}</td><td>C{t["strike"]:.0f}</td>'
                  f'<td>{t["entry_time"]}→{t["exit_time"]}</td>'
-                 f'<td>${t["premium"]}→${t["exit_premium"]}</td>'
-                 f'<td style="color:{c}">{t["pnl_pct"]:+.1f}%</td><td class="rs">{t["reason"]}</td></tr>')
+                 f'<td>${t["premium"]}→${t.get("eff_exit", t["exit_premium"])}</td>'
+                 f'<td class="{c}">{t["pnl_pct"]:+.1f}%</td>'
+                 f'<td class="{c}">${t.get("pnl_usd",0):+.0f}</td>'
+                 f'<td class="rs">{t["reason"]}</td></tr>')
     if not rows:
-        rows = '<tr><td colspan="6" class="rs">기록 없음 — 조건 충족 시 자동 진입</td></tr>'
+        rows = '<tr><td colspan="7" class="rs">NO OPERATIONS LOGGED — 3층 통과 시 자동 개시</td></tr>'
 
+    legacy = len(trades) - n
     return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>0DTE Mock · QQQ</title>
+<title>OP ZERO-DAY</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#06090d">
+<meta name="theme-color" content="#050807">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="0DTE">
+<meta name="apple-mobile-web-app-title" content="ZERO-DAY">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{{--bg:#06090d;--s:#0b1017;--b:#1a2230;--t:#e6edf5;--m:#6d7a8c;--d:#424c5c;--g:#dba642;--up:#34c77b;--dn:#e95656}}
+:root{{--bg:#050807;--pn:#0a0f0c;--ln:#1c2822;--amb:#e8b04b;--ambd:#8a6c33;--tx:#cfe0d6;--mut:#5f7268;--red:#e84545;--grn:#49d17c}}
 *{{margin:0;padding:0;box-sizing:border-box}}
-body{{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;padding:20px 16px 50px;max-width:620px;margin:0 auto}}
-header{{display:flex;align-items:baseline;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--b)}}
-h1{{font-family:'Poppins',sans-serif;font-size:21px;font-weight:700}}
-.eb{{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--g)}}
-.ts{{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--d)}}
-.live{{background:var(--s);border:1px solid var(--b);border-left:4px solid var(--g);padding:16px;margin:16px 0}}
-.live.idle{{border-left-color:var(--d)}}
-.vixgate{{background:var(--s);border:1px solid var(--b);border-left:4px solid var(--d);padding:14px 16px;margin:16px 0}}
-.vixgate.dead{{border-left-color:var(--r);background:rgba(233,86,86,.07)}}
-.vixgate.livegate{{border-left-color:var(--g);background:rgba(52,199,123,.07)}}
-.vixgate.mid{{border-left-color:var(--d)}}
-.vixgate .k{{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase}}
-.vixgate .v{{font-family:'Poppins',sans-serif;font-size:18px;font-weight:600;margin:6px 0 4px}}
-.vixgate.dead .v{{color:var(--r)}}
-.vixgate.livegate .v{{color:var(--g)}}
-.vixgate .s{{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--m);line-height:1.7}}
-.live .k{{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase}}
-.live .v{{font-family:'Poppins',sans-serif;font-size:20px;font-weight:600;margin:6px 0 4px}}
-.live .s{{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--m);line-height:1.7}}
-.stats{{display:flex;gap:10px;margin-bottom:16px}}
-.st{{flex:1;background:var(--s);border:1px solid var(--b);padding:12px}}
-.st .k{{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:var(--m)}}
-.st .v{{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;margin-top:4px}}
-table{{width:100%;border-collapse:collapse;background:var(--s);border:1px solid var(--b)}}
-th{{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:var(--m);text-align:left;padding:9px 8px;border-bottom:1px solid var(--b);text-transform:uppercase}}
-td{{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:9px 8px;border-bottom:1px solid var(--b)}}
+html{{background:var(--bg)}}
+body{{background:
+  repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),
+  radial-gradient(1200px 500px at 50% -10%,rgba(232,176,75,.05),transparent),
+  var(--bg);
+  color:var(--tx);font-family:'IBM Plex Mono','Noto Sans KR',monospace;
+  padding:0 14px 40px;max-width:640px;margin:0 auto;font-size:12px}}
+.cls{{background:var(--red);color:#fff;font-size:9.5px;letter-spacing:.28em;text-align:center;
+  padding:5px 4px;margin:0 -14px;font-weight:600;text-transform:uppercase}}
+.cls.bt{{margin-top:26px}}
+header{{display:flex;align-items:baseline;gap:12px;padding:16px 2px 12px;border-bottom:1px solid var(--ln)}}
+.op{{font-family:'Michroma',monospace;font-size:15px;letter-spacing:.14em;color:var(--amb);
+  text-shadow:0 0 12px rgba(232,176,75,.45)}}
+.sub{{font-size:9px;letter-spacing:.2em;color:var(--mut);text-transform:uppercase}}
+.ts{{margin-left:auto;font-size:10.5px;color:var(--ambd);text-align:right;line-height:1.6}}
+.panel{{position:relative;background:var(--pn);border:1px solid var(--ln);padding:14px 16px;margin:14px 0}}
+.panel::before,.panel::after{{content:"";position:absolute;width:12px;height:12px;border:1px solid var(--amb);opacity:.7}}
+.panel::before{{top:-1px;left:-1px;border-right:0;border-bottom:0}}
+.panel::after{{bottom:-1px;right:-1px;border-left:0;border-top:0}}
+.panel.hot{{box-shadow:inset 0 0 30px rgba(232,176,75,.06)}}
+.ph{{font-size:9px;letter-spacing:.24em;color:var(--ambd);text-transform:uppercase;margin-bottom:11px}}
+.gr{{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed rgba(95,114,104,.25)}}
+.gr:last-of-type{{border-bottom:none}}
+.lamp{{width:9px;height:9px;border-radius:50%;flex:0 0 9px;position:relative;top:1px}}
+.lamp.go{{background:var(--grn);box-shadow:0 0 9px var(--grn)}}
+.lamp.nogo{{background:var(--red);box-shadow:0 0 9px var(--red)}}
+.lamp.stby{{background:var(--ambd);box-shadow:0 0 7px rgba(232,176,75,.5)}}
+.gl{{font-size:11px;letter-spacing:.1em;color:var(--tx);width:112px;flex:0 0 112px}}
+.gs{{font-size:10.5px;color:var(--mut);line-height:1.55}}
+.verdict{{margin-top:12px;padding:9px 12px;font-size:12px;letter-spacing:.14em;border:1px solid}}
+.verdict.go{{color:var(--grn);border-color:rgba(73,209,124,.4);background:rgba(73,209,124,.06);text-shadow:0 0 10px rgba(73,209,124,.5)}}
+.verdict.nogo{{color:var(--red);border-color:rgba(232,69,69,.4);background:rgba(232,69,69,.06)}}
+.verdict.stby{{color:var(--amb);border-color:rgba(232,176,75,.35);background:rgba(232,176,75,.05)}}
+.big{{font-size:19px;font-weight:600;letter-spacing:.03em;color:var(--amb);text-shadow:0 0 14px rgba(232,176,75,.35)}}
+.big.dim2{{color:var(--mut);text-shadow:none}}
+.dim{{color:var(--mut);font-weight:400;font-size:14px}}
+.meta{{margin-top:8px;font-size:10.5px;color:var(--mut);line-height:1.8}}
+.stats{{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}}
+.st{{background:var(--pn);border:1px solid var(--ln);padding:10px 8px;text-align:center}}
+.st .k{{font-size:8.5px;letter-spacing:.16em;color:var(--mut)}}
+.st .v{{font-size:15px;font-weight:600;margin-top:5px;color:var(--tx)}}
+.pos{{color:var(--grn)}}.neg{{color:var(--red)}}
+table{{width:100%;border-collapse:collapse;background:var(--pn);border:1px solid var(--ln)}}
+th{{font-size:8.5px;letter-spacing:.12em;color:var(--ambd);text-align:left;padding:8px 7px;
+  border-bottom:1px solid var(--ln);text-transform:uppercase}}
+td{{font-size:11px;padding:8px 7px;border-bottom:1px solid rgba(28,40,34,.6)}}
 tr:last-child td{{border-bottom:none}}
-.rs{{color:var(--d);font-size:10.5px}}
-.sec{{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--m);text-transform:uppercase;margin:20px 0 8px}}
-.days{{background:var(--s);border:1px solid var(--b)}}
-.dayrow{{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;padding:10px 12px;border-bottom:1px solid var(--b)}}
-.dayrow:last-child{{border-bottom:none}}
-.dd{{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t);width:44px}}
-.dn{{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--m)}}
-.dp{{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;margin-left:auto}}
-.dx{{flex-basis:100%;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--d)}}
-.rule{{font-size:11.5px;color:var(--d);line-height:1.9;margin-top:16px;padding-top:14px;border-top:1px solid var(--b)}}
+.rs{{color:var(--mut);font-size:10px}}
+.brief{{font-size:10.5px;color:var(--mut);line-height:1.9;margin-top:16px;padding:12px 14px;
+  border:1px dashed var(--ln)}}
+.brief b{{color:var(--ambd)}}
+@media (prefers-reduced-motion:no-preference){{
+  .lamp.go,.verdict.go{{animation:pulse 2.6s ease-in-out infinite}}
+  @keyframes pulse{{50%{{opacity:.72}}}}
+}}
 </style></head><body>
-<header><div><div class="eb">0DTE MOCK</div><h1>QQQ VWAP 밴드</h1></div><div class="ts">{now}</div></header>
-{vixbar}
-{cur}
+<div class="cls">Mock Simulation // Training Use Only // Not Investment Advice</div>
+<header><div><div class="op">OP&nbsp;ZERO-DAY</div><div class="sub">QQQ 0DTE · 3-Layer System</div></div>
+<div class="ts">{now}<br>SYS {VERSION} · UPLINK 15MIN</div></header>
+{gate}
+{pos_html}
+<div class="panel"><div class="ph">FUND LEDGER · MOCK ${CAPITAL_START:.0f}</div>
 <div class="stats">
-  <div class="st"><div class="k">TRADES</div><div class="v">{n}</div></div>
-  <div class="st"><div class="k">WIN RATE</div><div class="v">{f"{wr}%" if wr is not None else "—"}</div></div>
-  <div class="st"><div class="k">AVG</div><div class="v" style="color:{'#34c77b' if (avg or 0)>0 else '#e95656'}">{f"{avg:+.1f}%" if avg is not None else "—"}</div></div>
-  <div class="st"><div class="k">TOTAL</div><div class="v" style="color:{'#34c77b' if tot>0 else '#e95656'}">{tot:+.0f}%</div></div>
+  <div class="st"><div class="k">BAL</div><div class="v">${bal:.0f}</div></div>
+  <div class="st"><div class="k">P/L</div><div class="v {'pos' if tot_usd>0 else ('neg' if tot_usd<0 else '')}">${tot_usd:+.0f}</div></div>
+  <div class="st"><div class="k">OPS</div><div class="v">{n}</div></div>
+  <div class="st"><div class="k">WIN</div><div class="v">{f"{wr:.0f}%" if wr is not None else "—"}</div></div>
+  <div class="st"><div class="k">LEGACY</div><div class="v dim2" style="color:var(--mut)">{legacy}</div></div>
 </div>
-<div class="sec">일별 성적</div>
-<div class="days">{daily}</div>
-<div class="sec">전체 기록</div>
-<table><tr><th>날짜</th><th>포지션</th><th>시각</th><th>프리미엄</th><th>손익</th><th>청산</th></tr>{rows}</table>
-<div class="rule">
-<b>전략 {VERSION_NOTE}</b> — 10:00 ET 점수(갭·EMA9/21·VWAP·RSI, -4~+4) ·
-3층: VIX≥50% · PM위치>0.5 · VWAP -1σ 터치 → ITM CALL(Δ0.7~0.8) 1계약<br>
-청산: TP1 VWAP 50% → 러너 +1σ · 손절 당일저점 · 마감 14:30 ET · 하루 1회 · mock $1,000<br>
-백테스트(60일·기초자산): 강한 롱 71.4% 상승 / 강한 숏 66.7% 하락 — 옵션 손익은 별개이며 이 기록으로 검증 중<br>
-<b>모의매매입니다. 실거래 아니며 투자조언이 아닙니다.</b> 프리미엄은 15분 지연 mid 기준이라 실제 체결가와 다릅니다.
+<table><tr><th>DATE</th><th>CONTRACT</th><th>WINDOW</th><th>FILL</th><th>P/L%</th><th>P/L$</th><th>EXIT</th></tr>{rows}</table>
 </div>
+<div class="brief">
+<b>RULES OF ENGAGEMENT</b> — L1 VIX9D/VIX3M 백분위 ≥50 · L2 프리마켓 위치 &gt;0.5 · L3 VWAP -1σ 터치
+→ ITM CALL Δ0.7~0.8 × 1계약<br>
+EXIT — TP1 VWAP(가치 50%) → 러너 +1σ · 손절 당일저점 · 14:30 ET 강제청산 · 1 op/day<br>
+근거 — v9 501거래일: 승률 63.1% · PF 1.69 · 반반 1.63/1.76 (QQQ 전용, 숏 봉인)<br>
+LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리미엄은 지연 mid 기준.
+</div>
+<div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){{}});
 (function(){{
