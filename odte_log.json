@@ -87,19 +87,23 @@
    "vix_pct": 2.0,
    "vix_state": "DEAD",
    "pm_pos": 0.685
+  },
+  "2026-08-17": {
+   "status": "WAIT_OPEN",
+   "bars": 3,
+   "at": "09:41"
   }
  },
  "vix": {
-  "state": "ERR",
-  "msg": "수집실패 9D=True 3M=False",
-  "pct": 0.0,
-  "ratio": 0.0,
-  "asof": "-"
+  "ratio": 0.8204,
+  "pct": 67.3,
+  "state": "LIVE",
+  "asof": "2026-07-17"
  },
  "pm": {
-  "pos": 0.685,
-  "pm_hi": 734.41,
-  "pm_lo": 730.76,
-  "ok": true
+  "pos": 0.457,
+  "pm_hi": 735.86,
+  "pm_lo": 730.52,
+  "ok": false
  }
 }
