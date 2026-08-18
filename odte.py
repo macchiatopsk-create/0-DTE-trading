@@ -52,6 +52,8 @@ GAP_MIN, GAP_MAX = 0.20, 1.00     # 갭 크기 (%)
 GAP_VIX_SKIP = 5.0                # 개장 VIX 변화 |x|>=5% 이면 스킵
 GAP_STOP_FRAC = 0.50              # 손절 = 갭의 50% 역행
 GAP_CUT = dt.time(14, 0)
+GAP_CAPITAL = 1000.0              # 갭 트랙 mock 자본 (itm-2.0과 동일 조건 비교용)
+# 갭업 → 풋, 갭다운 → 콜. 델타 0.70~0.80 ITM 1계약.
 
 # ── VIX 기간구조 게이트 ────────────────────────────────────
 # 전날 종가 ^VIX9D/^VIX3M 의 252일 rolling 백분위.
@@ -274,6 +276,45 @@ def session_state(df):
                 ts=day.index[-1].strftime("%H:%M")), today, len(day)
 
 # ───────────────────────── 옵션 ─────────────────────────
+def opt_premium(strike, side, expiry):
+    """특정 스트라이크 현재 프리미엄(mid)."""
+    try:
+        ch = yf.Ticker(TICKER).option_chain(expiry)
+        df = ch.calls if side == "call" else ch.puts
+        r = df[df["strike"] == strike]
+        if r.empty: return None
+        b = float(r["bid"].iloc[0] or 0); a = float(r["ask"].iloc[0] or 0)
+        if b > 0 and a > 0: return round((b + a) / 2, 2)
+        return round(float(r["lastPrice"].iloc[0] or 0), 2)
+    except Exception:
+        return None
+
+
+def itm_opt(spot, expiry, side="call", cap=None):
+    """델타 0.70~0.80 ITM 콜/풋. 콜은 스팟보다 낮은 스트라이크, 풋은 높은 스트라이크."""
+    try:
+        tk = yf.Ticker(TICKER)
+        ch = tk.option_chain(expiry)
+        df = ch.calls if side == "call" else ch.puts
+        itm = df[df["strike"] < spot].copy() if side == "call" else df[df["strike"] > spot].copy()
+        if itm.empty: return None
+        target = spot * (0.992 if side == "call" else 1.008)
+        itm["dist"] = (itm["strike"] - target).abs()
+        itm = itm.sort_values("dist")
+        budget = cap if cap is not None else CAPITAL_START
+        for _, r in itm.iterrows():
+            b = float(r.get("bid") or 0); a = float(r.get("ask") or 0)
+            prem = round((b + a) / 2, 2) if (b > 0 and a > 0) else round(float(r.get("lastPrice") or 0), 2)
+            if prem <= 0 or prem * 100 > budget: continue
+            return dict(strike=float(r["strike"]), premium=prem, side=side,
+                        iv=round(float(r.get("impliedVolatility") or 0), 4),
+                        symbol=str(r.get("contractSymbol") or ""))
+        return None
+    except Exception as e:
+        print(f"  ITM {side} 조회 실패: {e}")
+        return None
+
+
 def itm_call(spot, expiry):
     """델타 0.70~0.80 최근접 ITM 콜. yfinance 체인의 ITM 콜에서 스팟-스트라이크 거리로 근사 선택
     (yfinance는 그리스 미제공 -> 거리 기반: 델타 0.75 ~= 스팟-0.7%~0.9% 아래 스트라이크)."""
@@ -345,15 +386,26 @@ def step():
         if gopen is None and gsig["cover"] is not None:
             # 진입: 09:30 즉시 (백테스트 최적) — 하루 1회
             if gtrack.get(dstr) is None:
+                gcap = GAP_CAPITAL + sum(t.get("pnl_usd", 0) for t in log.get("gap_trades", []))
+                oside = "put" if gsig["sgn"] > 0 else "call"     # 갭업→풋, 갭다운→콜
+                gopt = itm_opt(gsig["entry"], today_expiry(today), oside, gcap)
+                if gopt is None:
+                    print(f"  [갭] 신호 있으나 ITM {oside} 데이터 없음 — 기록만")
                 gtrack[dstr] = dict(entry=gsig["entry"], target=gsig["target"],
                                     stop=gsig["stop"], dir=gsig["dir"], sgn=gsig["sgn"],
                                     gap=gsig["gap"], room=gsig["room"],
                                     r50=gsig["r50"], at=now.strftime("%H:%M"), res=None,
                                     band_px=None, band_t=None, band_room=None,
-                                    mfe=0.0, mfe_t=None)
+                                    mfe=0.0, mfe_t=None,
+                                    opt_side=oside,
+                                    strike=(gopt["strike"] if gopt else None),
+                                    premium=(gopt["premium"] if gopt else None),
+                                    cap_at_entry=round(gcap, 2),
+                                    mfe_prem=-99.0, mfe_prem_t=None)
                 log["gap_open"] = dict(date=dstr, **gtrack[dstr])
+                pm = f" · {oside.upper()} {gopt['strike']:.0f} @${gopt['premium']}" if gopt else ""
                 print(f"  [갭] 진입 {gsig['dir']} @{gsig['entry']} → 타깃 {gsig['target']} "
-                      f"손절 {gsig['stop']} (갭 {gsig['gap']:+.2f}%)")
+                      f"손절 {gsig['stop']} (갭 {gsig['gap']:+.2f}%){pm}")
         gopen = log.get("gap_open")
         if gopen and gopen.get("res") is None:
             # 최적 청산 지점·밴드 진입 자리 추적
@@ -362,6 +414,13 @@ def step():
             if gopen.get("band_px") is None and gsig.get("band_px"):
                 gopen["band_px"] = gsig["band_px"]; gopen["band_t"] = gsig["band_t"]
                 gopen["band_room"] = gsig["band_room"]
+            gcur = None
+            if gopen.get("strike") and gopen.get("premium"):
+                gcur = opt_premium(gopen["strike"], gopen["opt_side"], today_expiry(today))
+                if gcur and gcur > 0:
+                    _p = (gcur / gopen["premium"] - 1) * 100
+                    if _p > gopen.get("mfe_prem", -99):
+                        gopen["mfe_prem"] = round(_p, 1); gopen["mfe_prem_t"] = now.strftime("%H:%M")
             log["gap_open"] = gopen
             sgn = gopen["sgn"]; cur = gsig["cur"]
             hit_t = (cur <= gopen["target"]) if sgn > 0 else (cur >= gopen["target"])
@@ -373,11 +432,19 @@ def step():
             if res:
                 pnl = ((gopen["entry"] - px) / gopen["entry"] * 100) if sgn > 0 \
                       else ((px - gopen["entry"]) / gopen["entry"] * 100)
+                exit_prem = gcur if (gcur and gcur > 0) else gopen.get("premium")
+                pnl_pct = pnl_usd = None
+                if gopen.get("premium") and exit_prem:
+                    pnl_pct = round((exit_prem / gopen["premium"] - 1) * 100, 1)
+                    pnl_usd = round((exit_prem - gopen["premium"]) * 100, 2)
                 rec = dict(gopen); rec.update(res=res, exit=round(px, 2),
-                                              pnl=round(pnl, 3), exit_at=now.strftime("%H:%M"))
+                                              pnl=round(pnl, 3), exit_at=now.strftime("%H:%M"),
+                                              exit_premium=exit_prem,
+                                              pnl_pct=pnl_pct, pnl_usd=pnl_usd)
                 log.setdefault("gap_trades", []).append(rec)
                 log["gap_open"] = None
-                print(f"  [갭] 청산 {res} {pnl:+.3f}%")
+                print(f"  [갭] 청산 {res} 기초 {pnl:+.3f}% / 옵션 "
+                      f"{f'{pnl_pct:+.1f}% (${pnl_usd:+.0f})' if pnl_pct is not None else 'n/a'}")
     log["vix"] = vg                      # early return 경로에서도 화면에 남도록 즉시 저장
     log["pm"] = pmv
     if vg:
@@ -582,11 +649,16 @@ def render(log, st):
 
     # ── 갭 트랙 패널 ──
     gs = log.get("gap"); go = log.get("gap_open"); gts = log.get("gap_trades", [])
-    gn = len(gts); gw = sum(1 for t in gts if t["pnl"] > 0)
-    gwr = f"{gw/gn*100:.0f}%" if gn else "—"
-    gsum = sum(t["pnl"] for t in gts)
-    gg = sum(t["pnl"] for t in gts if t["pnl"] > 0); gl_ = -sum(t["pnl"] for t in gts if t["pnl"] <= 0)
-    gpf = f"{gg/gl_:.2f}" if gl_ > 0 else ("—" if not gn else "∞")
+    gn = len(gts)
+    gopt = [t for t in gts if t.get("pnl_usd") is not None]
+    gw = sum(1 for t in gopt if t["pnl_usd"] > 0)
+    gwr = f"{gw/len(gopt)*100:.0f}%" if gopt else "—"
+    gusd = round(sum(t.get("pnl_usd", 0) or 0 for t in gts), 2)
+    gbal = round(GAP_CAPITAL + gusd, 2)
+    gg = sum(t["pnl_usd"] for t in gopt if t["pnl_usd"] > 0)
+    gl_ = -sum(t["pnl_usd"] for t in gopt if t["pnl_usd"] <= 0)
+    gpf = f"{gg/gl_:.2f}" if gl_ > 0 else ("—" if not gopt else "∞")
+    gux = sum(t["pnl"] for t in gts)
 
     if gs is None:
         gstat, gcls, gdesc = "STANDBY", "stby", "데이터 없음 / 장외"
@@ -615,10 +687,18 @@ def render(log, st):
         bcell = (f'{bp}<br><span class="rs">{t.get("band_t","")} · {br:.2f}%</span>'
                  if bp else '<span class="rs">—</span>')
         mf = t.get("mfe", 0) or 0
+        pu = t.get("pnl_usd"); pp = t.get("pnl_pct")
+        c2 = "pos" if (pu or 0) > 0 else "neg"
+        ocell = (f'{t.get("opt_side","")[:1].upper()}{t.get("strike",0):.0f} ${t.get("premium","")}'
+                 f'<br><span class="rs">{f"{pp:+.0f}% ${pu:+.0f}" if pu is not None else "n/a"}</span>'
+                 if t.get("strike") else '<span class="rs">—</span>')
+        mpp = t.get("mfe_prem"); mpp = None if (mpp is None or mpp < -90) else mpp
         grows += (f'<tr><td>{t["date"][5:]}</td><td>{t["dir"]}</td>'
-                  f'<td>{t["gap"]:+.2f}%</td><td>{t["entry"]}→{t.get("exit","")}</td>'
+                  f'<td>{t["gap"]:+.2f}%</td>'
                   f'<td class="{c}">{t["pnl"]:+.3f}%</td>'
-                  f'<td class="pos">{mf:+.3f}%<br><span class="rs">{t.get("mfe_t","") or ""}</span></td>'
+                  f'<td class="{c2}">{ocell}</td>'
+                  f'<td class="pos">{mf:+.3f}%<br><span class="rs">{t.get("mfe_t","") or ""}'
+                  f'{f" · 옵션{mpp:+.0f}%" if mpp is not None else ""}</span></td>'
                   f'<td>{bcell}</td><td class="rs">{t["res"]}</td></tr>')
     if not grows:
         grows = '<tr><td colspan="7" class="rs">NO OPERATIONS — 갭 0.2~1.0% 발생 시 자동 개시</td></tr>'
@@ -736,22 +816,23 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
 <span class="gs">{gstat} · {gdesc}</span></div>
 <div class="verdict {gcls}">▶ {gstat}</div></div>
 {gpos}
-<div class="panel"><div class="ph">GAP LEDGER · 기초자산 기준</div>
+<div class="panel"><div class="ph">GAP LEDGER · MOCK ${GAP_CAPITAL:.0f} · ITM 0DTE</div>
 <div class="stats">
+  <div class="st"><div class="k">BAL</div><div class="v">${gbal:.0f}</div></div>
+  <div class="st"><div class="k">P/L</div><div class="v {'pos' if gusd>0 else ('neg' if gusd<0 else '')}">${gusd:+.0f}</div></div>
   <div class="st"><div class="k">OPS</div><div class="v">{gn}</div></div>
   <div class="st"><div class="k">WIN</div><div class="v">{gwr}</div></div>
-  <div class="st"><div class="k">PF</div><div class="v">{gpf}</div></div>
-  <div class="st"><div class="k">SUM</div><div class="v {'pos' if gsum>0 else ('neg' if gsum<0 else '')}">{gsum:+.2f}%</div></div>
-  <div class="st"><div class="k">TARGET</div><div class="v" style="font-size:11px">1.58</div></div>
+  <div class="st"><div class="k">기초합</div><div class="v" style="font-size:12px">{gux:+.2f}%</div></div>
 </div>
-<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>PX</th><th>P/L%</th><th>MFE·시각</th><th>VWAP밴드 자리</th><th>EXIT</th></tr>{grows}</table>
+<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>기초P/L</th><th>옵션</th><th>MFE·시각</th><th>VWAP밴드</th><th>EXIT</th></tr>{grows}</table>
 </div>
 <div class="brief">
 <b>GAP FILL · FORWARD TEST</b> — 09:30 시가 갭 0.2~1.0% → 갭 메우는 방향 즉시 진입<br>
-타깃 전날 종가 · 손절 갭 50% 역행 · 14:00 컷 · 하루 1회 · 기초자산 기준 기록<br>
+타깃 전날 종가 · 손절 갭 50% 역행 · 14:00 컷 · 하루 1회<br>
+집행 — 갭업→ITM PUT / 갭다운→ITM CALL (Δ0.7~0.8) 1계약 · mock $1,000 (itm-2.0과 동일 조건)<br>
 백테스트 근거 — 1시간봉 2년 n=151 · PF 1.58 · 상위2제외 1.48 · 반반 1.53/1.62<br>
-※ 0DTE 옵션 환산 시 PF 0.36~0.96 (세타·스프레드가 잠식). 본 트랙은 <b>기초자산 검증용</b>이며
-   되돌림 진입(표본 6~7건, PF 3.5~4.6 관찰)이 실제로 나은지 확인하는 것이 목적.
+※ 백테스트 옵션 환산은 PF 0.36~0.96 (세타·스프레드 잠식) — <b>실측으로 이게 맞는지 확인 중</b>.
+   기초 P/L과 옵션 P/L을 나란히 기록하고, MFE·VWAP밴드 자리로 더 나은 진입/청산이 있었는지 검증.
 </div>
 </div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
