@@ -896,8 +896,13 @@ tr:last-child td{{border-bottom:none}}
   text-transform:uppercase;background:transparent;font-family:'IBM Plex Mono',monospace}}
 .tab.on{{color:var(--amb);border-color:var(--ln);background:var(--pn);
   text-shadow:0 0 10px rgba(232,176,75,.4)}}
-.tabpane{{display:none}}
-.tabpane.on{{display:block}}
+.track{{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -14px;padding:0 14px;gap:28px}}
+.track::-webkit-scrollbar{{display:none}}
+.tabpane{{flex:0 0 100%;scroll-snap-align:start;min-width:0}}
+.dots{{display:flex;justify-content:center;gap:7px;margin:16px 0 4px}}
+.dot{{width:6px;height:6px;border-radius:50%;background:var(--ln);transition:all .25s}}
+.dot.on{{background:var(--amb);width:20px;border-radius:3px;box-shadow:0 0 8px rgba(232,176,75,.5)}}
 .chips{{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}}
 .chip{{background:rgba(255,255,255,.02);border:1px solid var(--ln);padding:9px 6px;text-align:center}}
 .chip.hi{{border-color:rgba(232,69,69,.45);background:rgba(232,69,69,.07)}}
@@ -933,11 +938,12 @@ tr:last-child td{{border-bottom:none}}
 <header><div><div class="op">OP&nbsp;ZERO-DAY</div><div class="sub">QQQ 0DTE · 3-Layer System</div></div>
 <div class="ts">{now}<br>SYS {VERSION} · UPLINK 15MIN</div></header>
 <div class="tabs">
-  <button class="tab on" data-t="t1">3-LAYER · ITM</button>
-  <button class="tab" data-t="t2">GAP FILL</button>
-  <button class="tab" data-t="t3">MACRO</button>
+  <button class="tab on" data-i="0">3-LAYER · ITM</button>
+  <button class="tab" data-i="1">GAP FILL</button>
+  <button class="tab" data-i="2">MACRO</button>
 </div>
-<div id="t1" class="tabpane on">
+<div class="track" id="track">
+<div class="tabpane">
 {gate}
 {pos_html}
 <div class="panel"><div class="ph">FUND LEDGER · MOCK ${CAPITAL_START:.0f}</div>
@@ -959,7 +965,7 @@ EXIT — TP1 VWAP(가치 50%) → 러너 +1σ · 손절 당일저점 · 14:30 ET
 LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리미엄은 지연 mid 기준.
 </div>
 </div>
-<div id="t2" class="tabpane">
+<div class="tabpane">
 <div class="panel"><div class="ph">GAP STATUS</div>
 <div class="gr"><span class="lamp {gcls}"></span><span class="gl">GAP FILL</span>
 <span class="gs">{gstat} · {gdesc}</span></div>
@@ -985,7 +991,7 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
    기초 P/L과 옵션 P/L을 나란히 기록하고, MFE·VWAP밴드 자리로 더 나은 진입/청산이 있었는지 검증.
 </div>
 </div>
-<div id="t3" class="tabpane">
+<div class="tabpane">
 {mac_html}
 <div class="brief">
 <b>참고용 · 매매 신호 아님</b><br>
@@ -996,17 +1002,37 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
 실제로 쓸모 있는 건 <b>레인지</b>입니다. 방향이 아니라 "오늘 얼마나 움직일 장인가"요.
 </div>
 </div>
+</div>
+<div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){{}});
-document.querySelectorAll('.tab').forEach(function(b){{
-  b.addEventListener('click',function(){{
-    document.querySelectorAll('.tab').forEach(function(x){{x.classList.remove('on')}});
-    document.querySelectorAll('.tabpane').forEach(function(x){{x.classList.remove('on')}});
-    b.classList.add('on');
-    document.getElementById(b.dataset.t).classList.add('on');
+(function(){{
+  var tr=document.getElementById('track');
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  var dots=[].slice.call(document.querySelectorAll('.dot'));
+  var panes=[].slice.call(tr.children);
+  function mark(i){{
+    tabs.forEach(function(t,k){{t.classList.toggle('on',k===i)}});
+    dots.forEach(function(d,k){{d.classList.toggle('on',k===i)}});
+  }}
+  tabs.forEach(function(b){{
+    b.addEventListener('click',function(){{
+      var i=+b.dataset.i;
+      tr.scrollTo({{left:panes[i].offsetLeft-tr.offsetLeft,behavior:'smooth'}});
+      mark(i);
+    }});
   }});
-}});
+  var tmr;
+  tr.addEventListener('scroll',function(){{
+    clearTimeout(tmr);
+    tmr=setTimeout(function(){{
+      var i=Math.round(tr.scrollLeft/tr.clientWidth);
+      if(i<0)i=0; if(i>2)i=2;
+      mark(i);
+    }},90);
+  }},{{passive:true}});
+}})();
 (function(){{
   var f=new Intl.DateTimeFormat("en-US",{{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false}});
   function live(){{var o={{}};f.formatToParts(new Date()).forEach(function(p){{o[p.type]=p.value}});
