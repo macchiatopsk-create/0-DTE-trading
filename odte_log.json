@@ -103,15 +103,64 @@
   }
  },
  "vix": {
-  "ratio": 0.6507,
-  "pct": 5.6,
-  "state": "DEAD",
-  "asof": "2026-08-17"
+  "state": "ERR",
+  "msg": "수집실패 9D=False 3M=False",
+  "pct": 0.0,
+  "ratio": 0.0,
+  "asof": "-"
  },
  "pm": {
   "pos": 0.457,
   "pm_hi": 735.86,
   "pm_lo": 730.52,
   "ok": false
- }
+ },
+ "gap": {
+  "state": "ACTIVE",
+  "gap": 0.261,
+  "dir": "숏",
+  "sgn": 1,
+  "prev_close": 731.05,
+  "open": 732.96,
+  "entry": 732.96,
+  "target": 731.05,
+  "stop": 733.92,
+  "room": 0.261,
+  "cover": 0.27,
+  "r50": 731.12,
+  "cur": 729.86
+ },
+ "gap_track": {
+  "2026-08-17": {
+   "entry": 732.96,
+   "target": 731.05,
+   "stop": 733.92,
+   "dir": "숏",
+   "sgn": 1,
+   "gap": 0.261,
+   "room": 0.261,
+   "r50": 731.12,
+   "at": "23:31",
+   "res": null
+  }
+ },
+ "gap_open": null,
+ "gap_trades": [
+  {
+   "date": "2026-08-17",
+   "entry": 732.96,
+   "target": 731.05,
+   "stop": 733.92,
+   "dir": "숏",
+   "sgn": 1,
+   "gap": 0.261,
+   "room": 0.261,
+   "r50": 731.12,
+   "at": "23:31",
+   "res": "TGT",
+   "exit": 731.05,
+   "pnl": 0.261,
+   "exit_at": "23:31"
+  }
+ ]
 }
