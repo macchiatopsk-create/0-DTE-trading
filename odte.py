@@ -15,6 +15,7 @@
 """
 import os, sys, json, math
 import datetime as dt
+import math, math
 from zoneinfo import ZoneInfo
 
 try:
@@ -148,12 +149,37 @@ def gap_signal(df, st):
         # 되돌림 진입 후보: 눌림 후 50% 재회복 지점
         ext = min(L) if sgn > 0 else max(H)
         r50 = ext + (op - ext) * 0.5
+
+        # VWAP 밴드 터치 추적 (역방향 밴드 = 되돌림 진입 자리)
+        V = [float(x) for x in rt["Volume"]]
+        T = [t.strftime("%H:%M") for t in rt.index]
+        cpv = cv = cpv2 = 0.0; band_hit = None; band_px = None; band_t = None
+        for i in range(len(C)):
+            tp = (H[i] + L[i] + C[i]) / 3
+            cpv += tp * V[i]; cv += V[i]; cpv2 += tp * tp * V[i]
+            w = cpv / cv if cv else tp
+            sd = math.sqrt(max(cpv2 / cv - w * w, 0.0)) if cv else 0.0
+            if band_hit is None and sd > 1e-9 and i >= 1:
+                lvl = w + sd if sgn > 0 else w - sd     # 갭업=숏이면 상단에서 진입
+                if (H[i] >= lvl) if sgn > 0 else (L[i] <= lvl):
+                    band_hit, band_px, band_t = i, round(lvl, 2), T[i]
+
+        # MFE: 진입(시가) 기준 최대 유리 지점과 그 시각
+        best = 0.0; best_t = None; best_px = None
+        for i in range(len(C)):
+            fav = (op - L[i]) if sgn > 0 else (H[i] - op)
+            if fav > best:
+                best = fav; best_t = T[i]; best_px = round(L[i] if sgn > 0 else H[i], 2)
+
         return dict(state="ACTIVE", gap=round(gp, 3), dir=("숏" if sgn > 0 else "롱"),
                     sgn=sgn, prev_close=round(pcl, 2), open=round(op, 2),
                     entry=round(op, 2), target=round(pcl, 2),
                     stop=round(op + sgn * gapabs * GAP_STOP_FRAC, 2),
                     room=round(abs(pcl - op) / op * 100, 3),
-                    cover=round(cover, 2), r50=round(r50, 2), cur=round(cur, 2))
+                    cover=round(cover, 2), r50=round(r50, 2), cur=round(cur, 2),
+                    band_px=band_px, band_t=band_t,
+                    band_room=(round(abs(pcl - band_px) / band_px * 100, 3) if band_px else None),
+                    mfe=round(best / op * 100, 3), mfe_t=best_t, mfe_px=best_px)
     except Exception as e:
         print(f"  갭 신호 계산 실패: {e}")
         return None
@@ -322,12 +348,21 @@ def step():
                 gtrack[dstr] = dict(entry=gsig["entry"], target=gsig["target"],
                                     stop=gsig["stop"], dir=gsig["dir"], sgn=gsig["sgn"],
                                     gap=gsig["gap"], room=gsig["room"],
-                                    r50=gsig["r50"], at=now.strftime("%H:%M"), res=None)
+                                    r50=gsig["r50"], at=now.strftime("%H:%M"), res=None,
+                                    band_px=None, band_t=None, band_room=None,
+                                    mfe=0.0, mfe_t=None)
                 log["gap_open"] = dict(date=dstr, **gtrack[dstr])
                 print(f"  [갭] 진입 {gsig['dir']} @{gsig['entry']} → 타깃 {gsig['target']} "
                       f"손절 {gsig['stop']} (갭 {gsig['gap']:+.2f}%)")
         gopen = log.get("gap_open")
         if gopen and gopen.get("res") is None:
+            # 최적 청산 지점·밴드 진입 자리 추적
+            if gsig.get("mfe", 0) > gopen.get("mfe", 0):
+                gopen["mfe"], gopen["mfe_t"] = gsig["mfe"], gsig["mfe_t"]
+            if gopen.get("band_px") is None and gsig.get("band_px"):
+                gopen["band_px"] = gsig["band_px"]; gopen["band_t"] = gsig["band_t"]
+                gopen["band_room"] = gsig["band_room"]
+            log["gap_open"] = gopen
             sgn = gopen["sgn"]; cur = gsig["cur"]
             hit_t = (cur <= gopen["target"]) if sgn > 0 else (cur >= gopen["target"])
             hit_s = (cur >= gopen["stop"]) if sgn > 0 else (cur <= gopen["stop"])
@@ -376,6 +411,14 @@ def step():
             pass
         # ── 기초자산 트리거 (v10 검증 C안) ──
         px = st["px"]; w = st["vwap"]; s_ = st["sd"]
+        # 최대 유리 지점(MFE)과 그 시각 — 사후 최적 청산 분석용
+        _mfe = (px / open_pos["entry_px"] - 1) * 100
+        if _mfe > open_pos.get("mfe", -99):
+            open_pos["mfe"] = round(_mfe, 3); open_pos["mfe_t"] = now.strftime("%H:%M")
+        if cur_prem and cur_prem > 0:
+            _pm = (cur_prem / open_pos["premium"] - 1) * 100
+            if _pm > open_pos.get("mfe_prem", -99):
+                open_pos["mfe_prem"] = round(_pm, 1); open_pos["mfe_prem_t"] = now.strftime("%H:%M")
         # TP1: VWAP 도달 -> 가치 50% 청산 기록 (1계약 mock)
         if not open_pos.get("tp1_prem") and px >= w and cur_prem and cur_prem > 0:
             open_pos["tp1_prem"] = cur_prem
@@ -435,7 +478,8 @@ def step():
         elif opt["premium"] * 100 > cap:
             status = f"SKIP_FUND · 프리미엄 ${opt['premium']*100:.0f} > 잔고 ${cap:.0f}"
         else:
-            log["open"] = dict(date=dstr, side="call", strike=opt["strike"],
+            log["open"] = dict(date=dstr, side="call", mfe=-99.0, mfe_t=None,
+                               mfe_prem=-99.0, mfe_prem_t=None, strike=opt["strike"],
                                premium=opt["premium"], iv=opt["iv"], symbol=opt["symbol"],
                                entry_time=now.strftime("%H:%M"), entry_px=round(st["px"], 2),
                                score=st["score"], gap=round(st["gap"], 2), rsi=round(st["rsi"], 1),
@@ -524,14 +568,17 @@ def render(log, st):
     rows = ""
     for t in reversed(itm[-40:]):
         c = "pos" if t["pnl_pct"] > 0 else "neg"
+        mp = t.get("mfe_prem"); mp = None if (mp is None or mp < -90) else mp
         rows += (f'<tr><td>{t["date"][5:]}</td><td>C{t["strike"]:.0f}</td>'
                  f'<td>{t["entry_time"]}→{t["exit_time"]}</td>'
                  f'<td>${t["premium"]}→${t.get("eff_exit", t["exit_premium"])}</td>'
                  f'<td class="{c}">{t["pnl_pct"]:+.1f}%</td>'
                  f'<td class="{c}">${t.get("pnl_usd",0):+.0f}</td>'
+                 f'<td class="pos">{f"{mp:+.0f}%" if mp is not None else "—"}'
+                 f'<br><span class="rs">{t.get("mfe_prem_t","") or ""}</span></td>'
                  f'<td class="rs">{t["reason"]}</td></tr>')
     if not rows:
-        rows = '<tr><td colspan="7" class="rs">NO OPERATIONS LOGGED — 3층 통과 시 자동 개시</td></tr>'
+        rows = '<tr><td colspan="8" class="rs">NO OPERATIONS LOGGED — 3층 통과 시 자동 개시</td></tr>'
 
     # ── 갭 트랙 패널 ──
     gs = log.get("gap"); go = log.get("gap_open"); gts = log.get("gap_trades", [])
@@ -564,10 +611,15 @@ def render(log, st):
     grows = ""
     for t in reversed(gts[-40:]):
         c = "pos" if t["pnl"] > 0 else "neg"
+        bp = t.get("band_px"); br = t.get("band_room")
+        bcell = (f'{bp}<br><span class="rs">{t.get("band_t","")} · {br:.2f}%</span>'
+                 if bp else '<span class="rs">—</span>')
+        mf = t.get("mfe", 0) or 0
         grows += (f'<tr><td>{t["date"][5:]}</td><td>{t["dir"]}</td>'
-                  f'<td>{t["gap"]:+.2f}%</td><td>{t["at"]}→{t.get("exit_at","")}</td>'
-                  f'<td>{t["entry"]}→{t.get("exit","")}</td>'
-                  f'<td class="{c}">{t["pnl"]:+.3f}%</td><td class="rs">{t["res"]}</td></tr>')
+                  f'<td>{t["gap"]:+.2f}%</td><td>{t["entry"]}→{t.get("exit","")}</td>'
+                  f'<td class="{c}">{t["pnl"]:+.3f}%</td>'
+                  f'<td class="pos">{mf:+.3f}%<br><span class="rs">{t.get("mfe_t","") or ""}</span></td>'
+                  f'<td>{bcell}</td><td class="rs">{t["res"]}</td></tr>')
     if not grows:
         grows = '<tr><td colspan="7" class="rs">NO OPERATIONS — 갭 0.2~1.0% 발생 시 자동 개시</td></tr>'
 
@@ -668,7 +720,7 @@ tr:last-child td{{border-bottom:none}}
   <div class="st"><div class="k">WIN</div><div class="v">{f"{wr:.0f}%" if wr is not None else "—"}</div></div>
   <div class="st"><div class="k">LEGACY</div><div class="v dim2" style="color:var(--mut)">{legacy}</div></div>
 </div>
-<table><tr><th>DATE</th><th>CONTRACT</th><th>WINDOW</th><th>FILL</th><th>P/L%</th><th>P/L$</th><th>EXIT</th></tr>{rows}</table>
+<table><tr><th>DATE</th><th>CONTRACT</th><th>WINDOW</th><th>FILL</th><th>P/L%</th><th>P/L$</th><th>MFE·시각</th><th>EXIT</th></tr>{rows}</table>
 </div>
 <div class="brief">
 <b>RULES OF ENGAGEMENT</b> — L1 VIX9D/VIX3M 백분위 ≥50 · L2 프리마켓 위치 &gt;0.5 · L3 VWAP -1σ 터치
@@ -692,7 +744,7 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
   <div class="st"><div class="k">SUM</div><div class="v {'pos' if gsum>0 else ('neg' if gsum<0 else '')}">{gsum:+.2f}%</div></div>
   <div class="st"><div class="k">TARGET</div><div class="v" style="font-size:11px">1.58</div></div>
 </div>
-<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>WINDOW</th><th>PX</th><th>P/L%</th><th>EXIT</th></tr>{grows}</table>
+<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>PX</th><th>P/L%</th><th>MFE·시각</th><th>VWAP밴드 자리</th><th>EXIT</th></tr>{grows}</table>
 </div>
 <div class="brief">
 <b>GAP FILL · FORWARD TEST</b> — 09:30 시가 갭 0.2~1.0% → 갭 메우는 방향 즉시 진입<br>
