@@ -89,31 +89,26 @@
    "pm_pos": 0.685
   },
   "2026-08-17": {
-   "status": "NO TRADE · VIX게이트 (백분위 11% < 50)",
+   "status": "진입 조건 충족 · ITM 콜 데이터 없음",
    "score": -3,
-   "rsi": 24.5,
+   "rsi": 35.2,
    "direction": -1,
    "gap": 0.26,
-   "px": 730.64,
-   "vwap": 732.5,
-   "at": "13:46",
-   "vix_pct": 10.8,
-   "vix_state": "DEAD",
-   "pm_pos": 0.457
+   "px": 729.86,
+   "vwap": 731.76,
+   "at": "07:04",
+   "vix_pct": 67.3,
+   "vix_state": "LIVE",
+   "pm_pos": null
   }
  },
  "vix": {
-  "ratio": 0.6507,
-  "pct": 5.6,
-  "state": "DEAD",
-  "asof": "2026-08-17"
+  "ratio": 0.8204,
+  "pct": 67.3,
+  "state": "LIVE",
+  "asof": "2026-07-17"
  },
- "pm": {
-  "pos": 0.457,
-  "pm_hi": 735.86,
-  "pm_lo": 730.52,
-  "ok": false
- },
+ "pm": null,
  "gap": {
   "state": "ACTIVE",
   "gap": 0.261,

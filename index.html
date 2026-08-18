@@ -78,14 +78,14 @@ tr:last-child td{border-bottom:none}
 </style></head><body>
 <div class="cls">Mock Simulation // Training Use Only // Not Investment Advice</div>
 <header><div><div class="op">OP&nbsp;ZERO-DAY</div><div class="sub">QQQ 0DTE · 3-Layer System</div></div>
-<div class="ts">2026-08-17 23:43 ET<br>SYS itm-2.0 · UPLINK 15MIN</div></header>
+<div class="ts">2026-08-18 07:04 ET<br>SYS itm-2.0 · UPLINK 15MIN</div></header>
 <div class="tabs">
   <button class="tab on" data-t="t1">3-LAYER · ITM</button>
   <button class="tab" data-t="t2">GAP FILL</button>
 </div>
 <div id="t1" class="tabpane on">
-<div class="panel"><div class="ph">MISSION STATUS · 3-LAYER GATE</div><div class="gr"><span class="lamp nogo"></span><span class="gl">L1 VOLATILITY</span><span class="gs">NO-GO · 백분위 6% &lt; 50 · 기준 2026-08-17</span></div><div class="gr"><span class="lamp nogo"></span><span class="gl">L2 DIRECTION</span><span class="gs">NO-GO · PM위치 0.46 ≤ 0.5 — 롱 엣지 없음</span></div><div class="gr"><span class="lamp go"></span><span class="gl">L3 TRIGGER</span><span class="gs">GO&nbsp;&nbsp;&nbsp;· VWAP -1σ 터치 (-1.30σ)</span></div><div class="verdict nogo">▶ HOLD — NO ENTRY TODAY</div></div>
-<div class="panel"><div class="ph">ACTIVE POSITION</div><div class="big dim2">NONE</div><div class="meta">NO TRADE · VIX게이트 (백분위 11% < 50)</div></div>
+<div class="panel"><div class="ph">MISSION STATUS · 3-LAYER GATE</div><div class="gr"><span class="lamp go"></span><span class="gl">L1 VOLATILITY</span><span class="gs">GO&nbsp;&nbsp;&nbsp;· 백분위 67% · TS 0.820</span></div><div class="gr"><span class="lamp stby"></span><span class="gl">L2 DIRECTION</span><span class="gs">STANDBY · 프리마켓 데이터 없음</span></div><div class="gr"><span class="lamp go"></span><span class="gl">L3 TRIGGER</span><span class="gs">GO&nbsp;&nbsp;&nbsp;· VWAP -1σ 터치 (-1.30σ)</span></div><div class="verdict stby">▶ STANDBY — MONITORING</div></div>
+<div class="panel"><div class="ph">ACTIVE POSITION</div><div class="big dim2">NONE</div><div class="meta">세션 대기</div></div>
 <div class="panel"><div class="ph">FUND LEDGER · MOCK $1000</div>
 <div class="stats">
   <div class="st"><div class="k">BAL</div><div class="v">$1000</div></div>
@@ -110,22 +110,23 @@ LEGACY 2건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리�
 <span class="gs">SIGNAL · 갭 +0.26% → 숏 · 타깃까지 0.261%<br>첫봉 커버 0.27 · 되돌림50% 지점 731.12</span></div>
 <div class="verdict go">▶ SIGNAL</div></div>
 <div class="panel"><div class="ph">GAP · ACTIVE</div><div class="big dim2">NONE</div><div class="meta">갭 +0.26% → 숏 · 타깃까지 0.261%<br>첫봉 커버 0.27 · 되돌림50% 지점 731.12</div></div>
-<div class="panel"><div class="ph">GAP LEDGER · 기초자산 기준</div>
+<div class="panel"><div class="ph">GAP LEDGER · MOCK $1000 · ITM 0DTE</div>
 <div class="stats">
+  <div class="st"><div class="k">BAL</div><div class="v">$1000</div></div>
+  <div class="st"><div class="k">P/L</div><div class="v ">$+0</div></div>
   <div class="st"><div class="k">OPS</div><div class="v">1</div></div>
-  <div class="st"><div class="k">WIN</div><div class="v">100%</div></div>
-  <div class="st"><div class="k">PF</div><div class="v">∞</div></div>
-  <div class="st"><div class="k">SUM</div><div class="v pos">+0.26%</div></div>
-  <div class="st"><div class="k">TARGET</div><div class="v" style="font-size:11px">1.58</div></div>
+  <div class="st"><div class="k">WIN</div><div class="v">—</div></div>
+  <div class="st"><div class="k">기초합</div><div class="v" style="font-size:12px">+0.26%</div></div>
 </div>
-<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>PX</th><th>P/L%</th><th>MFE·시각</th><th>VWAP밴드 자리</th><th>EXIT</th></tr><tr><td>08-17</td><td>숏</td><td>+0.26%</td><td>732.96→731.05</td><td class="pos">+0.261%</td><td class="pos">+0.000%<br><span class="rs"></span></td><td><span class="rs">—</span></td><td class="rs">TGT</td></tr></table>
+<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>기초P/L</th><th>옵션</th><th>MFE·시각</th><th>VWAP밴드</th><th>EXIT</th></tr><tr><td>08-17</td><td>숏</td><td>+0.26%</td><td class="pos">+0.261%</td><td class="neg"><span class="rs">—</span></td><td class="pos">+0.000%<br><span class="rs"></span></td><td><span class="rs">—</span></td><td class="rs">TGT</td></tr></table>
 </div>
 <div class="brief">
 <b>GAP FILL · FORWARD TEST</b> — 09:30 시가 갭 0.2~1.0% → 갭 메우는 방향 즉시 진입<br>
-타깃 전날 종가 · 손절 갭 50% 역행 · 14:00 컷 · 하루 1회 · 기초자산 기준 기록<br>
+타깃 전날 종가 · 손절 갭 50% 역행 · 14:00 컷 · 하루 1회<br>
+집행 — 갭업→ITM PUT / 갭다운→ITM CALL (Δ0.7~0.8) 1계약 · mock $1,000 (itm-2.0과 동일 조건)<br>
 백테스트 근거 — 1시간봉 2년 n=151 · PF 1.58 · 상위2제외 1.48 · 반반 1.53/1.62<br>
-※ 0DTE 옵션 환산 시 PF 0.36~0.96 (세타·스프레드가 잠식). 본 트랙은 <b>기초자산 검증용</b>이며
-   되돌림 진입(표본 6~7건, PF 3.5~4.6 관찰)이 실제로 나은지 확인하는 것이 목적.
+※ 백테스트 옵션 환산은 PF 0.36~0.96 (세타·스프레드 잠식) — <b>실측으로 이게 맞는지 확인 중</b>.
+   기초 P/L과 옵션 P/L을 나란히 기록하고, MFE·VWAP밴드 자리로 더 나은 진입/청산이 있었는지 검증.
 </div>
 </div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
