@@ -811,7 +811,8 @@ tr:last-child td{{border-bottom:none}}
 </div>
 <div class="brief">
 <b>RULES OF ENGAGEMENT</b> — L1 VIX9D/VIX3M 백분위 ≥50 · L2 프리마켓 위치 &gt;0.5 · L3 VWAP -1σ 터치
-→ <b>ITM CALL 매수</b> Δ0.7~0.8 × 1계약<br>
+→ <b>ITM CALL 매수(BUY)</b> Δ0.7~0.8 × 1계약<br>
+집행 — <b>전부 매수(BUY)</b>. 롱 온리 · 숏은 엣지 없음 확인되어 봉인 · 옵션 매도(SELL) 전략 아님<br>
 EXIT — TP1 VWAP(가치 50%) → 러너 +1σ · 손절 당일저점 · 14:30 ET 강제청산 · 1 op/day<br>
 근거 — v9 501거래일: 승률 63.1% · PF 1.69 · 반반 1.63/1.76 (QQQ 전용, 숏 봉인)<br>
 LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리미엄은 지연 mid 기준.
