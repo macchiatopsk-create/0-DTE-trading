@@ -698,7 +698,9 @@ def render(log, st):
                  f'<br><span class="rs">{f"{pp:+.0f}% ${pu:+.0f}" if pu is not None else "n/a"}</span>'
                  if t.get("strike") else '<span class="rs">체결전<br>기록</span>')
         mpp = t.get("mfe_prem"); mpp = None if (mpp is None or mpp < -90) else mpp
-        grows += (f'<tr><td>{t["date"][5:]}</td><td>{t["dir"]}</td>'
+        _act = "BUY PUT" if t.get("sgn", 1) > 0 else "BUY CALL"
+        grows += (f'<tr><td>{t["date"][5:]}</td>'
+                  f'<td>{_act}<br><span class="rs">기초 {t["dir"]}</span></td>'
                   f'<td>{t["gap"]:+.2f}%</td>'
                   f'<td class="{c}">{t["pnl"]:+.3f}%</td>'
                   f'<td class="{c2}">{ocell}</td>'
