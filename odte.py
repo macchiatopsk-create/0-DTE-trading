@@ -667,14 +667,19 @@ def render(log, st):
         gdesc = f'갭 {gs["gap"]:+.2f}% — 대상 구간(±{GAP_MIN}~{GAP_MAX}%) 밖'
     else:
         gstat, gcls = "SIGNAL", "go"
-        gdesc = (f'갭 {gs["gap"]:+.2f}% → {gs["dir"]} · 타깃까지 {gs["room"]:.3f}%'
+        _act = "BUY PUT (풋 매수)" if gs["sgn"] > 0 else "BUY CALL (콜 매수)"
+        gdesc = (f'갭 {gs["gap"]:+.2f}% → 기초 {gs["dir"]} · <b style="color:var(--amb)">{_act}</b>'
+                 f' · 타깃까지 {gs["room"]:.3f}%'
                  f'<br>첫봉 커버 {gs["cover"]:.2f} · 되돌림50% 지점 {gs["r50"]}')
 
     if go:
+        _act = "BUY PUT" if go["sgn"] > 0 else "BUY CALL"
+        _c = (f'{_act} {go["strike"]:.0f} @ ${go["premium"]}' if go.get("strike")
+              else f'{_act} (계약 데이터 없음)')
         gpos = (f'<div class="panel hot"><div class="ph">GAP · ACTIVE</div>'
-                f'<div class="big">{go["dir"]} @ {go["entry"]}</div>'
-                f'<div class="meta">진입 {go["at"]} · 타깃 {go["target"]} · 손절 {go["stop"]}'
-                f'<br>갭 {go["gap"]:+.2f}% · 타깃거리 {go["room"]:.3f}%</div></div>')
+                f'<div class="big">{_c}</div>'
+                f'<div class="meta">기초 {go["dir"]} · 진입 {go["entry"]} · 타깃 {go["target"]} '
+                f'· 손절 {go["stop"]}<br>갭 {go["gap"]:+.2f}% · 타깃거리 {go["room"]:.3f}%</div></div>')
     else:
         gpos = ('<div class="panel"><div class="ph">GAP · ACTIVE</div>'
                 '<div class="big dim2">NONE</div>'
@@ -691,7 +696,7 @@ def render(log, st):
         c2 = "pos" if (pu or 0) > 0 else "neg"
         ocell = (f'{t.get("opt_side","")[:1].upper()}{t.get("strike",0):.0f} ${t.get("premium","")}'
                  f'<br><span class="rs">{f"{pp:+.0f}% ${pu:+.0f}" if pu is not None else "n/a"}</span>'
-                 if t.get("strike") else '<span class="rs">—</span>')
+                 if t.get("strike") else '<span class="rs">체결전<br>기록</span>')
         mpp = t.get("mfe_prem"); mpp = None if (mpp is None or mpp < -90) else mpp
         grows += (f'<tr><td>{t["date"][5:]}</td><td>{t["dir"]}</td>'
                   f'<td>{t["gap"]:+.2f}%</td>'
@@ -804,7 +809,7 @@ tr:last-child td{{border-bottom:none}}
 </div>
 <div class="brief">
 <b>RULES OF ENGAGEMENT</b> — L1 VIX9D/VIX3M 백분위 ≥50 · L2 프리마켓 위치 &gt;0.5 · L3 VWAP -1σ 터치
-→ ITM CALL Δ0.7~0.8 × 1계약<br>
+→ <b>ITM CALL 매수</b> Δ0.7~0.8 × 1계약<br>
 EXIT — TP1 VWAP(가치 50%) → 러너 +1σ · 손절 당일저점 · 14:30 ET 강제청산 · 1 op/day<br>
 근거 — v9 501거래일: 승률 63.1% · PF 1.69 · 반반 1.63/1.76 (QQQ 전용, 숏 봉인)<br>
 LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리미엄은 지연 mid 기준.
@@ -829,7 +834,8 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
 <div class="brief">
 <b>GAP FILL · FORWARD TEST</b> — 09:30 시가 갭 0.2~1.0% → 갭 메우는 방향 즉시 진입<br>
 타깃 전날 종가 · 손절 갭 50% 역행 · 14:00 컷 · 하루 1회<br>
-집행 — 갭업→ITM PUT / 갭다운→ITM CALL (Δ0.7~0.8) 1계약 · mock $1,000 (itm-2.0과 동일 조건)<br>
+집행 — <b>전부 매수(BUY)</b>. 갭업 = 하락 베팅 → <b>ITM PUT 매수</b> / 갭다운 = 상승 베팅 → <b>ITM CALL 매수</b><br>
+Δ0.7~0.8 · 1계약 · mock $1,000 (itm-2.0과 동일 조건). 옵션 매도(SELL) 전략 아님<br>
 백테스트 근거 — 1시간봉 2년 n=151 · PF 1.58 · 상위2제외 1.48 · 반반 1.53/1.62<br>
 ※ 백테스트 옵션 환산은 PF 0.36~0.96 (세타·스프레드 잠식) — <b>실측으로 이게 맞는지 확인 중</b>.
    기초 P/L과 옵션 P/L을 나란히 기록하고, MFE·VWAP밴드 자리로 더 나은 진입/청산이 있었는지 검증.
