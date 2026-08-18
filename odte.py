@@ -555,7 +555,7 @@ def step():
                                vix_pct=(vg["pct"] if vg else None),
                                vix_state=(vg["state"] if vg else None),
                                pm_pos=(pmv["pos"] if pmv else None))
-            status = f"진입 · ITM CALL {opt['strike']:.0f} @ ${opt['premium']} (잔고 ${cap:.0f})"
+            status = f"진입 · BUY CALL {opt['strike']:.0f} @ ${opt['premium']} (잔고 ${cap:.0f})"
             print(f"  {status}")
     log["days"][dstr] = dict(status=status, score=st["score"], rsi=round(st["rsi"], 1),
                              direction=st["direction"], gap=round(st["gap"], 2),
