@@ -784,33 +784,46 @@ def render(log, st):
                     '<div class="big dim2">NO DATA</div>'
                     '<div class="meta">매크로 지표 수집 실패 — 다음 실행에서 재시도</div></div>')
     else:
-        exs = " · ".join(f'{e["name"]} {e["chg"]:+.2f}%<span class="rs">({e["pct"]:.0f}%tile)</span>'
-                         for e in mm["extremes"])
         nu, nd = len(mm["up"]), len(mm["dn"])
-        tot = nu + nd
-        def _rows(lst, cls):
+        tot = max(nu + nd, 1)
+        upct = nu / tot * 100
+
+        chips = ""
+        for e in mm["extremes"]:
+            hot = "hi" if e["pct"] >= 85 else ("lo" if e["pct"] <= 15 else "")
+            chips += (f'<div class="chip {hot}"><div class="cn">{e["name"]}</div>'
+                      f'<div class="cv">{e["chg"]:+.2f}%</div>'
+                      f'<div class="cp">{e["pct"]:.0f}<span>%tile</span></div></div>')
+
+        def _lst(lst, cls, arrow):
             r = ""
             for x in lst:
-                r += (f'<tr><td>{x["d"][2:]}</td><td class="rs">{x["dist"]:.2f}</td>'
-                      f'<td>{x["gap"]:+.2f}%</td>'
-                      f'<td class="{cls}">{x["ret"]:+.2f}%</td>'
-                      f'<td class="rs">{x["lo"]:+.2f} / {x["hi"]:+.2f}</td></tr>')
-            return r or '<tr><td colspan="5" class="rs">해당 없음</td></tr>'
+                r += (f'<div class="mrow"><span class="md">{x["d"][5:]}</span>'
+                      f'<span class="mg">갭 {x["gap"]:+.2f}</span>'
+                      f'<span class="mr {cls}">{arrow} {x["ret"]:+.2f}%</span></div>')
+            return r or '<div class="mrow"><span class="rs">해당 없음</span></div>'
+
         mac_html = (
-            f'<div class="panel"><div class="ph">TODAY · MACRO PROFILE</div>'
-            f'<div class="meta">{exs}</div>'
-            f'<div class="meta" style="margin-top:9px">가장 극단인 지표 4개 · 과거 {mm["n_hist"]}일 중 백분위'
-            f'<br>피처 {mm["n_feat"]}개(금리·유가·달러·VIX·금·구리·크레딧·환율·해외지수·선물) z-score 거리</div></div>'
-            f'<div class="panel"><div class="ph">유사했던 날 {tot}일 · 결과가 갈립니다</div>'
+            f'<div class="panel"><div class="ph">오늘 매크로 · 가장 극단인 4개</div>'
+            f'<div class="chips">{chips}</div>'
+            f'<div class="meta" style="margin-top:10px">과거 {mm["n_hist"]}일 대비 백분위 '
+            f'· 지표 {mm["n_feat"]}개로 유사일 검색</div></div>'
+
+            f'<div class="panel hot"><div class="ph">오늘 예상 움직임 폭</div>'
+            f'<div class="big">{mm["rng"]:.2f}%</div>'
+            f'<div class="meta">유사일 평균 레인지 · 전체 평균 {mm["base_rng"]:.2f}%'
+            f'<br>저점 {mm["lo_avg"]:+.2f}% · 고점 {mm["hi_avg"]:+.2f}% (09:30 기준)</div></div>'
+
+            f'<div class="panel"><div class="ph">유사했던 {tot}일의 결말</div>'
+            f'<div class="split"><div class="sbar">'
+            f'<div class="sup" style="width:{upct:.0f}%"></div>'
+            f'<div class="sdn" style="width:{100-upct:.0f}%"></div></div>'
+            f'<div class="slab"><span class="pos">▲ {nu}일 상승</span>'
+            f'<span class="neg">{nd}일 하락 ▼</span></div></div>'
             f'<div class="mgrid">'
-            f'<div><div class="mh pos">▲ 올랐던 날 {nu}</div>'
-            f'<table><tr><th>날짜</th><th>거리</th><th>갭</th><th>종가</th><th>저/고</th></tr>{_rows(mm["up"],"pos")}</table></div>'
-            f'<div><div class="mh neg">▼ 빠졌던 날 {nd}</div>'
-            f'<table><tr><th>날짜</th><th>거리</th><th>갭</th><th>종가</th><th>저/고</th></tr>{_rows(mm["dn"],"neg")}</table></div>'
-            f'</div>'
-            f'<div class="meta" style="margin-top:12px">유사일 평균 레인지 {mm["rng"]:.2f}% '
-            f'(전체 평균 {mm["base_rng"]:.2f}%) · 저점 {mm["lo_avg"]:+.2f}% / 고점 {mm["hi_avg"]:+.2f}%'
-            f'<br>전체 기간 상승 비율 {mm["base_up"]:.0f}% — 유사일 {nu}/{tot}건이 상승</div></div>')
+            f'<div class="mcol"><div class="mh pos">▲ 올랐던 날</div>{_lst(mm["up"],"pos","▲")}</div>'
+            f'<div class="mcol"><div class="mh neg">▼ 빠졌던 날</div>{_lst(mm["dn"],"neg","▼")}</div>'
+            f'</div></div>')
 
     legacy = len(trades) - n
     return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
@@ -885,9 +898,31 @@ tr:last-child td{{border-bottom:none}}
   text-shadow:0 0 10px rgba(232,176,75,.4)}}
 .tabpane{{display:none}}
 .tabpane.on{{display:block}}
-.mgrid{{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
-.mh{{font-size:10px;letter-spacing:.12em;padding:5px 0 7px;text-transform:uppercase}}
-@media (max-width:520px){{.mgrid{{grid-template-columns:1fr}}}}
+.chips{{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}}
+.chip{{background:rgba(255,255,255,.02);border:1px solid var(--ln);padding:9px 6px;text-align:center}}
+.chip.hi{{border-color:rgba(232,69,69,.45);background:rgba(232,69,69,.07)}}
+.chip.lo{{border-color:rgba(73,209,124,.4);background:rgba(73,209,124,.06)}}
+.chip .cn{{font-size:9px;letter-spacing:.1em;color:var(--mut)}}
+.chip .cv{{font-size:13px;font-weight:600;margin:4px 0 2px;color:var(--tx)}}
+.chip .cp{{font-size:10px;color:var(--ambd)}}
+.chip .cp span{{font-size:8px;opacity:.7}}
+.split{{margin:2px 0 14px}}
+.sbar{{display:flex;height:9px;border:1px solid var(--ln);overflow:hidden}}
+.sup{{background:var(--grn);opacity:.75}}
+.sdn{{background:var(--red);opacity:.75}}
+.slab{{display:flex;justify-content:space-between;font-size:10.5px;margin-top:6px}}
+.mgrid{{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+.mcol{{min-width:0}}
+.mh{{font-size:10px;letter-spacing:.12em;padding:0 0 8px;text-transform:uppercase;
+  border-bottom:1px dashed rgba(95,114,104,.3);margin-bottom:6px}}
+.mrow{{display:flex;justify-content:space-between;align-items:baseline;gap:4px;
+  padding:5px 0;font-size:11px;border-bottom:1px solid rgba(28,40,34,.5)}}
+.mrow:last-child{{border-bottom:none}}
+.md{{color:var(--tx);flex:0 0 auto}}
+.mg{{color:var(--mut);font-size:9.5px}}
+.mr{{font-weight:600;flex:0 0 auto}}
+@media (max-width:520px){{.mgrid{{grid-template-columns:1fr;gap:16px}}
+  .chips{{grid-template-columns:repeat(2,1fr)}}}}
 .brief b{{color:var(--ambd)}}
 @media (prefers-reduced-motion:no-preference){{
   .lamp.go,.verdict.go{{animation:pulse 2.6s ease-in-out infinite}}
@@ -953,11 +988,12 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
 <div id="t3" class="tabpane">
 {mac_html}
 <div class="brief">
-<b>MACRO PATTERN MATCH · 참고용</b> — 09:30에 확정된 매크로 지표(전일 종가 대비 개장 변화율)를
-z-score 벡터로 만들어 과거 2년에서 유클리드 거리가 가까운 날을 찾습니다.<br>
-<b>이것은 매매 신호가 아닙니다.</b> 측정 결과 유사일의 방향 적중은 48~60%로 베이스라인과
-통계적으로 구별되지 않습니다(CI가 50% 포함). 올랐던 날과 빠졌던 날을 나란히 보여주는 이유가 그것입니다.<br>
-쓸모 있는 축은 <b>방향이 아니라 레인지</b>입니다 — 오늘 얼마나 움직일 장인지의 참고치로 보십시오.
+<b>참고용 · 매매 신호 아님</b><br>
+09:30에 확정된 금리·유가·달러·VIX·금·환율·해외지수·선물 17개를 z-score로 묶어
+과거 2년에서 가장 닮은 날을 찾습니다.<br>
+방향 적중은 48~60%로 <b>동전 던지기와 구별되지 않습니다.</b> 그래서 확률 하나로 뭉개지 않고
+올랐던 날과 빠졌던 날을 그대로 보여줍니다 — 형님이 그날들을 보고 판단하시라고.<br>
+실제로 쓸모 있는 건 <b>레인지</b>입니다. 방향이 아니라 "오늘 얼마나 움직일 장인가"요.
 </div>
 </div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
