@@ -100,6 +100,11 @@
    "vix_pct": 67.3,
    "vix_state": "LIVE",
    "pm_pos": null
+  },
+  "2026-08-18": {
+   "status": "WAIT_OPEN",
+   "bars": 1,
+   "at": "09:33"
   }
  },
  "vix": {
@@ -108,27 +113,17 @@
   "state": "LIVE",
   "asof": "2026-07-17"
  },
- "pm": null,
+ "pm": {
+  "pos": 0.025,
+  "pm_hi": 729.87,
+  "pm_lo": 719.97,
+  "ok": false
+ },
  "gap": {
-  "state": "ACTIVE",
-  "gap": 0.261,
-  "dir": "숏",
-  "sgn": 1,
-  "prev_close": 731.05,
-  "open": 732.96,
-  "entry": 732.96,
-  "target": 731.05,
-  "stop": 733.92,
-  "room": 0.261,
-  "cover": 0.27,
-  "r50": 731.12,
-  "cur": 729.86,
-  "band_px": 733.04,
-  "band_t": "09:35",
-  "band_room": 0.271,
-  "mfe": 0.503,
-  "mfe_t": "15:55",
-  "mfe_px": 729.27
+  "state": "NO_GAP",
+  "gap": -1.321,
+  "prev_close": 729.86,
+  "open": 720.22
  },
  "gap_track": {
   "2026-08-17": {
