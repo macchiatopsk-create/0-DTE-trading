@@ -43,6 +43,15 @@ CAPITAL_START = 1000.0   # mock 자본. 로그의 trades에서 동적 집계 (�
 DELTA_LO, DELTA_HI = 0.70, 0.80   # ITM 콜 델타 밴드
 ENTRY_BAND_SIG = 1.0     # VWAP -1σ 터치 대기 (v10: 진입대기가 09:30 즉시진입보다 우수)
 
+# ── 갭 전략 (별도 트랙, 포워드 테스트) ─────────────────────
+# 근거: 1시간봉 2년 n=151 PF 1.58 (상위2제외 1.48, 반반 1.53/1.62)
+#   갭 0.2~1.0% → 갭 메우는 방향. 09:30 즉시진입이 첫봉대기보다 우수.
+# 미검증(표본 6~7): 되돌림 진입(R50/HOD)이 손절을 10→2건으로 줄임. 이번 포워드로 확인.
+GAP_MIN, GAP_MAX = 0.20, 1.00     # 갭 크기 (%)
+GAP_VIX_SKIP = 5.0                # 개장 VIX 변화 |x|>=5% 이면 스킵
+GAP_STOP_FRAC = 0.50              # 손절 = 갭의 50% 역행
+GAP_CUT = dt.time(14, 0)
+
 # ── VIX 기간구조 게이트 ────────────────────────────────────
 # 전날 종가 ^VIX9D/^VIX3M 의 252일 rolling 백분위.
 # 하위 20% = 콘탱고 과도 = 다음날 안 움직이는 날 -> 0DTE 방향베팅 금지.
@@ -112,6 +121,42 @@ def vix_gate():
         print(f"  VIX 게이트 조회 실패: {type(e).__name__}: {e}")
         return dict(state="ERR", msg=f"{type(e).__name__}: {e}"[:200],
                     pct=0.0, ratio=0.0, asof="-")
+
+
+def gap_signal(df, st):
+    """당일 갭 신호. 09:30 시가 vs 전날 종가. 되돌림 진입 후보도 같이 계산."""
+    try:
+        d = df.copy()
+        days = sorted(set(d.index.date))
+        if len(days) < 2: return None
+        today, prev = days[-1], days[-2]
+        pcl = float(d[d.index.date == prev]["Close"].iloc[-1])
+        rt = d[(d.index.date == today) & (d.index.time >= dt.time(9, 30))
+               & (d.index.time < dt.time(16, 0))]
+        if len(rt) < 1: return None
+        op = float(rt["Open"].iloc[0])
+        gp = (op - pcl) / pcl * 100
+        if not (GAP_MIN <= abs(gp) < GAP_MAX):
+            return dict(state="NO_GAP", gap=round(gp, 3), prev_close=round(pcl, 2),
+                        open=round(op, 2))
+        sgn = 1 if gp > 0 else -1
+        gapabs = abs(op - pcl)
+        H = [float(x) for x in rt["High"]]; L = [float(x) for x in rt["Low"]]
+        C = [float(x) for x in rt["Close"]]
+        cur = C[-1]
+        cover = ((op - C[0]) / (op - pcl)) if sgn > 0 else ((C[0] - op) / abs(op - pcl))
+        # 되돌림 진입 후보: 눌림 후 50% 재회복 지점
+        ext = min(L) if sgn > 0 else max(H)
+        r50 = ext + (op - ext) * 0.5
+        return dict(state="ACTIVE", gap=round(gp, 3), dir=("숏" if sgn > 0 else "롱"),
+                    sgn=sgn, prev_close=round(pcl, 2), open=round(op, 2),
+                    entry=round(op, 2), target=round(pcl, 2),
+                    stop=round(op + sgn * gapabs * GAP_STOP_FRAC, 2),
+                    room=round(abs(pcl - op) / op * 100, 3),
+                    cover=round(cover, 2), r50=round(r50, 2), cur=round(cur, 2))
+    except Exception as e:
+        print(f"  갭 신호 계산 실패: {e}")
+        return None
 
 
 def premarket_pos():
@@ -265,6 +310,39 @@ def step():
     dstr = str(today)
     vg = vix_gate()
     pmv = premarket_pos()
+    gsig = gap_signal(df, st)
+    log["gap"] = gsig
+    if gsig and gsig.get("state") == "ACTIVE":
+        vixchg = vg.get("open_chg") if vg else None
+        gtrack = log.setdefault("gap_track", {})
+        gopen = log.get("gap_open")
+        if gopen is None and gsig["cover"] is not None:
+            # 진입: 09:30 즉시 (백테스트 최적) — 하루 1회
+            if gtrack.get(dstr) is None:
+                gtrack[dstr] = dict(entry=gsig["entry"], target=gsig["target"],
+                                    stop=gsig["stop"], dir=gsig["dir"], sgn=gsig["sgn"],
+                                    gap=gsig["gap"], room=gsig["room"],
+                                    r50=gsig["r50"], at=now.strftime("%H:%M"), res=None)
+                log["gap_open"] = dict(date=dstr, **gtrack[dstr])
+                print(f"  [갭] 진입 {gsig['dir']} @{gsig['entry']} → 타깃 {gsig['target']} "
+                      f"손절 {gsig['stop']} (갭 {gsig['gap']:+.2f}%)")
+        gopen = log.get("gap_open")
+        if gopen and gopen.get("res") is None:
+            sgn = gopen["sgn"]; cur = gsig["cur"]
+            hit_t = (cur <= gopen["target"]) if sgn > 0 else (cur >= gopen["target"])
+            hit_s = (cur >= gopen["stop"]) if sgn > 0 else (cur <= gopen["stop"])
+            res = None
+            if hit_t: res, px = "TGT", gopen["target"]
+            elif hit_s: res, px = "STOP", gopen["stop"]
+            elif now.time() >= GAP_CUT: res, px = "CUT", cur
+            if res:
+                pnl = ((gopen["entry"] - px) / gopen["entry"] * 100) if sgn > 0 \
+                      else ((px - gopen["entry"]) / gopen["entry"] * 100)
+                rec = dict(gopen); rec.update(res=res, exit=round(px, 2),
+                                              pnl=round(pnl, 3), exit_at=now.strftime("%H:%M"))
+                log.setdefault("gap_trades", []).append(rec)
+                log["gap_open"] = None
+                print(f"  [갭] 청산 {res} {pnl:+.3f}%")
     log["vix"] = vg                      # early return 경로에서도 화면에 남도록 즉시 저장
     log["pm"] = pmv
     if vg:
@@ -455,6 +533,44 @@ def render(log, st):
     if not rows:
         rows = '<tr><td colspan="7" class="rs">NO OPERATIONS LOGGED — 3층 통과 시 자동 개시</td></tr>'
 
+    # ── 갭 트랙 패널 ──
+    gs = log.get("gap"); go = log.get("gap_open"); gts = log.get("gap_trades", [])
+    gn = len(gts); gw = sum(1 for t in gts if t["pnl"] > 0)
+    gwr = f"{gw/gn*100:.0f}%" if gn else "—"
+    gsum = sum(t["pnl"] for t in gts)
+    gg = sum(t["pnl"] for t in gts if t["pnl"] > 0); gl_ = -sum(t["pnl"] for t in gts if t["pnl"] <= 0)
+    gpf = f"{gg/gl_:.2f}" if gl_ > 0 else ("—" if not gn else "∞")
+
+    if gs is None:
+        gstat, gcls, gdesc = "STANDBY", "stby", "데이터 없음 / 장외"
+    elif gs.get("state") == "NO_GAP":
+        gstat, gcls = "NO-GO", "nogo"
+        gdesc = f'갭 {gs["gap"]:+.2f}% — 대상 구간(±{GAP_MIN}~{GAP_MAX}%) 밖'
+    else:
+        gstat, gcls = "SIGNAL", "go"
+        gdesc = (f'갭 {gs["gap"]:+.2f}% → {gs["dir"]} · 타깃까지 {gs["room"]:.3f}%'
+                 f'<br>첫봉 커버 {gs["cover"]:.2f} · 되돌림50% 지점 {gs["r50"]}')
+
+    if go:
+        gpos = (f'<div class="panel hot"><div class="ph">GAP · ACTIVE</div>'
+                f'<div class="big">{go["dir"]} @ {go["entry"]}</div>'
+                f'<div class="meta">진입 {go["at"]} · 타깃 {go["target"]} · 손절 {go["stop"]}'
+                f'<br>갭 {go["gap"]:+.2f}% · 타깃거리 {go["room"]:.3f}%</div></div>')
+    else:
+        gpos = ('<div class="panel"><div class="ph">GAP · ACTIVE</div>'
+                '<div class="big dim2">NONE</div>'
+                f'<div class="meta">{gdesc}</div></div>')
+
+    grows = ""
+    for t in reversed(gts[-40:]):
+        c = "pos" if t["pnl"] > 0 else "neg"
+        grows += (f'<tr><td>{t["date"][5:]}</td><td>{t["dir"]}</td>'
+                  f'<td>{t["gap"]:+.2f}%</td><td>{t["at"]}→{t.get("exit_at","")}</td>'
+                  f'<td>{t["entry"]}→{t.get("exit","")}</td>'
+                  f'<td class="{c}">{t["pnl"]:+.3f}%</td><td class="rs">{t["res"]}</td></tr>')
+    if not grows:
+        grows = '<tr><td colspan="7" class="rs">NO OPERATIONS — 갭 0.2~1.0% 발생 시 자동 개시</td></tr>'
+
     legacy = len(trades) - n
     return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -520,6 +636,14 @@ tr:last-child td{{border-bottom:none}}
 .rs{{color:var(--mut);font-size:10px}}
 .brief{{font-size:10.5px;color:var(--mut);line-height:1.9;margin-top:16px;padding:12px 14px;
   border:1px dashed var(--ln)}}
+.tabs{{display:flex;gap:0;margin:14px 0 0;border-bottom:1px solid var(--ln)}}
+.tab{{flex:1;padding:11px 8px;text-align:center;font-size:10.5px;letter-spacing:.14em;
+  color:var(--mut);cursor:pointer;border:1px solid transparent;border-bottom:none;
+  text-transform:uppercase;background:transparent;font-family:'IBM Plex Mono',monospace}}
+.tab.on{{color:var(--amb);border-color:var(--ln);background:var(--pn);
+  text-shadow:0 0 10px rgba(232,176,75,.4)}}
+.tabpane{{display:none}}
+.tabpane.on{{display:block}}
 .brief b{{color:var(--ambd)}}
 @media (prefers-reduced-motion:no-preference){{
   .lamp.go,.verdict.go{{animation:pulse 2.6s ease-in-out infinite}}
@@ -529,6 +653,11 @@ tr:last-child td{{border-bottom:none}}
 <div class="cls">Mock Simulation // Training Use Only // Not Investment Advice</div>
 <header><div><div class="op">OP&nbsp;ZERO-DAY</div><div class="sub">QQQ 0DTE · 3-Layer System</div></div>
 <div class="ts">{now}<br>SYS {VERSION} · UPLINK 15MIN</div></header>
+<div class="tabs">
+  <button class="tab on" data-t="t1">3-LAYER · ITM</button>
+  <button class="tab" data-t="t2">GAP FILL</button>
+</div>
+<div id="t1" class="tabpane on">
 {gate}
 {pos_html}
 <div class="panel"><div class="ph">FUND LEDGER · MOCK ${CAPITAL_START:.0f}</div>
@@ -548,9 +677,42 @@ EXIT — TP1 VWAP(가치 50%) → 러너 +1σ · 손절 당일저점 · 14:30 ET
 근거 — v9 501거래일: 승률 63.1% · PF 1.69 · 반반 1.63/1.76 (QQQ 전용, 숏 봉인)<br>
 LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리미엄은 지연 mid 기준.
 </div>
+</div>
+<div id="t2" class="tabpane">
+<div class="panel"><div class="ph">GAP STATUS</div>
+<div class="gr"><span class="lamp {gcls}"></span><span class="gl">GAP FILL</span>
+<span class="gs">{gstat} · {gdesc}</span></div>
+<div class="verdict {gcls}">▶ {gstat}</div></div>
+{gpos}
+<div class="panel"><div class="ph">GAP LEDGER · 기초자산 기준</div>
+<div class="stats">
+  <div class="st"><div class="k">OPS</div><div class="v">{gn}</div></div>
+  <div class="st"><div class="k">WIN</div><div class="v">{gwr}</div></div>
+  <div class="st"><div class="k">PF</div><div class="v">{gpf}</div></div>
+  <div class="st"><div class="k">SUM</div><div class="v {'pos' if gsum>0 else ('neg' if gsum<0 else '')}">{gsum:+.2f}%</div></div>
+  <div class="st"><div class="k">TARGET</div><div class="v" style="font-size:11px">1.58</div></div>
+</div>
+<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>WINDOW</th><th>PX</th><th>P/L%</th><th>EXIT</th></tr>{grows}</table>
+</div>
+<div class="brief">
+<b>GAP FILL · FORWARD TEST</b> — 09:30 시가 갭 0.2~1.0% → 갭 메우는 방향 즉시 진입<br>
+타깃 전날 종가 · 손절 갭 50% 역행 · 14:00 컷 · 하루 1회 · 기초자산 기준 기록<br>
+백테스트 근거 — 1시간봉 2년 n=151 · PF 1.58 · 상위2제외 1.48 · 반반 1.53/1.62<br>
+※ 0DTE 옵션 환산 시 PF 0.36~0.96 (세타·스프레드가 잠식). 본 트랙은 <b>기초자산 검증용</b>이며
+   되돌림 진입(표본 6~7건, PF 3.5~4.6 관찰)이 실제로 나은지 확인하는 것이 목적.
+</div>
+</div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){{}});
+document.querySelectorAll('.tab').forEach(function(b){{
+  b.addEventListener('click',function(){{
+    document.querySelectorAll('.tab').forEach(function(x){{x.classList.remove('on')}});
+    document.querySelectorAll('.tabpane').forEach(function(x){{x.classList.remove('on')}});
+    b.classList.add('on');
+    document.getElementById(b.dataset.t).classList.add('on');
+  }});
+}});
 (function(){{
   var f=new Intl.DateTimeFormat("en-US",{{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false}});
   function live(){{var o={{}};f.formatToParts(new Date()).forEach(function(p){{o[p.type]=p.value}});
