@@ -70,9 +70,31 @@ tr:last-child td{border-bottom:none}
   text-shadow:0 0 10px rgba(232,176,75,.4)}
 .tabpane{display:none}
 .tabpane.on{display:block}
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mh{font-size:10px;letter-spacing:.12em;padding:5px 0 7px;text-transform:uppercase}
-@media (max-width:520px){.mgrid{grid-template-columns:1fr}}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.chip{background:rgba(255,255,255,.02);border:1px solid var(--ln);padding:9px 6px;text-align:center}
+.chip.hi{border-color:rgba(232,69,69,.45);background:rgba(232,69,69,.07)}
+.chip.lo{border-color:rgba(73,209,124,.4);background:rgba(73,209,124,.06)}
+.chip .cn{font-size:9px;letter-spacing:.1em;color:var(--mut)}
+.chip .cv{font-size:13px;font-weight:600;margin:4px 0 2px;color:var(--tx)}
+.chip .cp{font-size:10px;color:var(--ambd)}
+.chip .cp span{font-size:8px;opacity:.7}
+.split{margin:2px 0 14px}
+.sbar{display:flex;height:9px;border:1px solid var(--ln);overflow:hidden}
+.sup{background:var(--grn);opacity:.75}
+.sdn{background:var(--red);opacity:.75}
+.slab{display:flex;justify-content:space-between;font-size:10.5px;margin-top:6px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mcol{min-width:0}
+.mh{font-size:10px;letter-spacing:.12em;padding:0 0 8px;text-transform:uppercase;
+  border-bottom:1px dashed rgba(95,114,104,.3);margin-bottom:6px}
+.mrow{display:flex;justify-content:space-between;align-items:baseline;gap:4px;
+  padding:5px 0;font-size:11px;border-bottom:1px solid rgba(28,40,34,.5)}
+.mrow:last-child{border-bottom:none}
+.md{color:var(--tx);flex:0 0 auto}
+.mg{color:var(--mut);font-size:9.5px}
+.mr{font-weight:600;flex:0 0 auto}
+@media (max-width:520px){.mgrid{grid-template-columns:1fr;gap:16px}
+  .chips{grid-template-columns:repeat(2,1fr)}}
 .brief b{color:var(--ambd)}
 @media (prefers-reduced-motion:no-preference){
   .lamp.go,.verdict.go{animation:pulse 2.6s ease-in-out infinite}
@@ -81,15 +103,15 @@ tr:last-child td{border-bottom:none}
 </style></head><body>
 <div class="cls">Mock Simulation // Training Use Only // Not Investment Advice</div>
 <header><div><div class="op">OP&nbsp;ZERO-DAY</div><div class="sub">QQQ 0DTE · 3-Layer System</div></div>
-<div class="ts">2026-08-18 11:02 ET<br>SYS itm-2.0 · UPLINK 15MIN</div></header>
+<div class="ts">2026-08-18 11:29 ET<br>SYS itm-2.0 · UPLINK 15MIN</div></header>
 <div class="tabs">
   <button class="tab on" data-t="t1">3-LAYER · ITM</button>
   <button class="tab" data-t="t2">GAP FILL</button>
   <button class="tab" data-t="t3">MACRO</button>
 </div>
 <div id="t1" class="tabpane on">
-<div class="panel"><div class="ph">MISSION STATUS · 3-LAYER GATE</div><div class="gr"><span class="lamp nogo"></span><span class="gl">L1 VOLATILITY</span><span class="gs">NO-GO · 백분위 18% &lt; 50 · 기준 2026-08-18</span></div><div class="gr"><span class="lamp nogo"></span><span class="gl">L2 DIRECTION</span><span class="gs">NO-GO · PM위치 0.03 ≤ 0.5 — 롱 엣지 없음</span></div><div class="gr"><span class="lamp go"></span><span class="gl">L3 TRIGGER</span><span class="gs">GO&nbsp;&nbsp;&nbsp;· VWAP -1σ 터치 (-2.14σ)</span></div><div class="verdict nogo">▶ HOLD — NO ENTRY TODAY</div></div>
-<div class="panel"><div class="ph">ACTIVE POSITION</div><div class="big dim2">NONE</div><div class="meta">NO TRADE · VIX게이트 (백분위 18% < 50)</div></div>
+<div class="panel"><div class="ph">MISSION STATUS · 3-LAYER GATE</div><div class="gr"><span class="lamp nogo"></span><span class="gl">L1 VOLATILITY</span><span class="gs">NO-GO · 백분위 24% &lt; 50 · 기준 2026-08-18</span></div><div class="gr"><span class="lamp nogo"></span><span class="gl">L2 DIRECTION</span><span class="gs">NO-GO · PM위치 0.03 ≤ 0.5 — 롱 엣지 없음</span></div><div class="gr"><span class="lamp stby"></span><span class="gl">L3 TRIGGER</span><span class="gs">STANDBY · -1σ 대기 (현재 -0.72σ)</span></div><div class="verdict nogo">▶ HOLD — NO ENTRY TODAY</div></div>
+<div class="panel"><div class="ph">ACTIVE POSITION</div><div class="big dim2">NONE</div><div class="meta">NO TRADE · VIX게이트 (백분위 24% < 50)</div></div>
 <div class="panel"><div class="ph">FUND LEDGER · MOCK $1000</div>
 <div class="stats">
   <div class="st"><div class="k">BAL</div><div class="v">$1000</div></div>
@@ -136,13 +158,14 @@ LEGACY 2건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리�
 </div>
 </div>
 <div id="t3" class="tabpane">
-<div class="panel"><div class="ph">TODAY · MACRO PROFILE</div><div class="meta">TLT -0.96%<span class="rs">(3%tile)</span> · VIX +10.95%<span class="rs">(96%tile)</span> · 30Y +1.04%<span class="rs">(95%tile)</span> · GOLD +1.26%<span class="rs">(94%tile)</span></div><div class="meta" style="margin-top:9px">가장 극단인 지표 4개 · 과거 498일 중 백분위<br>피처 17개(금리·유가·달러·VIX·금·구리·크레딧·환율·해외지수·선물) z-score 거리</div></div><div class="panel"><div class="ph">유사했던 날 12일 · 결과가 갈립니다</div><div class="mgrid"><div><div class="mh pos">▲ 올랐던 날 6</div><table><tr><th>날짜</th><th>거리</th><th>갭</th><th>종가</th><th>저/고</th></tr><tr><td>25-12-01</td><td class="rs">2.08</td><td>-0.91%</td><td class="pos">+0.58%</td><td class="rs">-0.18 / +0.95</td></tr><tr><td>25-07-11</td><td class="rs">2.15</td><td>-0.39%</td><td class="pos">+0.16%</td><td class="rs">-0.23 / +0.45</td></tr><tr><td>24-12-26</td><td class="rs">2.16</td><td>-0.31%</td><td class="pos">+0.24%</td><td class="rs">-0.38 / +0.55</td></tr><tr><td>25-09-02</td><td class="rs">2.61</td><td>-1.59%</td><td class="pos">+0.77%</td><td class="rs">-0.32 / +0.83</td></tr><tr><td>26-01-12</td><td class="rs">2.69</td><td>-0.69%</td><td class="pos">+0.78%</td><td class="rs">-0.01 / +1.05</td></tr><tr><td>24-10-21</td><td class="rs">2.96</td><td>-0.25%</td><td class="pos">+0.44%</td><td class="rs">-0.39 / +0.60</td></tr></table></div><div><div class="mh neg">▼ 빠졌던 날 6</div><table><tr><th>날짜</th><th>거리</th><th>갭</th><th>종가</th><th>저/고</th></tr><tr><td>26-01-30</td><td class="rs">2.24</td><td>-0.59%</td><td class="neg">-0.61%</td><td class="rs">-1.02 / +0.41</td></tr><tr><td>26-05-12</td><td class="rs">2.71</td><td>-0.71%</td><td class="neg">-0.14%</td><td class="rs">-1.64 / +0.28</td></tr><tr><td>25-05-21</td><td class="rs">2.87</td><td>-0.77%</td><td class="neg">-0.63%</td><td class="rs">-0.97 / +1.30</td></tr><tr><td>26-07-23</td><td class="rs">2.91</td><td>-1.51%</td><td class="neg">-0.39%</td><td class="rs">-0.99 / +0.57</td></tr><tr><td>26-01-08</td><td class="rs">2.95</td><td>-0.16%</td><td class="neg">-0.41%</td><td class="rs">-0.84 / +0.06</td></tr><tr><td>25-04-21</td><td class="rs">2.99</td><td>-1.32%</td><td class="neg">-1.17%</td><td class="rs">-2.35 / +0.19</td></tr></table></div></div><div class="meta" style="margin-top:12px">유사일 평균 레인지 1.38% (전체 평균 1.48%) · 저점 -0.78% / 고점 +0.60%<br>전체 기간 상승 비율 54% — 유사일 6/12건이 상승</div></div>
+<div class="panel"><div class="ph">오늘 매크로 · 가장 극단인 4개</div><div class="chips"><div class="chip lo"><div class="cn">TLT</div><div class="cv">-0.96%</div><div class="cp">3<span>%tile</span></div></div><div class="chip hi"><div class="cn">VIX</div><div class="cv">+10.95%</div><div class="cp">96<span>%tile</span></div></div><div class="chip hi"><div class="cn">30Y</div><div class="cv">+1.04%</div><div class="cp">95<span>%tile</span></div></div><div class="chip hi"><div class="cn">GOLD</div><div class="cv">+1.26%</div><div class="cp">94<span>%tile</span></div></div></div><div class="meta" style="margin-top:10px">과거 498일 대비 백분위 · 지표 17개로 유사일 검색</div></div><div class="panel hot"><div class="ph">오늘 예상 움직임 폭</div><div class="big">1.38%</div><div class="meta">유사일 평균 레인지 · 전체 평균 1.48%<br>저점 -0.78% · 고점 +0.60% (09:30 기준)</div></div><div class="panel"><div class="ph">유사했던 12일의 결말</div><div class="split"><div class="sbar"><div class="sup" style="width:50%"></div><div class="sdn" style="width:50%"></div></div><div class="slab"><span class="pos">▲ 6일 상승</span><span class="neg">6일 하락 ▼</span></div></div><div class="mgrid"><div class="mcol"><div class="mh pos">▲ 올랐던 날</div><div class="mrow"><span class="md">12-01</span><span class="mg">갭 -0.91</span><span class="mr pos">▲ +0.58%</span></div><div class="mrow"><span class="md">07-11</span><span class="mg">갭 -0.39</span><span class="mr pos">▲ +0.16%</span></div><div class="mrow"><span class="md">12-26</span><span class="mg">갭 -0.31</span><span class="mr pos">▲ +0.24%</span></div><div class="mrow"><span class="md">09-02</span><span class="mg">갭 -1.59</span><span class="mr pos">▲ +0.77%</span></div><div class="mrow"><span class="md">01-12</span><span class="mg">갭 -0.69</span><span class="mr pos">▲ +0.78%</span></div><div class="mrow"><span class="md">10-21</span><span class="mg">갭 -0.25</span><span class="mr pos">▲ +0.44%</span></div></div><div class="mcol"><div class="mh neg">▼ 빠졌던 날</div><div class="mrow"><span class="md">01-30</span><span class="mg">갭 -0.59</span><span class="mr neg">▼ -0.61%</span></div><div class="mrow"><span class="md">05-12</span><span class="mg">갭 -0.71</span><span class="mr neg">▼ -0.14%</span></div><div class="mrow"><span class="md">05-21</span><span class="mg">갭 -0.77</span><span class="mr neg">▼ -0.63%</span></div><div class="mrow"><span class="md">07-23</span><span class="mg">갭 -1.51</span><span class="mr neg">▼ -0.39%</span></div><div class="mrow"><span class="md">01-08</span><span class="mg">갭 -0.16</span><span class="mr neg">▼ -0.41%</span></div><div class="mrow"><span class="md">04-21</span><span class="mg">갭 -1.32</span><span class="mr neg">▼ -1.17%</span></div></div></div></div>
 <div class="brief">
-<b>MACRO PATTERN MATCH · 참고용</b> — 09:30에 확정된 매크로 지표(전일 종가 대비 개장 변화율)를
-z-score 벡터로 만들어 과거 2년에서 유클리드 거리가 가까운 날을 찾습니다.<br>
-<b>이것은 매매 신호가 아닙니다.</b> 측정 결과 유사일의 방향 적중은 48~60%로 베이스라인과
-통계적으로 구별되지 않습니다(CI가 50% 포함). 올랐던 날과 빠졌던 날을 나란히 보여주는 이유가 그것입니다.<br>
-쓸모 있는 축은 <b>방향이 아니라 레인지</b>입니다 — 오늘 얼마나 움직일 장인지의 참고치로 보십시오.
+<b>참고용 · 매매 신호 아님</b><br>
+09:30에 확정된 금리·유가·달러·VIX·금·환율·해외지수·선물 17개를 z-score로 묶어
+과거 2년에서 가장 닮은 날을 찾습니다.<br>
+방향 적중은 48~60%로 <b>동전 던지기와 구별되지 않습니다.</b> 그래서 확률 하나로 뭉개지 않고
+올랐던 날과 빠졌던 날을 그대로 보여줍니다 — 형님이 그날들을 보고 판단하시라고.<br>
+실제로 쓸모 있는 건 <b>레인지</b>입니다. 방향이 아니라 "오늘 얼마나 움직일 장인가"요.
 </div>
 </div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
