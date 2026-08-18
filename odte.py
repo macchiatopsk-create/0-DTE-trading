@@ -21,6 +21,7 @@ from zoneinfo import ZoneInfo
 try:
     import yfinance as yf
     import pandas as pd
+    import numpy as np
 except ImportError:
     print("필요: pip install yfinance pandas"); sys.exit(1)
 
@@ -53,6 +54,13 @@ GAP_VIX_SKIP = 5.0                # 개장 VIX 변화 |x|>=5% 이면 스킵
 GAP_STOP_FRAC = 0.50              # 손절 = 갭의 50% 역행
 GAP_CUT = dt.time(14, 0)
 GAP_CAPITAL = 1000.0              # 갭 트랙 mock 자본 (itm-2.0과 동일 조건 비교용)
+
+# ── 매크로 유사일 브리핑 (참고용, 매매 신호 아님) ──────────
+MACRO_FEATS = {"^TNX":"10Y","^TYX":"30Y","^FVX":"5Y","CL=F":"WTI","DX-Y.NYB":"DXY",
+               "^VIX":"VIX","GC=F":"GOLD","HG=F":"COPPER","HYG":"HY","TLT":"TLT",
+               "EURUSD=X":"EUR","JPY=X":"JPY","^N225":"NIKKEI","^GDAXI":"DAX",
+               "ES=F":"ES","NQ=F":"NQ","RTY=F":"RTY"}
+MACRO_TOPN = 12
 # 갭업 → 풋, 갭다운 → 콜. 델타 0.70~0.80 ITM 1계약.
 
 # ── VIX 기간구조 게이트 ────────────────────────────────────
@@ -124,6 +132,64 @@ def vix_gate():
         print(f"  VIX 게이트 조회 실패: {type(e).__name__}: {e}")
         return dict(state="ERR", msg=f"{type(e).__name__}: {e}"[:200],
                     pct=0.0, ratio=0.0, asof="-")
+
+
+def macro_match():
+    """09:30 확정 매크로 지표의 개장 변화율을 z-score 벡터로 만들어
+    과거 2년에서 유사일을 찾는다. 방향 예측이 아니라 '어떤 날들과 닮았나' 참고용."""
+    try:
+        def _nz(d):
+            try: d.index = d.index.tz_localize(None)
+            except (TypeError, AttributeError): pass
+            d.index = pd.to_datetime(d.index).normalize()
+            return d[~d.index.duplicated(keep="last")]
+        cols = {}
+        for tk, nm in MACRO_FEATS.items():
+            try:
+                d = _nz(yf.Ticker(tk).history(period="2y")[["Open", "Close"]].dropna())
+                cols[nm] = (d["Open"] / d["Close"].shift(1) - 1) * 100
+            except Exception:
+                pass
+        if len(cols) < 8: return None
+        F = pd.DataFrame(cols)
+        cov = F.notna().mean()
+        F = F[[c for c in F.columns if cov[c] >= 0.90]]
+        Z = ((F - F.mean()) / F.std()).fillna(0.0)
+
+        q = _nz(yf.Ticker(TICKER).history(period="2y")[["Open", "High", "Low", "Close"]].dropna())
+        tgt = pd.DataFrame({"ret": (q["Close"] / q["Open"] - 1) * 100,
+                            "lo": (q["Low"] / q["Open"] - 1) * 100,
+                            "hi": (q["High"] / q["Open"] - 1) * 100,
+                            "gap": (q["Open"] / q["Close"].shift(1) - 1) * 100})
+        df = Z.join(tgt, how="inner").dropna(subset=["ret", "lo", "hi", "gap"])
+        if len(df) < 100: return None
+        fc = [c for c in Z.columns if c in df.columns]
+        today = df.index[-1]; hist = df.iloc[:-1].copy()
+        v0 = df.loc[today, fc].values.astype(float)
+        M = hist[fc].values.astype(float)
+        hist["dist"] = np.sqrt(((M - v0) ** 2).sum(axis=1))
+        hist = hist.sort_values("dist")
+        top = hist.head(MACRO_TOPN)
+
+        raw = F.loc[today]
+        pcts = {c: float((hist[c] < df.loc[today, c]).mean() * 100) for c in fc}
+        ext = sorted(fc, key=lambda c: -abs(pcts[c] - 50))[:4]
+        return dict(
+            date=str(today.date()), n_hist=len(hist), n_feat=len(fc),
+            extremes=[dict(name=c, chg=round(float(raw[c]), 2), pct=round(pcts[c])) for c in ext],
+            up=[dict(d=str(i.date()), dist=round(r["dist"], 2), gap=round(r["gap"], 2),
+                     ret=round(r["ret"], 2), lo=round(r["lo"], 2), hi=round(r["hi"], 2))
+                for i, r in top.iterrows() if r["ret"] > 0],
+            dn=[dict(d=str(i.date()), dist=round(r["dist"], 2), gap=round(r["gap"], 2),
+                     ret=round(r["ret"], 2), lo=round(r["lo"], 2), hi=round(r["hi"], 2))
+                for i, r in top.iterrows() if r["ret"] <= 0],
+            rng=round(float((top["hi"] - top["lo"]).mean()), 3),
+            base_rng=round(float((hist["hi"] - hist["lo"]).mean()), 3),
+            lo_avg=round(float(top["lo"].mean()), 3), hi_avg=round(float(top["hi"].mean()), 3),
+            base_up=round(float((hist["ret"] > 0).mean() * 100), 1))
+    except Exception as e:
+        print(f"  매크로 매칭 실패: {e}")
+        return None
 
 
 def gap_signal(df, st):
@@ -379,6 +445,7 @@ def step():
     pmv = premarket_pos()
     gsig = gap_signal(df, st)
     log["gap"] = gsig
+    log["macro"] = macro_match()
     if gsig and gsig.get("state") == "ACTIVE":
         vixchg = vg.get("open_chg") if vg else None
         gtrack = log.setdefault("gap_track", {})
@@ -710,6 +777,41 @@ def render(log, st):
     if not grows:
         grows = '<tr><td colspan="7" class="rs">NO OPERATIONS — 갭 0.2~1.0% 발생 시 자동 개시</td></tr>'
 
+    # ── 매크로 유사일 패널 ──
+    mm = log.get("macro")
+    if not mm:
+        mac_html = ('<div class="panel"><div class="ph">MACRO PATTERN MATCH</div>'
+                    '<div class="big dim2">NO DATA</div>'
+                    '<div class="meta">매크로 지표 수집 실패 — 다음 실행에서 재시도</div></div>')
+    else:
+        exs = " · ".join(f'{e["name"]} {e["chg"]:+.2f}%<span class="rs">({e["pct"]:.0f}%tile)</span>'
+                         for e in mm["extremes"])
+        nu, nd = len(mm["up"]), len(mm["dn"])
+        tot = nu + nd
+        def _rows(lst, cls):
+            r = ""
+            for x in lst:
+                r += (f'<tr><td>{x["d"][2:]}</td><td class="rs">{x["dist"]:.2f}</td>'
+                      f'<td>{x["gap"]:+.2f}%</td>'
+                      f'<td class="{cls}">{x["ret"]:+.2f}%</td>'
+                      f'<td class="rs">{x["lo"]:+.2f} / {x["hi"]:+.2f}</td></tr>')
+            return r or '<tr><td colspan="5" class="rs">해당 없음</td></tr>'
+        mac_html = (
+            f'<div class="panel"><div class="ph">TODAY · MACRO PROFILE</div>'
+            f'<div class="meta">{exs}</div>'
+            f'<div class="meta" style="margin-top:9px">가장 극단인 지표 4개 · 과거 {mm["n_hist"]}일 중 백분위'
+            f'<br>피처 {mm["n_feat"]}개(금리·유가·달러·VIX·금·구리·크레딧·환율·해외지수·선물) z-score 거리</div></div>'
+            f'<div class="panel"><div class="ph">유사했던 날 {tot}일 · 결과가 갈립니다</div>'
+            f'<div class="mgrid">'
+            f'<div><div class="mh pos">▲ 올랐던 날 {nu}</div>'
+            f'<table><tr><th>날짜</th><th>거리</th><th>갭</th><th>종가</th><th>저/고</th></tr>{_rows(mm["up"],"pos")}</table></div>'
+            f'<div><div class="mh neg">▼ 빠졌던 날 {nd}</div>'
+            f'<table><tr><th>날짜</th><th>거리</th><th>갭</th><th>종가</th><th>저/고</th></tr>{_rows(mm["dn"],"neg")}</table></div>'
+            f'</div>'
+            f'<div class="meta" style="margin-top:12px">유사일 평균 레인지 {mm["rng"]:.2f}% '
+            f'(전체 평균 {mm["base_rng"]:.2f}%) · 저점 {mm["lo_avg"]:+.2f}% / 고점 {mm["hi_avg"]:+.2f}%'
+            f'<br>전체 기간 상승 비율 {mm["base_up"]:.0f}% — 유사일 {nu}/{tot}건이 상승</div></div>')
+
     legacy = len(trades) - n
     return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -783,6 +885,9 @@ tr:last-child td{{border-bottom:none}}
   text-shadow:0 0 10px rgba(232,176,75,.4)}}
 .tabpane{{display:none}}
 .tabpane.on{{display:block}}
+.mgrid{{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
+.mh{{font-size:10px;letter-spacing:.12em;padding:5px 0 7px;text-transform:uppercase}}
+@media (max-width:520px){{.mgrid{{grid-template-columns:1fr}}}}
 .brief b{{color:var(--ambd)}}
 @media (prefers-reduced-motion:no-preference){{
   .lamp.go,.verdict.go{{animation:pulse 2.6s ease-in-out infinite}}
@@ -795,6 +900,7 @@ tr:last-child td{{border-bottom:none}}
 <div class="tabs">
   <button class="tab on" data-t="t1">3-LAYER · ITM</button>
   <button class="tab" data-t="t2">GAP FILL</button>
+  <button class="tab" data-t="t3">MACRO</button>
 </div>
 <div id="t1" class="tabpane on">
 {gate}
@@ -842,6 +948,16 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
 백테스트 근거 — 1시간봉 2년 n=151 · PF 1.58 · 상위2제외 1.48 · 반반 1.53/1.62<br>
 ※ 백테스트 옵션 환산은 PF 0.36~0.96 (세타·스프레드 잠식) — <b>실측으로 이게 맞는지 확인 중</b>.
    기초 P/L과 옵션 P/L을 나란히 기록하고, MFE·VWAP밴드 자리로 더 나은 진입/청산이 있었는지 검증.
+</div>
+</div>
+<div id="t3" class="tabpane">
+{mac_html}
+<div class="brief">
+<b>MACRO PATTERN MATCH · 참고용</b> — 09:30에 확정된 매크로 지표(전일 종가 대비 개장 변화율)를
+z-score 벡터로 만들어 과거 2년에서 유클리드 거리가 가까운 날을 찾습니다.<br>
+<b>이것은 매매 신호가 아닙니다.</b> 측정 결과 유사일의 방향 적중은 48~60%로 베이스라인과
+통계적으로 구별되지 않습니다(CI가 50% 포함). 올랐던 날과 빠졌던 날을 나란히 보여주는 이유가 그것입니다.<br>
+쓸모 있는 축은 <b>방향이 아니라 레인지</b>입니다 — 오늘 얼마나 움직일 장인지의 참고치로 보십시오.
 </div>
 </div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
