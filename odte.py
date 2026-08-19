@@ -779,14 +779,14 @@ def render(log, st):
         bk = books.get(k, dict(cap=GAP_CAPITAL, trades=[]))
         cap = bk["cap"]; tr = bk["trades"]
         pl = cap - GAP_CAPITAL
-        w = sum(1 for t in tr if t["usd"] > 0)
-        wr = f"{w/len(tr)*100:.0f}%" if tr else "—"
+        gw = sum(1 for t in tr if t["usd"] > 0)
+        gwr_s = f"{gw/len(tr)*100:.0f}%" if tr else "—"
         peak = GAP_CAPITAL; mdd = 0.0; c = GAP_CAPITAL
         for t in tr:
             c += t["usd"]; peak = max(peak, c); mdd = max(mdd, (peak - c) / peak * 100)
         cls = "pos" if pl > 0 else ("neg" if pl < 0 else "")
         srows += (f'<tr><td><b>{k}%</b></td><td>${cap:,.0f}</td>'
-                  f'<td class="{cls}">{pl:+,.0f}</td><td>{len(tr)}</td><td>{wr}</td>'
+                  f'<td class="{cls}">{pl:+,.0f}</td><td>{len(tr)}</td><td>{gwr_s}</td>'
                   f'<td class="rs">{mdd:.1f}%</td>'
                   f'<td class="rs">{tr[-1]["nc"] if tr else 0}</td></tr>')
 
