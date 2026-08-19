@@ -35,7 +35,7 @@ SCORE_MIN = 3        # |DTE 점수| 이 값 이상일 때만 진입
 # 청산은 프리미엄 %가 아니라 기초자산 트리거 (v10 검증 C안)
 #   TP1: VWAP 도달 -> 가치 50% 청산 기록 / 러너: +1σ 전량 / 손절: 당일저점 / 14:30 시간청산
 # (1계약이라 물리적 분할 불가 -> mock상 0.5*TP1가 + 0.5*최종가로 기록)
-CUTOFF   = dt.time(14, 30)   # 세타 급가속 전 청산
+CUTOFF   = dt.time(11, 30)   # 세타 방어 — 갭 트랙과 통일 (형님 결정 2026-08-19)
 MAX_PER_DAY = 1      # 방향 베팅이라 하루 1회
 VERSION_NOTE = "3layer-itm-forward"
 VERSION  = "itm-2.0"
@@ -61,6 +61,7 @@ GAP_SIZES = [0.30, 0.40, 0.50, 0.60, 0.70]   # 병렬 비교할 사이징
 # 커버 판정 기준선 3종 병렬 (봉 크기별 진입 타이밍 비교)
 GAP_TFS = {"5m": 1, "15m": 2, "1h": 11}      # 키: 이름, 값: 5분봉 인덱스(0-base)
 GAP_TF_LABEL = {"5m": "5분(09:35)", "15m": "15분(09:45)", "1h": "1시간(10:30)"}
+GAP_ENTRIES = {"now": "즉시 진입", "vwap": "VWAP 중간선 대기"}
 GAP_TF_TIME = {"5m": "09:35", "15m": "09:45", "1h": "10:30"}
 GAP_DELTA = 0.69                              # 소급 환산용 (실측: 콜0.698/풋0.685)
 GAP_CAPITAL = 2000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
@@ -225,6 +226,13 @@ def gap_signal(df, st):
         C = [float(x) for x in rt["Close"]]
         cur = C[-1]
         # 첫 1시간(09:30~10:30) 종가 기준 커버율 — 5분봉이면 12번째 봉
+        # VWAP 중간선 되돌림 터치 (진입 후보 B)
+        Vv = [float(x) for x in rt["Volume"]]
+        _cv = _cpv = 0.0; Wm = []
+        for i in range(len(C)):
+            tp = (H[i] + L[i] + C[i]) / 3
+            _cv += Vv[i]; _cpv += tp * Vv[i]
+            Wm.append(_cpv / _cv if _cv else tp)
         # 3종 기준선 각각의 커버율·진입가
         tfs = {}
         for tf, idx in GAP_TFS.items():
@@ -232,9 +240,16 @@ def gap_signal(df, st):
             cx = C[i]
             cv = ((op - cx) / (op - pcl)) if sgn > 0 else ((cx - op) / abs(op - pcl))
             rdy = len(C) > idx
+            # 기준선 이후 VWAP 중간선 역방향 터치 지점
+            vw_px = None
+            for j in range(i, len(C)):
+                if (H[j] >= Wm[j]) if sgn > 0 else (L[j] <= Wm[j]):
+                    vw_px = round(Wm[j], 2); break
             tfs[tf] = dict(cover=round(cv, 2), entry=round(cx, 2), ready=rdy,
                            ok=(rdy and cv >= GAP_COVER_MIN),
-                           room=round(abs(pcl - cx) / cx * 100, 3))
+                           room=round(abs(pcl - cx) / cx * 100, 3),
+                           vw_entry=vw_px,
+                           vw_room=(round(abs(pcl - vw_px) / vw_px * 100, 3) if vw_px else None))
         idx1h = min(11, len(C) - 1)
         c1h = C[idx1h]
         cover = tfs["1h"]["cover"]
@@ -489,16 +504,20 @@ def step():
     if gsig and gsig.get("state") in ("ACTIVE", "WAIT", "LOW_COVER") and gsig.get("tfs"):
         tracks = log.setdefault("gap_tracks", {})
         for tf in GAP_TFS:
-            tr = tracks.setdefault(tf, dict(open=None, trades=[], books={}, done={}))
+          for em in GAP_ENTRIES:
+            tk = f"{tf}|{em}"
+            tr = tracks.setdefault(tk, dict(open=None, trades=[], books={}, done={}))
             info = gsig["tfs"][tf]
+            ep_use = info["entry"] if em == "now" else info.get("vw_entry")
+            rm_use = info["room"] if em == "now" else info.get("vw_room")
             gopen = tr["open"]
 
             # ── 진입 ──
-            if gopen is None and tr["done"].get(dstr) is None and info["ok"]:
+            if gopen is None and tr["done"].get(dstr) is None and info["ok"] and ep_use:
                 if True:
-                    late = bool(gsig.get("filled"))    # 갭필 후 발견 여부만 표시
+                    late = bool(gsig.get("filled"))
                     oside = "put" if gsig["sgn"] > 0 else "call"
-                    gopt = itm_opt(info["entry"], today_expiry(today), oside, 1e9)
+                    gopt = itm_opt(ep_use, today_expiry(today), oside, 1e9)
                     if gopt:
                         prem = gopt["premium"]
                         if late:
@@ -522,8 +541,8 @@ def step():
                             prem_src=("소급" if late else "실시간"),
                             band_px=None, band_t=None, mfe=0.0, mfe_t=None,
                             mfe_prem=-99.0, mfe_prem_t=None, filled=False, fill_t=None, res=None)
-                        print(f"  [갭/{tf}] 진입 커버{info['cover']:.2f} {oside.upper()} "
-                              f"{gopt['strike']:.0f} @${prem} 계약{ent}")
+                        print(f"  [갭/{tk}] 진입 커버{info['cover']:.2f} @{ep_use} "
+                              f"{oside.upper()} {gopt['strike']:.0f} @${prem}")
 
             # ── 관리·청산 ──
             gopen = tr["open"]
@@ -570,7 +589,7 @@ def step():
                         exit_at=now.strftime("%H:%M"), exit_premium=ex,
                         pnl_pct=pct, per_contract=per, ux=round(ux, 3))
                     tr["trades"].append(rec); tr["open"] = None
-                    print(f"  [갭/{tf}] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
+                    print(f"  [갭/{tk}] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
 
     log["vix"] = vg                      # early return 경로에서도 화면에 남도록 즉시 저장
     log["pm"] = pmv
@@ -890,27 +909,36 @@ def render(log, st):
 
     subtabs = ""; subpanes = ""
     for j, tf in enumerate(GAP_TFS):
-        tr = tracks.get(tf, {})
-        n = len(tr.get("trades", []))
+        n_tf = sum(len(tracks.get(f"{tf}|{e}", {}).get("trades", [])) for e in GAP_ENTRIES)
         subtabs += (f'<button class="stab{" on" if j==0 else ""}" data-s="{tf}">'
-                    f'{GAP_TF_LABEL[tf]}<br><span class="rs">{n}건</span></button>')
-        op = tr.get("open")
-        if op:
-            oh = (f'<div class="panel hot"><div class="ph">진행 중</div>'
-                  f'<div class="big">{"BUY PUT" if op["sgn"]>0 else "BUY CALL"} {op["strike"]:.0f} '
-                  f'<span class="dim">@ ${op["premium"]}</span></div>'
-                  f'<div class="meta">진입 {op["at"]} @ {op["entry"]} · 커버 {op["cover"]:.2f} '
-                  f'· 타깃 {op["target"]}<br>'
-                  f'{"갭필 " + str(op["fill_t"]) + " · 트레일 추적" if op["filled"] else "갭필 대기 · 11:30 컷"}</div></div>')
-        else:
+                    f'{GAP_TF_LABEL[tf]}<br><span class="rs">{n_tf}건</span></button>')
+        inner_t = ""; inner_p = ""
+        for m, em in enumerate(GAP_ENTRIES):
+            tk = f"{tf}|{em}"
+            tr = tracks.get(tk, {})
+            nn = len(tr.get("trades", []))
+            inner_t += (f'<button class="etab{" on" if m==0 else ""}" data-e="{tf}_{em}">'
+                        f'{GAP_ENTRIES[em]} <span class="rs">{nn}</span></button>')
+            op = tr.get("open")
             oh = ""
-        subpanes += (f'<div class="spane{" on" if j==0 else ""}" id="s{tf}">{oh}'
-                     f'<div class="panel"><div class="ph">사이징 · 각 ${GAP_CAPITAL:.0f}</div>'
-                     f'<table><tr><th>사이징</th><th>잔고</th><th>P/L</th><th>거래</th><th>승률</th><th>MDD</th></tr>'
-                     f'{_sizing_tbl(tr)}</table></div>'
-                     f'<div class="panel"><div class="ph">원장 · 행을 누르면 상세</div>'
-                     f'<table class="ltab"><tr><th>DATE</th><th>TYPE</th><th>GAP</th><th>커버</th>'
-                     f'<th>P/L</th><th>EXIT</th><th></th></tr>{_ledger(tr, tf)}</table></div></div>')
+            if op:
+                oh = (f'<div class="panel hot"><div class="ph">진행 중</div>'
+                      f'<div class="big">{"BUY PUT" if op["sgn"]>0 else "BUY CALL"} {op["strike"]:.0f} '
+                      f'<span class="dim">@ ${op["premium"]}</span></div>'
+                      f'<div class="meta">진입 {op["at"]} @ {op["entry"]} · 커버 {op["cover"]:.2f}'
+                      f' · 타깃 {op["target"]}<br>'
+                      f'{"갭필 " + str(op["fill_t"]) + " · 트레일 추적" if op["filled"] else "갭필 대기 · 11:30 컷"}'
+                      f'</div></div>')
+            inner_p += (f'<div class="epane{" on" if m==0 else ""}" id="e{tf}_{em}">{oh}'
+                        f'<div class="panel"><div class="ph">사이징 · 각 ${GAP_CAPITAL:.0f}</div>'
+                        f'<table><tr><th>사이징</th><th>잔고</th><th>P/L</th><th>거래</th>'
+                        f'<th>승률</th><th>MDD</th></tr>{_sizing_tbl(tr)}</table></div>'
+                        f'<div class="panel"><div class="ph">원장 · 행을 누르면 상세</div>'
+                        f'<table class="ltab"><tr><th>DATE</th><th>TYPE</th><th>GAP</th>'
+                        f'<th>커버</th><th>P/L</th><th>EXIT</th><th></th></tr>'
+                        f'{_ledger(tr, tf + em)}</table></div></div>')
+        subpanes += (f'<div class="spane{" on" if j==0 else ""}" id="s{tf}">'
+                     f'<div class="etabs">{inner_t}</div>{inner_p}</div>')
 
     # ── 매크로 유사일 패널 ──
     mm = log.get("macro")
@@ -1024,7 +1052,7 @@ td{{font-size:11px;padding:8px 7px;border-bottom:1px solid rgba(28,40,34,.6)}}
 tr:last-child td{{border-bottom:none}}
 .rs{{color:var(--mut);font-size:10px}}
 .brief{{font-size:10.5px;color:var(--mut);line-height:1.9;margin-top:16px;padding:12px 14px;
-  border:1px dashed var(--ln)}}
+  border:1px dashed var(--ln);word-break:keep-all;overflow-wrap:anywhere}}
 .tabs{{display:flex;gap:0;margin:14px 0 0;border-bottom:1px solid var(--ln)}}
 .tab{{flex:1;padding:11px 8px;text-align:center;font-size:10.5px;letter-spacing:.14em;
   color:var(--mut);cursor:pointer;border:1px solid transparent;border-bottom:none;
@@ -1052,6 +1080,13 @@ tr:last-child td{{border-bottom:none}}
 .sdn{{background:var(--red);opacity:.75}}
 .slab{{display:flex;justify-content:space-between;font-size:10.5px;margin-top:6px}}
 .stabs{{display:flex;gap:6px;margin:14px 0 12px}}
+.etabs{{display:flex;gap:6px;margin:0 0 12px}}
+.etab{{flex:1;padding:8px 4px;font-size:9.5px;letter-spacing:.04em;background:transparent;
+  border:1px dashed var(--ln);color:var(--mut);cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.etab.on{{color:var(--amb);border-style:solid;border-color:var(--amb)}}
+.epane{{display:none}}
+.epane.on{{display:block}}
 .stab{{flex:1;padding:9px 4px;font-size:10px;line-height:1.5;letter-spacing:.06em;
   background:var(--pn);border:1px solid var(--ln);color:var(--mut);cursor:pointer;
   font-family:'IBM Plex Mono',monospace;text-align:center}}
@@ -1129,9 +1164,9 @@ LEGACY {legacy}건은 구버전 기록으로 통계 제외 · 프리미엄은 �
 <b>GAP FILL · FORWARD TEST</b> — 갭 0.2~1.5% & 첫봉(10:30) 커버 40%+ → 갭 메우는 방향 진입<br>
 갭필 도달 → 트레일 0.15% · <b>11:30까지 갭필 실패 시 청산</b>(세타 방어) · 14:00 최종컷<br>
 가격 손절 없음 — 사이징이 손실 상한<br>
-<b>서브탭 = 커버 판정 기준선 비교</b> — 5분(09:35) / 15분(09:45) / 1시간(10:30).
-같은 갭을 세 시점에 각각 판정해 어느 타이밍이 나은지 검증합니다. 각 기준선마다
-30/40/50/60/70% 다섯 계좌가 독립 운용됩니다<br>
+<b>2단 서브탭</b> — 위: 커버 판정 기준선 5분(09:35)/15분(09:45)/1시간(10:30),
+아래: 진입 방식 즉시/VWAP 중간선 대기.
+6개 조합 × 사이징 5종 = 30계좌가 같은 갭을 각각 기록합니다<br>
 집행 — <b>전부 매수(BUY)</b>. 갭업 → <b>ITM PUT</b> / 갭다운 → <b>ITM CALL</b> (Δ0.7)<br>
 백테스트 — 1시간봉 2년 n=87 · 승률 62.1% · PF 4.01 · 대손실(-50%↓) 0건<br>
 사이징별: 30% MDD 26% / 40% MDD 38% / 50% MDD 48% / 최장 5연패 · 최악 1회 -13~31%<br>
