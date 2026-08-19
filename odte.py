@@ -201,12 +201,12 @@ def gap_signal(df, st):
     try:
         d = df.copy()
         days = sorted(set(d.index.date))
-        if len(days) < 2: return None
+        if len(days) < 2: return dict(state="ERR", msg=f"거래일 {len(days)}일뿐")
         today, prev = days[-1], days[-2]
         pcl = float(d[d.index.date == prev]["Close"].iloc[-1])
         rt = d[(d.index.date == today) & (d.index.time >= dt.time(9, 30))
                & (d.index.time < dt.time(16, 0))]
-        if len(rt) < 1: return None
+        if len(rt) < 1: return dict(state="ERR", msg=f"{today} 정규장 봉 없음")
         op = float(rt["Open"].iloc[0])
         gp = (op - pcl) / pcl * 100
         if not (GAP_MIN <= abs(gp) < GAP_MAX):
@@ -265,8 +265,9 @@ def gap_signal(df, st):
                     band_room=(round(abs(pcl - band_px) / band_px * 100, 3) if band_px else None),
                     mfe=round(best / op * 100, 3), mfe_t=best_t, mfe_px=best_px)
     except Exception as e:
+        import traceback
         print(f"  갭 신호 계산 실패: {e}")
-        return None
+        return dict(state="ERR", msg=f"{type(e).__name__}: {e}"[:180])
 
 
 def premarket_pos():
@@ -278,12 +279,15 @@ def premarket_pos():
             df.columns = df.columns.get_level_values(0)
         df = df.dropna()
         df.index = df.index.tz_convert(NY)
-        today = sorted(set(df.index.date))[-1]
+        _days = sorted(set(df.index.date))
+        if len(_days) < 2:
+            return dict(state="ERR", msg=f"거래일 부족 {len(_days)}")
+        today = _days[-1]
         g = df[df.index.date == today]
         pm = g[(g.index.time >= dt.time(4, 0)) & (g.index.time < dt.time(9, 30))]
         rt = g[g.index.time >= dt.time(9, 30)]
-        if len(pm) < 3 or len(rt) < 1:
-            return None
+        if len(rt) < 1:
+            return dict(state="ERR", msg=f"정규장 봉 없음 (today={today})")
         pmh, pml = float(pm["High"].max()), float(pm["Low"].min())
         if pmh <= pml:
             return None
