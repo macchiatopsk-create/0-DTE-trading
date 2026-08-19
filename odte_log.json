@@ -397,31 +397,5 @@
   "cover": 1.86,
   "gap": 0.393,
   "mfe": 1.083
- },
- "gap_tracks": {
-  "5m": {
-   "open": null,
-   "trades": [],
-   "books": {},
-   "done": {
-    "2026-08-19": "LATE"
-   }
-  },
-  "15m": {
-   "open": null,
-   "trades": [],
-   "books": {},
-   "done": {
-    "2026-08-19": "LATE"
-   }
-  },
-  "1h": {
-   "open": null,
-   "trades": [],
-   "books": {},
-   "done": {
-    "2026-08-19": "LATE"
-   }
-  }
  }
 }

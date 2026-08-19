@@ -41,7 +41,8 @@ VERSION_NOTE = "3layer-itm-forward"
 VERSION  = "itm-2.0"
 
 # ── ITM 포워드 테스트 (2026-08-14 시작) ──
-CAPITAL_START = 1000.0   # mock 자본. 로그의 trades에서 동적 집계 (헌법 7조)
+CAPITAL_START = 2000.0   # mock 자본 (갭 트랙과 동일 조건)
+L3_SIZES = [0.30, 0.40, 0.50, 0.60, 0.70]   # 3층도 사이징 병렬 비교
 DELTA_LO, DELTA_HI = 0.70, 0.80   # ITM 콜 델타 밴드
 ENTRY_BAND_SIG = 1.0     # VWAP -1σ 터치 대기 (v10: 진입대기가 09:30 즉시진입보다 우수)
 
@@ -492,9 +493,8 @@ def step():
 
             # ── 진입 ──
             if gopen is None and tr["done"].get(dstr) is None and info["ok"]:
-                if gsig.get("filled"):
-                    tr["done"][dstr] = "LATE"          # 이미 갭필 -> 진입 시점 놓침
-                else:
+                if True:
+                    late = bool(gsig.get("filled"))    # 갭필 후 발견 여부만 표시
                     oside = "put" if gsig["sgn"] > 0 else "call"
                     gopt = itm_opt(info["entry"], today_expiry(today), oside, 1e9)
                     if gopt:
@@ -505,7 +505,8 @@ def step():
                             bk = tr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
                             ent[k] = int((bk["cap"] * f) // cost)
                         tr["done"][dstr] = True
-                        tr["open"] = dict(date=dstr, tf=tf, dir=gsig["dir"], sgn=gsig["sgn"],
+                        tr["open"] = dict(date=dstr, tf=tf, late=late,
+                            dir=gsig["dir"], sgn=gsig["sgn"],
                             gap=gsig["gap"], cover=info["cover"], entry=info["entry"],
                             target=gsig["target"], room=info["room"], at=now.strftime("%H:%M"),
                             opt_side=oside, strike=gopt["strike"], premium=prem, contracts=ent,
@@ -620,6 +621,14 @@ def step():
             eff_exit = round(0.5 * t1 + 0.5 * exit_prem, 2) if t1 else exit_prem
             pnl_pct = (eff_exit / open_pos["premium"] - 1) * 100
             pnl_usd = round((eff_exit - open_pos["premium"]) * 100, 2)
+            _books = log.setdefault("l3_books", {})
+            for _k, _nc in (open_pos.get("contracts") or {}).items():
+                if _nc < 1: continue
+                _bk = _books.setdefault(_k, dict(cap=CAPITAL_START, trades=[]))
+                _u = round((eff_exit - open_pos["premium"]) * 100 * _nc, 2)
+                _bk["cap"] = round(_bk["cap"] + _u, 2)
+                _bk["trades"].append(dict(d=dstr, nc=_nc, usd=_u,
+                                          pct=round(pnl_pct, 1), res=reason))
             tr = dict(open_pos)
             tr.update(exit_time=now.strftime("%H:%M"), exit_px=round(px, 2),
                       exit_premium=exit_prem, eff_exit=eff_exit,
@@ -656,7 +665,14 @@ def step():
         elif opt["premium"] * 100 > cap:
             status = f"SKIP_FUND · 프리미엄 ${opt['premium']*100:.0f} > 잔고 ${cap:.0f}"
         else:
+            _books = log.setdefault("l3_books", {})
+            _ent = {}
+            for _f in L3_SIZES:
+                _k = str(int(_f * 100))
+                _bk = _books.setdefault(_k, dict(cap=CAPITAL_START, trades=[]))
+                _ent[_k] = int((_bk["cap"] * _f) // (opt["premium"] * 100))
             log["open"] = dict(date=dstr, side="call", mfe=-99.0, mfe_t=None,
+                               contracts=_ent,
                                mfe_prem=-99.0, mfe_prem_t=None, strike=opt["strike"],
                                premium=opt["premium"], iv=opt["iv"], symbol=opt["symbol"],
                                entry_time=now.strftime("%H:%M"), entry_px=round(st["px"], 2),
@@ -743,20 +759,47 @@ def render(log, st):
                     f'<div class="meta">{d.get("status", "세션 대기")}</div></div>')
 
     # ── 원장 ──
+    l3books = log.get("l3_books", {})
+    l3size = ""
+    for f in L3_SIZES:
+        k = str(int(f * 100))
+        bk = l3books.get(k, dict(cap=CAPITAL_START, trades=[]))
+        cap = bk["cap"]; tl = bk["trades"]; pl = cap - CAPITAL_START
+        ww = sum(1 for x in tl if x["usd"] > 0)
+        wrs = f"{ww/len(tl)*100:.0f}%" if tl else "—"
+        peak = CAPITAL_START; mdd = 0.0; c = CAPITAL_START
+        for x in tl:
+            c += x["usd"]; peak = max(peak, c); mdd = max(mdd, (peak - c) / peak * 100)
+        cls = "pos" if pl > 0 else ("neg" if pl < 0 else "")
+        l3size += (f'<tr><td><b>{k}%</b></td><td>${cap:,.0f}</td>'
+                   f'<td class="{cls}">{pl:+,.0f}</td><td>{len(tl)}</td>'
+                   f'<td>{wrs}</td><td class="rs">{mdd:.1f}%</td></tr>')
+
     rows = ""
-    for t in reversed(itm[-40:]):
+    for i, t in enumerate(reversed(itm[-20:])):
         c = "pos" if t["pnl_pct"] > 0 else "neg"
         mp = t.get("mfe_prem"); mp = None if (mp is None or mp < -90) else mp
-        rows += (f'<tr><td>{t["date"][5:]}</td><td>C{t["strike"]:.0f}</td>'
-                 f'<td>{t["entry_time"]}→{t["exit_time"]}</td>'
-                 f'<td>${t["premium"]}→${t.get("eff_exit", t["exit_premium"])}</td>'
-                 f'<td class="{c}">{t["pnl_pct"]:+.1f}%</td>'
-                 f'<td class="{c}">${t.get("pnl_usd",0):+.0f}</td>'
-                 f'<td class="pos">{f"{mp:+.0f}%" if mp is not None else "—"}'
-                 f'<br><span class="rs">{t.get("mfe_prem_t","") or ""}</span></td>'
-                 f'<td class="rs">{t["reason"]}</td></tr>')
+        ct = " · ".join(f'{k}%: {v}' for k, v in
+                        sorted((t.get("contracts") or {}).items(), key=lambda x: int(x[0])))
+        det = (f'<div class="dgrid">'
+               f'<div><span class="dk">진입</span><span class="dv">{t["entry_time"]} @ {t.get("entry_px","")}</span></div>'
+               f'<div><span class="dk">청산</span><span class="dv">{t["exit_time"]} · {t["reason"]}</span></div>'
+               f'<div><span class="dk">계약</span><span class="dv">CALL {t["strike"]:.0f}</span></div>'
+               f'<div><span class="dk">프리미엄</span><span class="dv">${t["premium"]}→${t.get("eff_exit", t["exit_premium"])}</span></div>'
+               f'<div><span class="dk">TP1</span><span class="dv">{("$"+str(t.get("tp1_prem"))+" @ "+str(t.get("tp1_time",""))) if t.get("tp1_prem") else "미달성"}</span></div>'
+               f'<div><span class="dk">손절가(기초)</span><span class="dv">{t.get("stop_px","-")}</span></div>'
+               f'<div><span class="dk">옵션 손익</span><span class="dv {c}">{t["pnl_pct"]:+.1f}% (${t.get("pnl_usd",0):+.0f}/계약)</span></div>'
+               f'<div><span class="dk">최고 지점</span><span class="dv pos">{f"{mp:+.0f}% @ {t.get(chr(39)+chr(39)) or t.get("mfe_prem_t") or ""}" if mp is not None else "—"}</span></div>'
+               f'<div class="dfull"><span class="dk">사이징별 계약</span><span class="dv">{ct or "—"}</span></div>'
+               f'</div>')
+        rows += (f'<tr class="crow" data-i="L{i}"><td>{t["date"][5:]}</td>'
+                 f'<td>C{t["strike"]:.0f}</td>'
+                 f'<td class="{c}">{t["pnl_pct"]:+.0f}%</td>'
+                 f'<td class="pos">{f"{mp:+.0f}%" if mp is not None else "—"}</td>'
+                 f'<td class="rs">{t["reason"]}</td><td class="rs">▾</td></tr>'
+                 f'<tr class="drow" id="dL{i}"><td colspan="6">{det}</td></tr>')
     if not rows:
-        rows = '<tr><td colspan="8" class="rs">NO OPERATIONS LOGGED — 3층 통과 시 자동 개시</td></tr>'
+        rows = '<tr><td colspan="6" class="rs">NO OPERATIONS — 3층 통과 시 자동 개시</td></tr>'
 
     # ── 갭 트랙 패널 ──
     gs = log.get("gap")
@@ -1042,23 +1085,22 @@ tr:last-child td{{border-bottom:none}}
 <div class="tabpane">
 {gate}
 {pos_html}
-<div class="panel"><div class="ph">FUND LEDGER · MOCK ${CAPITAL_START:.0f}</div>
-<div class="stats">
-  <div class="st"><div class="k">BAL</div><div class="v">${bal:.0f}</div></div>
-  <div class="st"><div class="k">P/L</div><div class="v {'pos' if tot_usd>0 else ('neg' if tot_usd<0 else '')}">${tot_usd:+.0f}</div></div>
-  <div class="st"><div class="k">OPS</div><div class="v">{n}</div></div>
-  <div class="st"><div class="k">WIN</div><div class="v">{f"{wr:.0f}%" if wr is not None else "—"}</div></div>
-  <div class="st"><div class="k">LEGACY</div><div class="v dim2" style="color:var(--mut)">{legacy}</div></div>
+<div class="panel"><div class="ph">사이징 · 각 ${CAPITAL_START:.0f}</div>
+<table><tr><th>사이징</th><th>잔고</th><th>P/L</th><th>거래</th><th>승률</th><th>MDD</th></tr>{l3size}</table>
 </div>
-<table><tr><th>DATE</th><th>CONTRACT</th><th>WINDOW</th><th>FILL</th><th>P/L%</th><th>P/L$</th><th>MFE·시각</th><th>EXIT</th></tr>{rows}</table>
+<div class="panel"><div class="ph">원장 · 행을 누르면 상세</div>
+<table class="ltab"><tr><th>DATE</th><th>계약</th><th>P/L</th><th>MFE</th><th>EXIT</th><th></th></tr>{rows}</table>
 </div>
 <div class="brief">
-<b>RULES OF ENGAGEMENT</b> — L1 VIX9D/VIX3M 백분위 ≥50 · L2 프리마켓 위치 &gt;0.5 · L3 VWAP -1σ 터치
-→ <b>ITM CALL 매수(BUY)</b> Δ0.7~0.8 × 1계약<br>
-집행 — <b>전부 매수(BUY)</b>. 롱 온리 · 숏은 엣지 없음 확인되어 봉인 · 옵션 매도(SELL) 전략 아님<br>
-EXIT — TP1 VWAP(가치 50%) → 러너 +1σ · 손절 당일저점 · 14:30 ET 강제청산 · 1 op/day<br>
-근거 — v9 501거래일: 승률 63.1% · PF 1.69 · 반반 1.63/1.76 (QQQ 전용, 숏 봉인)<br>
-LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리미엄은 지연 mid 기준.
+<b>3-LAYER · ITM</b><br>
+L1 VIX9D/VIX3M 백분위 ≥50 · L2 프리마켓 위치 &gt;0.5 · L3 VWAP −1σ 터치<br>
+→ <b>ITM CALL 매수</b> (Δ0.7) · 롱 온리, 숏 봉인 · 옵션 매도 전략 아님<br>
+사이징 30/40/50/60/70% 다섯 계좌 각 ${CAPITAL_START:.0f} 병렬<br>
+EXIT — TP1 VWAP(50%) → 러너 +1σ · 손절 당일저점 · 14:30 강제청산 · 1회/일<br>
+백테스트 — v9 1시간봉 501일: 승률 63.1% · PF 1.69 · 반반 1.63/1.76<br>
+<b>⚠ 15분봉 60일 재검증(n=15)에서는 옵션 환산 PF 0.42로 부진</b>. 보유 24분으로 TP1이
+너무 가깝고, 최근 구간이 이 전략에 불리했을 수 있음 — 라이브로 확인 중<br>
+LEGACY {legacy}건은 구버전 기록으로 통계 제외 · 프리미엄은 지연 mid 기준
 </div>
 </div>
 <div class="tabpane">
