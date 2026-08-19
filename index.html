@@ -108,7 +108,7 @@ tr:last-child td{border-bottom:none}
 </style></head><body>
 <div class="cls">Mock Simulation // Training Use Only // Not Investment Advice</div>
 <header><div><div class="op">OP&nbsp;ZERO-DAY</div><div class="sub">QQQ 0DTE · 3-Layer System</div></div>
-<div class="ts">2026-08-18 17:01 ET<br>SYS itm-2.0 · UPLINK 15MIN</div></header>
+<div class="ts">2026-08-19 05:24 ET<br>SYS itm-2.0 · UPLINK 15MIN</div></header>
 <div class="tabs">
   <button class="tab on" data-i="0">3-LAYER · ITM</button>
   <button class="tab" data-i="1">GAP FILL</button>
@@ -116,8 +116,8 @@ tr:last-child td{border-bottom:none}
 </div>
 <div class="track" id="track">
 <div class="tabpane">
-<div class="panel"><div class="ph">MISSION STATUS · 3-LAYER GATE</div><div class="gr"><span class="lamp nogo"></span><span class="gl">L1 VOLATILITY</span><span class="gs">NO-GO · 백분위 22% &lt; 50 · 기준 2026-08-18</span></div><div class="gr"><span class="lamp nogo"></span><span class="gl">L2 DIRECTION</span><span class="gs">NO-GO · PM위치 0.03 ≤ 0.5 — 롱 엣지 없음</span></div><div class="gr"><span class="lamp stby"></span><span class="gl">L3 TRIGGER</span><span class="gs">STANDBY · -1σ 대기 (현재 -0.75σ)</span></div><div class="verdict nogo">▶ HOLD — NO ENTRY TODAY</div></div>
-<div class="panel"><div class="ph">ACTIVE POSITION</div><div class="big dim2">NONE</div><div class="meta">진입 · BUY CALL 712 @ $5.22 (잔고 $1000)</div></div>
+<div class="panel"><div class="ph">MISSION STATUS · 3-LAYER GATE</div><div class="gr"><span class="lamp go"></span><span class="gl">L1 VOLATILITY</span><span class="gs">GO&nbsp;&nbsp;&nbsp;· 백분위 67% · TS 0.820</span></div><div class="gr"><span class="lamp stby"></span><span class="gl">L2 DIRECTION</span><span class="gs">STANDBY · 프리마켓 데이터 없음</span></div><div class="gr"><span class="lamp stby"></span><span class="gl">L3 TRIGGER</span><span class="gs">STANDBY · -1σ 대기 (현재 -0.75σ)</span></div><div class="verdict stby">▶ STANDBY — MONITORING</div></div>
+<div class="panel"><div class="ph">ACTIVE POSITION</div><div class="big dim2">NONE</div><div class="meta">세션 대기</div></div>
 <div class="panel"><div class="ph">FUND LEDGER · MOCK $1000</div>
 <div class="stats">
   <div class="st"><div class="k">BAL</div><div class="v">$1077</div></div>
@@ -139,32 +139,29 @@ LEGACY 2건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 프리�
 </div>
 <div class="tabpane">
 <div class="panel"><div class="ph">GAP STATUS</div>
-<div class="gr"><span class="lamp nogo"></span><span class="gl">GAP FILL</span>
-<span class="gs">NO-GO · 갭 -1.32% — 대상 구간(±0.2~1.0%) 밖</span></div>
-<div class="verdict nogo">▶ NO-GO</div></div>
-<div class="panel"><div class="ph">GAP · ACTIVE</div><div class="big dim2">NONE</div><div class="meta">갭 -1.32% — 대상 구간(±0.2~1.0%) 밖</div></div>
-<div class="panel"><div class="ph">GAP LEDGER · MOCK $1000 · ITM 0DTE</div>
-<div class="stats">
-  <div class="st"><div class="k">BAL</div><div class="v">$1000</div></div>
-  <div class="st"><div class="k">P/L</div><div class="v ">$+0</div></div>
-  <div class="st"><div class="k">OPS</div><div class="v">1</div></div>
-  <div class="st"><div class="k">WIN</div><div class="v">—</div></div>
-  <div class="st"><div class="k">기초합</div><div class="v" style="font-size:12px">+0.26%</div></div>
+<div class="gr"><span class="lamp stby"></span><span class="gl">GAP FILL</span>
+<span class="gs">STANDBY · 장외 / 데이터 없음</span></div>
+<div class="verdict stby">▶ STANDBY</div></div>
+<div class="panel"><div class="ph">GAP · ACTIVE</div><div class="big dim2">NONE</div><div class="meta">장외 / 데이터 없음</div></div>
+<div class="panel"><div class="ph">사이징 비교 · 각 $2000 독립 운용</div>
+<table><tr><th>사이징</th><th>잔고</th><th>P/L</th><th>거래</th><th>승률</th><th>MDD</th><th>최근계약</th></tr><tr><td><b>30%</b></td><td>$2,000</td><td class="">+0</td><td>0</td><td>—</td><td class="rs">0.0%</td><td class="rs">0</td></tr><tr><td><b>40%</b></td><td>$2,000</td><td class="">+0</td><td>0</td><td>—</td><td class="rs">0.0%</td><td class="rs">0</td></tr><tr><td><b>50%</b></td><td>$2,000</td><td class="">+0</td><td>0</td><td>—</td><td class="rs">0.0%</td><td class="rs">0</td></tr><tr><td><b>60%</b></td><td>$2,000</td><td class="">+0</td><td>0</td><td>—</td><td class="rs">0.0%</td><td class="rs">0</td></tr><tr><td><b>70%</b></td><td>$2,000</td><td class="">+0</td><td>0</td><td>—</td><td class="rs">0.0%</td><td class="rs">0</td></tr></table>
 </div>
-<table><tr><th>DATE</th><th>DIR</th><th>GAP</th><th>기초P/L</th><th>옵션</th><th>MFE·시각</th><th>VWAP밴드</th><th>EXIT</th></tr><tr><td>08-17</td><td>BUY PUT<br><span class="rs">기초 숏</span></td><td>+0.26%</td><td class="pos">+0.261%</td><td class="neg"><span class="rs">체결전<br>기록</span></td><td class="pos">+0.000%<br><span class="rs"></span></td><td><span class="rs">—</span></td><td class="rs">TGT</td></tr></table>
+<div class="panel"><div class="ph">GAP LEDGER · ITM 0DTE 매수</div>
+<table><tr><th>DATE</th><th>TYPE<br>커버</th><th>GAP</th><th>WINDOW<br>갭필</th><th>옵션 P/L</th><th>기초</th><th>MFE·시각</th><th>EXIT</th></tr><tr><td colspan="8" class="rs">NO OPERATIONS — 갭 0.2~1.5% & 커버 40%+ 발생 시 개시</td></tr></table>
 </div>
 <div class="brief">
-<b>GAP FILL · FORWARD TEST</b> — 09:30 시가 갭 0.2~1.0% → 갭 메우는 방향 즉시 진입<br>
-타깃 전날 종가 · 손절 갭 50% 역행 · 14:00 컷 · 하루 1회<br>
-집행 — <b>전부 매수(BUY)</b>. 갭업 = 하락 베팅 → <b>ITM PUT 매수</b> / 갭다운 = 상승 베팅 → <b>ITM CALL 매수</b><br>
-Δ0.7~0.8 · 1계약 · mock $1,000 (itm-2.0과 동일 조건). 옵션 매도(SELL) 전략 아님<br>
-백테스트 근거 — 1시간봉 2년 n=151 · PF 1.58 · 상위2제외 1.48 · 반반 1.53/1.62<br>
-※ 백테스트 옵션 환산은 PF 0.36~0.96 (세타·스프레드 잠식) — <b>실측으로 이게 맞는지 확인 중</b>.
-   기초 P/L과 옵션 P/L을 나란히 기록하고, MFE·VWAP밴드 자리로 더 나은 진입/청산이 있었는지 검증.
+<b>GAP FILL · FORWARD TEST</b> — 갭 0.2~1.5% & 첫봉(10:30) 커버 40%+ → 갭 메우는 방향 진입<br>
+갭필 도달 → 트레일 0.15% · <b>11:30까지 갭필 실패 시 청산</b>(세타 방어) · 14:00 최종컷<br>
+가격 손절 없음 — 사이징이 손실 상한. 30/40/50/60/70% 다섯 계좌 병렬 비교<br>
+집행 — <b>전부 매수(BUY)</b>. 갭업 → <b>ITM PUT</b> / 갭다운 → <b>ITM CALL</b> (Δ0.7)<br>
+백테스트 — 1시간봉 2년 n=87 · 승률 62.1% · PF 4.01 · 대손실(-50%↓) 0건<br>
+사이징별: 30% MDD 26% / 40% MDD 38% / 50% MDD 48% / 최장 5연패 · 최악 1회 -13~31%<br>
+※ 11:30 시간컷이 핵심입니다 — 갭필 실패한 날 6시간 끌면서 세타로 프리미엄이 전액 날아갔고,
+   2시간에 끊자 대손실 4건이 0건이 됐습니다. MFE로 더 나은 청산 시점이 있었는지 계속 검증합니다.
 </div>
 </div>
 <div class="tabpane">
-<div class="panel"><div class="ph">오늘 매크로 · 가장 극단인 4개</div><div class="chips"><div class="chip hi"><div class="cn">GOLD</div><div class="cv">+1.26%</div><div class="cp">94<span>%tile</span></div></div><div class="chip lo"><div class="cn">DXY</div><div class="cv">-0.10%</div><div class="cp">14<span>%tile</span></div></div><div class="chip "><div class="cn">WTI</div><div class="cv">+0.57%</div><div class="cp">84<span>%tile</span></div></div><div class="chip "><div class="cn">VIX</div><div class="cv">+4.08%</div><div class="cp">84<span>%tile</span></div></div></div><div class="meta" style="margin-top:10px">과거 499일 대비 백분위 · 지표 17개로 유사일 검색</div></div><div class="panel hot"><div class="ph">오늘 예상 움직임 폭</div><div class="big">1.10%</div><div class="meta">유사일 평균 레인지 · 전체 평균 1.48%<br>저점 -0.44% · 고점 +0.66% (09:30 기준)</div></div><div class="panel"><div class="ph">유사했던 12일의 결말</div><div class="split"><div class="sbar"><div class="sup" style="width:58%"></div><div class="sdn" style="width:42%"></div></div><div class="slab"><span class="pos">▲ 7일 상승</span><span class="neg">5일 하락 ▼</span></div></div><div class="mgrid"><div class="mcol"><div class="mh pos">▲ 올랐던 날</div><div class="mrow"><span class="md">07-22</span><span class="mg">갭 -0.75</span><span class="mr pos">▲ +0.25%</span></div><div class="mrow"><span class="md">08-06</span><span class="mg">갭 -0.90</span><span class="mr pos">▲ +0.54%</span></div><div class="mrow"><span class="md">04-15</span><span class="mg">갭 +0.08</span><span class="mr pos">▲ +1.32%</span></div><div class="mrow"><span class="md">12-24</span><span class="mg">갭 -0.02</span><span class="mr pos">▲ +0.31%</span></div><div class="mrow"><span class="md">10-11</span><span class="mg">갭 -0.38</span><span class="mr pos">▲ +0.53%</span></div><div class="mrow"><span class="md">04-29</span><span class="mg">갭 +0.16</span><span class="mr pos">▲ +0.45%</span></div><div class="mrow"><span class="md">05-06</span><span class="mg">갭 -1.31</span><span class="mr pos">▲ +0.39%</span></div></div><div class="mcol"><div class="mh neg">▼ 빠졌던 날</div><div class="mrow"><span class="md">08-17</span><span class="mg">갭 +0.26</span><span class="mr neg">▼ -0.42%</span></div><div class="mrow"><span class="md">01-02</span><span class="mg">갭 +0.94</span><span class="mr neg">▼ -1.12%</span></div><div class="mrow"><span class="md">01-30</span><span class="mg">갭 -0.59</span><span class="mr neg">▼ -0.61%</span></div><div class="mrow"><span class="md">12-30</span><span class="mg">갭 -0.17</span><span class="mr neg">▼ -0.07%</span></div><div class="mrow"><span class="md">12-08</span><span class="mg">갭 +0.28</span><span class="mr neg">▼ -0.47%</span></div></div></div></div>
+<div class="panel"><div class="ph">오늘 매크로 · 가장 극단인 4개</div><div class="chips"><div class="chip lo"><div class="cn">DXY</div><div class="cv">-0.10%</div><div class="cp">14<span>%tile</span></div></div><div class="chip lo"><div class="cn">COPPER</div><div class="cv">-0.83%</div><div class="cp">15<span>%tile</span></div></div><div class="chip "><div class="cn">WTI</div><div class="cv">+0.57%</div><div class="cp">84<span>%tile</span></div></div><div class="chip "><div class="cn">VIX</div><div class="cv">+4.08%</div><div class="cp">84<span>%tile</span></div></div></div><div class="meta" style="margin-top:10px">과거 499일 대비 백분위 · 지표 17개로 유사일 검색</div></div><div class="panel hot"><div class="ph">오늘 예상 움직임 폭</div><div class="big">1.53%</div><div class="meta">유사일 평균 레인지 · 전체 평균 1.48%<br>저점 -1.13% · 고점 +0.41% (09:30 기준)</div></div><div class="panel"><div class="ph">유사했던 12일의 결말</div><div class="split"><div class="sbar"><div class="sup" style="width:33%"></div><div class="sdn" style="width:67%"></div></div><div class="slab"><span class="pos">▲ 4일 상승</span><span class="neg">8일 하락 ▼</span></div></div><div class="mgrid"><div class="mcol"><div class="mh pos">▲ 올랐던 날</div><div class="mrow"><span class="md">04-07</span><span class="mg">갭 -0.49</span><span class="mr pos">▲ +0.50%</span></div><div class="mrow"><span class="md">03-19</span><span class="mg">갭 +0.48</span><span class="mr pos">▲ +0.86%</span></div><div class="mrow"><span class="md">11-28</span><span class="mg">갭 +0.30</span><span class="mr pos">▲ +0.51%</span></div><div class="mrow"><span class="md">12-05</span><span class="mg">갭 +0.23</span><span class="mr pos">▲ +0.18%</span></div></div><div class="mcol"><div class="mh neg">▼ 빠졌던 날</div><div class="mrow"><span class="md">09-24</span><span class="mg">갭 +0.23</span><span class="mr neg">▼ -0.58%</span></div><div class="mrow"><span class="md">12-08</span><span class="mg">갭 +0.28</span><span class="mr neg">▼ -0.47%</span></div><div class="mrow"><span class="md">06-17</span><span class="mg">갭 +0.73</span><span class="mr neg">▼ -1.72%</span></div><div class="mrow"><span class="md">08-20</span><span class="mg">갭 -0.17</span><span class="mr neg">▼ -0.43%</span></div><div class="mrow"><span class="md">07-07</span><span class="mg">갭 -1.20</span><span class="mr neg">▼ -0.66%</span></div><div class="mrow"><span class="md">08-17</span><span class="mg">갭 +0.26</span><span class="mr neg">▼ -0.42%</span></div><div class="mrow"><span class="md">06-05</span><span class="mg">갭 -1.42</span><span class="mr neg">▼ -3.42%</span></div><div class="mrow"><span class="md">11-03</span><span class="mg">갭 +0.96</span><span class="mr neg">▼ -0.48%</span></div></div></div></div>
 <div class="brief">
 <b>참고용 · 매매 신호 아님</b><br>
 09:30에 확정된 금리·유가·달러·VIX·금·환율·해외지수·선물 17개를 z-score로 묶어
