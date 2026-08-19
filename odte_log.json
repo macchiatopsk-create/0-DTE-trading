@@ -152,8 +152,26 @@
  },
  "pm": null,
  "gap": {
-  "state": "ERR",
-  "msg": "NameError: name 'GAP_STOP_FRAC' is not defined"
+  "state": "WAIT",
+  "gap": -1.321,
+  "dir": "롱",
+  "sgn": -1,
+  "prev_close": 729.86,
+  "open": 720.22,
+  "entry": 719.73,
+  "target": 729.86,
+  "room": 1.407,
+  "cover": -0.05,
+  "r50": 721.17,
+  "cur": 717.59,
+  "filled": false,
+  "trail": null,
+  "band_px": 720.06,
+  "band_t": "09:35",
+  "band_room": 1.361,
+  "mfe": 0.265,
+  "mfe_t": "09:40",
+  "mfe_px": 722.13
  },
  "gap_track": {
   "2026-08-17": {
