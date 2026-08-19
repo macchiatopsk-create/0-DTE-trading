@@ -280,14 +280,12 @@ def premarket_pos():
         df = df.dropna()
         df.index = df.index.tz_convert(NY)
         _days = sorted(set(df.index.date))
-        if len(_days) < 2:
-            return dict(state="ERR", msg=f"거래일 부족 {len(_days)}")
+        if len(_days) < 1: return None
         today = _days[-1]
         g = df[df.index.date == today]
         pm = g[(g.index.time >= dt.time(4, 0)) & (g.index.time < dt.time(9, 30))]
         rt = g[g.index.time >= dt.time(9, 30)]
-        if len(rt) < 1:
-            return dict(state="ERR", msg=f"정규장 봉 없음 (today={today})")
+        if len(pm) < 3 or len(rt) < 1: return None
         pmh, pml = float(pm["High"].max()), float(pm["Low"].min())
         if pmh <= pml:
             return None
