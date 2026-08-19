@@ -222,25 +222,6 @@
   "mfe_t": "10:15",
   "mfe_px": 712.61
  },
- "gap_open": null,
- "gap_trades": [
-  {
-   "date": "2026-08-17",
-   "entry": 732.96,
-   "target": 731.05,
-   "stop": 733.92,
-   "dir": "숏",
-   "sgn": 1,
-   "gap": 0.261,
-   "room": 0.261,
-   "r50": 731.12,
-   "at": "23:31",
-   "res": "TGT",
-   "exit": 731.05,
-   "pnl": 0.261,
-   "exit_at": "23:31"
-  }
- ],
  "macro": {
   "date": "2026-08-19",
   "n_hist": 499,
@@ -373,31 +354,6 @@
   "hi_avg": 0.61,
   "base_up": 53.9
  },
- "gap_books": {
-  "30": {
-   "cap": 2000.0,
-   "trades": []
-  },
-  "40": {
-   "cap": 2000.0,
-   "trades": []
-  },
-  "50": {
-   "cap": 2000.0,
-   "trades": []
-  },
-  "60": {
-   "cap": 2000.0,
-   "trades": []
-  },
-  "70": {
-   "cap": 2000.0,
-   "trades": []
-  }
- },
- "gap_track": {
-  "2026-08-19": "LATE"
- },
  "gap_skip": {
   "date": "2026-08-19",
   "reason": "갭필 후 발견",
@@ -406,966 +362,595 @@
   "mfe": 1.083
  },
  "gap_tracks": {
-  "5m": {
-   "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "5m",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.94,
-     "entry": 717.77,
-     "target": 717.59,
-     "room": 0.025,
-     "at": "09:35",
-     "found_at": "14:00",
-     "opt_side": "put",
-     "strike": 724.0,
-     "premium": 6.88,
-     "contracts": {
-      "30": 0,
-      "40": 1,
-      "50": 1,
-      "60": 1,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 10.3,
-     "mfe_prem_t": "14:00",
-     "filled": true,
-     "fill_t": "14:00",
-     "res": "TRAIL",
-     "exit": 717.34,
-     "exit_at": "14:01",
-     "exit_premium": 7.35,
-     "pnl_pct": 6.8,
-     "per_contract": 47.0,
-     "ux": 0.06
-    }
-   ],
-   "books": {
-    "30": {
-     "cap": 2000.0,
-     "trades": []
-    },
-    "40": {
-     "cap": 2047.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 47.0,
-       "pct": 6.8,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "50": {
-     "cap": 2047.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 47.0,
-       "pct": 6.8,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "60": {
-     "cap": 2047.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 47.0,
-       "pct": 6.8,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "70": {
-     "cap": 2094.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 94.0,
-       "pct": 6.8,
-       "res": "TRAIL"
-      }
-     ]
-    }
-   },
-   "done": {
-    "2026-08-19": true
-   }
-  },
-  "15m": {
-   "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "15m",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.76,
-     "entry": 718.26,
-     "target": 717.59,
-     "room": 0.093,
-     "at": "09:45",
-     "found_at": "14:00",
-     "opt_side": "put",
-     "strike": 724.0,
-     "premium": 6.54,
-     "contracts": {
-      "30": 0,
-      "40": 1,
-      "50": 1,
-      "60": 1,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 16.1,
-     "mfe_prem_t": "14:00",
-     "filled": true,
-     "fill_t": "14:00",
-     "res": "TRAIL",
-     "exit": 717.34,
-     "exit_at": "14:01",
-     "exit_premium": 7.35,
-     "pnl_pct": 12.4,
-     "per_contract": 81.0,
-     "ux": 0.128
-    }
-   ],
-   "books": {
-    "30": {
-     "cap": 2000.0,
-     "trades": []
-    },
-    "40": {
-     "cap": 2081.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 81.0,
-       "pct": 12.4,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "50": {
-     "cap": 2081.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 81.0,
-       "pct": 12.4,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "60": {
-     "cap": 2081.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 81.0,
-       "pct": 12.4,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "70": {
-     "cap": 2162.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 162.0,
-       "pct": 12.4,
-       "res": "TRAIL"
-      }
-     ]
-    }
-   },
-   "done": {
-    "2026-08-19": true
-   }
-  },
-  "1h": {
-   "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "1h",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 1.86,
-     "entry": 715.17,
-     "target": 717.59,
-     "room": 0.338,
-     "at": "10:30",
-     "found_at": "14:00",
-     "opt_side": "put",
-     "strike": 721.0,
-     "premium": 5.62,
-     "contracts": {
-      "30": 1,
-      "40": 1,
-      "50": 1,
-      "60": 2,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": -19.2,
-     "mfe_prem_t": "14:00",
-     "filled": true,
-     "fill_t": "14:00",
-     "res": "TRAIL",
-     "exit": 717.34,
-     "exit_at": "14:01",
-     "exit_premium": 4.53,
-     "pnl_pct": -19.4,
-     "per_contract": -109.0,
-     "ux": -0.303
-    }
-   ],
-   "books": {
-    "30": {
-     "cap": 1891.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -109.0,
-       "pct": -19.4,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "40": {
-     "cap": 1891.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -109.0,
-       "pct": -19.4,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "50": {
-     "cap": 1891.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -109.0,
-       "pct": -19.4,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "60": {
-     "cap": 1782.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": -218.0,
-       "pct": -19.4,
-       "res": "TRAIL"
-      }
-     ]
-    },
-    "70": {
-     "cap": 1782.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": -218.0,
-       "pct": -19.4,
-       "res": "TRAIL"
-      }
-     ]
-    }
-   },
-   "done": {
-    "2026-08-19": true
-   }
-  },
   "5m|now": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "5m",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.94,
-     "entry": 717.77,
-     "target": 717.59,
-     "room": 0.025,
-     "at": "09:35",
-     "found_at": "14:29",
-     "opt_side": "put",
-     "strike": 724.0,
-     "premium": 6.34,
-     "contracts": {
-      "30": 0,
-      "40": 1,
-      "50": 1,
-      "60": 1,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 15.9,
-     "mfe_prem_t": "14:29",
-     "filled": true,
-     "fill_t": "14:29",
-     "res": "TRAIL",
-     "exit": 716.35,
-     "exit_at": "14:56",
-     "exit_premium": 7.21,
-     "pnl_pct": 13.7,
-     "per_contract": 87.0,
-     "ux": 0.198
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
      "cap": 2000.0,
      "trades": []
     },
     "40": {
-     "cap": 2087.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 87.0,
-       "pct": 13.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 2087.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 87.0,
-       "pct": 13.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 2087.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 87.0,
-       "pct": 13.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 2174.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 174.0,
-       "pct": 13.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
    "done": {
     "2026-08-19": true
-   }
+   },
+   "skips": [
+    {
+     "d": "2026-08-19",
+     "reason": "갭필 후 발견(소급 폐기)",
+     "cover": 0.94,
+     "gap": 0.393,
+     "at": "--:--"
+    }
+   ]
   },
   "5m|vwap": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "5m",
-     "em": "vwap",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.94,
-     "entry": 719.72,
-     "target": 717.59,
-     "room": 0.296,
-     "at": "09:35",
-     "found_at": "15:45",
-     "opt_side": "put",
-     "strike": 725.0,
-     "premium": 6.48,
-     "contracts": {
-      "30": 0,
-      "40": 1,
-      "50": 1,
-      "60": 1,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 717.35,
-     "band_t": "10:40",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 42.1,
-     "mfe_prem_t": "16:03",
-     "filled": true,
-     "fill_t": "15:45",
-     "res": "TRAIL",
-     "exit": 716.11,
-     "exit_at": "16:03",
-     "exit_premium": 9.21,
-     "pnl_pct": 42.1,
-     "per_contract": 273.0,
-     "ux": 0.502
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
      "cap": 2000.0,
      "trades": []
     },
     "40": {
-     "cap": 2273.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 273.0,
-       "pct": 42.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 2273.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 273.0,
-       "pct": 42.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 2273.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 273.0,
-       "pct": 42.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 2546.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 546.0,
-       "pct": 42.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
    "done": {
     "2026-08-19": true
-   }
+   },
+   "skips": [
+    {
+     "d": "2026-08-19",
+     "reason": "갭필 후 발견(소급 폐기)",
+     "cover": 0.94,
+     "gap": 0.393,
+     "at": "--:--"
+    }
+   ]
   },
   "15m|now": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "15m",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.76,
-     "entry": 718.26,
-     "target": 717.59,
-     "room": 0.093,
-     "at": "09:45",
-     "found_at": "14:29",
-     "opt_side": "put",
-     "strike": 724.0,
-     "premium": 6.0,
-     "contracts": {
-      "30": 1,
-      "40": 1,
-      "50": 1,
-      "60": 2,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 22.5,
-     "mfe_prem_t": "14:29",
-     "filled": true,
-     "fill_t": "14:29",
-     "res": "TRAIL",
-     "exit": 716.35,
-     "exit_at": "14:56",
-     "exit_premium": 7.21,
-     "pnl_pct": 20.2,
-     "per_contract": 121.0,
-     "ux": 0.266
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
-     "cap": 2121.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 121.0,
-       "pct": 20.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "40": {
-     "cap": 2121.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 121.0,
-       "pct": 20.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 2121.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 121.0,
-       "pct": 20.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 2242.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 242.0,
-       "pct": 20.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 2242.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 242.0,
-       "pct": 20.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
    "done": {
     "2026-08-19": true
-   }
+   },
+   "skips": [
+    {
+     "d": "2026-08-19",
+     "reason": "갭필 후 발견(소급 폐기)",
+     "cover": 0.76,
+     "gap": 0.393,
+     "at": "--:--"
+    }
+   ]
   },
   "15m|vwap": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "15m",
-     "em": "vwap",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.76,
-     "entry": 715.72,
-     "target": 717.59,
-     "room": 0.261,
-     "at": "09:45",
-     "found_at": "15:45",
-     "opt_side": "put",
-     "strike": 721.0,
-     "premium": 1.87,
-     "contracts": {
-      "30": 3,
-      "40": 4,
-      "50": 5,
-      "60": 6,
-      "70": 7
-     },
-     "prem_src": "소급",
-     "band_px": 717.35,
-     "band_t": "10:40",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 180.2,
-     "mfe_prem_t": "16:03",
-     "filled": true,
-     "fill_t": "15:45",
-     "res": "TRAIL",
-     "exit": 716.11,
-     "exit_at": "16:03",
-     "exit_premium": 5.24,
-     "pnl_pct": 180.2,
-     "per_contract": 337.0,
-     "ux": -0.054
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
-     "cap": 3011.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 3,
-       "usd": 1011.0,
-       "pct": 180.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "40": {
-     "cap": 3348.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 4,
-       "usd": 1348.0,
-       "pct": 180.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 3685.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 5,
-       "usd": 1685.0,
-       "pct": 180.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 4022.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 6,
-       "usd": 2022.0,
-       "pct": 180.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 4359.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 7,
-       "usd": 2359.0,
-       "pct": 180.2,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
    "done": {
     "2026-08-19": true
-   }
+   },
+   "skips": [
+    {
+     "d": "2026-08-19",
+     "reason": "갭필 후 발견(소급 폐기)",
+     "cover": 0.76,
+     "gap": 0.393,
+     "at": "--:--"
+    }
+   ]
   },
   "1h|now": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "1h",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 1.86,
-     "entry": 715.17,
-     "target": 717.59,
-     "room": 0.338,
-     "at": "10:30",
-     "found_at": "14:29",
-     "opt_side": "put",
-     "strike": 721.0,
-     "premium": 5.78,
-     "contracts": {
-      "30": 1,
-      "40": 1,
-      "50": 1,
-      "60": 2,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": -13.5,
-     "mfe_prem_t": "14:29",
-     "filled": true,
-     "fill_t": "14:29",
-     "res": "TRAIL",
-     "exit": 716.35,
-     "exit_at": "14:56",
-     "exit_premium": 4.18,
-     "pnl_pct": -27.7,
-     "per_contract": -160.0,
-     "ux": -0.165
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
-     "cap": 1840.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -160.0,
-       "pct": -27.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "40": {
-     "cap": 1840.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -160.0,
-       "pct": -27.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 1840.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -160.0,
-       "pct": -27.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 1680.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": -320.0,
-       "pct": -27.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 1680.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": -320.0,
-       "pct": -27.7,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
    "done": {
     "2026-08-19": true
-   }
+   },
+   "skips": [
+    {
+     "d": "2026-08-19",
+     "reason": "갭필 후 발견(소급 폐기)",
+     "cover": 1.86,
+     "gap": 0.393,
+     "at": "--:--"
+    }
+   ]
   },
   "1h|vwap": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "1h",
-     "em": "vwap",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 1.86,
-     "entry": 715.72,
-     "target": 717.59,
-     "room": 0.261,
-     "at": "10:30",
-     "found_at": "15:45",
-     "opt_side": "put",
-     "strike": 721.0,
-     "premium": 4.0,
-     "contracts": {
-      "30": 1,
-      "40": 2,
-      "50": 2,
-      "60": 3,
-      "70": 3
-     },
-     "prem_src": "소급",
-     "band_px": 717.35,
-     "band_t": "10:40",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 31.0,
-     "mfe_prem_t": "16:03",
-     "filled": true,
-     "fill_t": "15:45",
-     "res": "TRAIL",
-     "exit": 716.11,
-     "exit_at": "16:03",
-     "exit_premium": 5.24,
-     "pnl_pct": 31.0,
-     "per_contract": 124.0,
-     "ux": -0.054
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
-     "cap": 2124.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 124.0,
-       "pct": 31.0,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "40": {
-     "cap": 2248.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 248.0,
-       "pct": 31.0,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 2248.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 248.0,
-       "pct": 31.0,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 2372.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 3,
-       "usd": 372.0,
-       "pct": 31.0,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 2372.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 3,
-       "usd": 372.0,
-       "pct": 31.0,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
    "done": {
     "2026-08-19": true
+   },
+   "skips": [
+    {
+     "d": "2026-08-19",
+     "reason": "갭필 후 발견(소급 폐기)",
+     "cover": 1.86,
+     "gap": 0.393,
+     "at": "--:--"
+    }
+   ]
+  }
+ },
+ "LEGACY": {
+  "gap_tracks": {
+   "5m": {
+    "open": null,
+    "trades": [
+     {
+      "date": "2026-08-19",
+      "tf": "5m",
+      "late": true,
+      "dir": "숏",
+      "sgn": 1,
+      "gap": 0.393,
+      "cover": 0.94,
+      "entry": 717.77,
+      "target": 717.59,
+      "room": 0.025,
+      "at": "09:35",
+      "found_at": "14:00",
+      "opt_side": "put",
+      "strike": 724.0,
+      "premium": 6.88,
+      "contracts": {
+       "30": 0,
+       "40": 1,
+       "50": 1,
+       "60": 1,
+       "70": 2
+      },
+      "prem_src": "소급",
+      "band_px": 718.99,
+      "band_t": "12:05",
+      "mfe": 1.083,
+      "mfe_t": "10:15",
+      "mfe_prem": 10.3,
+      "mfe_prem_t": "14:00",
+      "filled": true,
+      "fill_t": "14:00",
+      "res": "TRAIL",
+      "exit": 717.34,
+      "exit_at": "14:01",
+      "exit_premium": 7.35,
+      "pnl_pct": 6.8,
+      "per_contract": 47.0,
+      "ux": 0.06
+     }
+    ],
+    "books": {
+     "30": {
+      "cap": 2000.0,
+      "trades": []
+     },
+     "40": {
+      "cap": 2047.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": 47.0,
+        "pct": 6.8,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "50": {
+      "cap": 2047.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": 47.0,
+        "pct": 6.8,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "60": {
+      "cap": 2047.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": 47.0,
+        "pct": 6.8,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "70": {
+      "cap": 2094.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 2,
+        "usd": 94.0,
+        "pct": 6.8,
+        "res": "TRAIL"
+       }
+      ]
+     }
+    },
+    "done": {
+     "2026-08-19": true
+    }
+   },
+   "15m": {
+    "open": null,
+    "trades": [
+     {
+      "date": "2026-08-19",
+      "tf": "15m",
+      "late": true,
+      "dir": "숏",
+      "sgn": 1,
+      "gap": 0.393,
+      "cover": 0.76,
+      "entry": 718.26,
+      "target": 717.59,
+      "room": 0.093,
+      "at": "09:45",
+      "found_at": "14:00",
+      "opt_side": "put",
+      "strike": 724.0,
+      "premium": 6.54,
+      "contracts": {
+       "30": 0,
+       "40": 1,
+       "50": 1,
+       "60": 1,
+       "70": 2
+      },
+      "prem_src": "소급",
+      "band_px": 718.99,
+      "band_t": "12:05",
+      "mfe": 1.083,
+      "mfe_t": "10:15",
+      "mfe_prem": 16.1,
+      "mfe_prem_t": "14:00",
+      "filled": true,
+      "fill_t": "14:00",
+      "res": "TRAIL",
+      "exit": 717.34,
+      "exit_at": "14:01",
+      "exit_premium": 7.35,
+      "pnl_pct": 12.4,
+      "per_contract": 81.0,
+      "ux": 0.128
+     }
+    ],
+    "books": {
+     "30": {
+      "cap": 2000.0,
+      "trades": []
+     },
+     "40": {
+      "cap": 2081.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": 81.0,
+        "pct": 12.4,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "50": {
+      "cap": 2081.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": 81.0,
+        "pct": 12.4,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "60": {
+      "cap": 2081.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": 81.0,
+        "pct": 12.4,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "70": {
+      "cap": 2162.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 2,
+        "usd": 162.0,
+        "pct": 12.4,
+        "res": "TRAIL"
+       }
+      ]
+     }
+    },
+    "done": {
+     "2026-08-19": true
+    }
+   },
+   "1h": {
+    "open": null,
+    "trades": [
+     {
+      "date": "2026-08-19",
+      "tf": "1h",
+      "late": true,
+      "dir": "숏",
+      "sgn": 1,
+      "gap": 0.393,
+      "cover": 1.86,
+      "entry": 715.17,
+      "target": 717.59,
+      "room": 0.338,
+      "at": "10:30",
+      "found_at": "14:00",
+      "opt_side": "put",
+      "strike": 721.0,
+      "premium": 5.62,
+      "contracts": {
+       "30": 1,
+       "40": 1,
+       "50": 1,
+       "60": 2,
+       "70": 2
+      },
+      "prem_src": "소급",
+      "band_px": 718.99,
+      "band_t": "12:05",
+      "mfe": 1.083,
+      "mfe_t": "10:15",
+      "mfe_prem": -19.2,
+      "mfe_prem_t": "14:00",
+      "filled": true,
+      "fill_t": "14:00",
+      "res": "TRAIL",
+      "exit": 717.34,
+      "exit_at": "14:01",
+      "exit_premium": 4.53,
+      "pnl_pct": -19.4,
+      "per_contract": -109.0,
+      "ux": -0.303
+     }
+    ],
+    "books": {
+     "30": {
+      "cap": 1891.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": -109.0,
+        "pct": -19.4,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "40": {
+      "cap": 1891.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": -109.0,
+        "pct": -19.4,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "50": {
+      "cap": 1891.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 1,
+        "usd": -109.0,
+        "pct": -19.4,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "60": {
+      "cap": 1782.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 2,
+        "usd": -218.0,
+        "pct": -19.4,
+        "res": "TRAIL"
+       }
+      ]
+     },
+     "70": {
+      "cap": 1782.0,
+      "trades": [
+       {
+        "d": "2026-08-19",
+        "nc": 2,
+        "usd": -218.0,
+        "pct": -19.4,
+        "res": "TRAIL"
+       }
+      ]
+     }
+    },
+    "done": {
+     "2026-08-19": true
+    }
    }
+  },
+  "gap_books": {
+   "30": {
+    "cap": 2000.0,
+    "trades": []
+   },
+   "40": {
+    "cap": 2000.0,
+    "trades": []
+   },
+   "50": {
+    "cap": 2000.0,
+    "trades": []
+   },
+   "60": {
+    "cap": 2000.0,
+    "trades": []
+   },
+   "70": {
+    "cap": 2000.0,
+    "trades": []
+   }
+  },
+  "gap_open": null,
+  "gap_trades": [
+   {
+    "date": "2026-08-17",
+    "entry": 732.96,
+    "target": 731.05,
+    "stop": 733.92,
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.261,
+    "room": 0.261,
+    "r50": 731.12,
+    "at": "23:31",
+    "res": "TGT",
+    "exit": 731.05,
+    "pnl": 0.261,
+    "exit_at": "23:31"
+   }
+  ],
+  "gap_track": {
+   "2026-08-19": "LATE"
   }
  }
 }

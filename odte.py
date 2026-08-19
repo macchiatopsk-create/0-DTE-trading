@@ -63,7 +63,6 @@ GAP_TFS = {"5m": 1, "15m": 2, "1h": 11}      # 키: 이름, 값: 5분봉 인덱�
 GAP_TF_LABEL = {"5m": "5분(09:35)", "15m": "15분(09:45)", "1h": "1시간(10:30)"}
 GAP_ENTRIES = {"now": "즉시 진입", "vwap": "VWAP 중간선 대기"}
 GAP_TF_TIME = {"5m": "09:35", "15m": "09:45", "1h": "10:30"}
-GAP_DELTA = 0.69                              # 소급 환산용 (실측: 콜0.698/풋0.685)
 GAP_CAPITAL = 2000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
 
 # ── 매크로 유사일 브리핑 (참고용, 매매 신호 아님) ──────────
@@ -515,16 +514,20 @@ def step():
 
             # ── 진입 ──
             if gopen is None and tr["done"].get(dstr) is None and info["ok"] and ep_use:
-                if True:
-                    late = bool(gsig.get("filled"))
+                if bool(gsig.get("filled")):
+                    # 갭필이 끝난 뒤 발견 = 소급 진입. 델타 보정으로도 세타 복원이 불가능해
+                    # 프리미엄 기준값이 조작되므로 진입하지 않고 스킵 기록만 남긴다.
+                    tr["done"][dstr] = True
+                    tr.setdefault("skips", []).append(dict(
+                        d=dstr, reason="갭필 후 발견", cover=round(info["cover"], 2),
+                        gap=gsig["gap"], at=now.strftime("%H:%M")))
+                    print(f"  [갭/{tk}] 스킵 — 갭필 후 발견 (커버 {info['cover']:.2f})")
+                else:
+                    late = False
                     oside = "put" if gsig["sgn"] > 0 else "call"
                     gopt = itm_opt(ep_use, today_expiry(today), oside, 1e9)
                     if gopt:
                         prem = gopt["premium"]
-                        if late:
-                            # 발견이 늦었으면 기준선 시점 프리미엄을 델타로 소급
-                            _d = gsig["sgn"] * (info["entry"] - gsig["cur"]) * GAP_DELTA
-                            prem = round(max(prem - _d, 0.05), 2)
                         cost = prem * 100
                         ent = {}
                         for f in GAP_SIZES:
@@ -549,8 +552,11 @@ def step():
             gopen = tr["open"]
             if gopen and gopen.get("res") is None:
                 sgn = gopen["sgn"]; cur = gsig["cur"]
-                if gsig.get("mfe", 0) > gopen.get("mfe", 0):
-                    gopen["mfe"], gopen["mfe_t"] = gsig["mfe"], gsig["mfe_t"]
+                # MFE는 전역(시가 기준)이 아니라 이 트랙의 진입 이후로만 측정
+                _adv = ((gopen["entry"] - cur) / gopen["entry"] * 100) if sgn > 0 \
+                       else ((cur - gopen["entry"]) / gopen["entry"] * 100)
+                if _adv > gopen.get("mfe", 0.0):
+                    gopen["mfe"], gopen["mfe_t"] = round(_adv, 3), now.strftime("%H:%M")
                 if gopen.get("band_px") is None and gsig.get("band_px"):
                     gopen["band_px"] = gsig["band_px"]; gopen["band_t"] = gsig["band_t"]
                 if not gopen["filled"] and gsig.get("filled"):
@@ -581,8 +587,12 @@ def step():
                     ux = ((gopen["entry"] - cur) / gopen["entry"] * 100) if sgn > 0 \
                          else ((cur - gopen["entry"]) / gopen["entry"] * 100)
                     for k, nc in gopen["contracts"].items():
-                        if nc < 1: continue
                         bk = tr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+                        if nc < 1:
+                            # 프리미엄 > 배정자본 → 실제로 못 산 날. 승률 분모에서 빼되 흔적은 남긴다
+                            bk["trades"].append(dict(d=dstr, nc=0, usd=0.0, pct=0.0,
+                                                     res="SKIP_FUND"))
+                            continue
                         usd = round(per * nc, 2)
                         bk["cap"] = round(bk["cap"] + usd, 2)
                         bk["trades"].append(dict(d=dstr, nc=nc, usd=usd, pct=pct, res=res))
@@ -876,15 +886,20 @@ def render(log, st):
         for f in GAP_SIZES:
             k = str(int(f * 100))
             bk = (tr.get("books") or {}).get(k, dict(cap=GAP_CAPITAL, trades=[]))
-            cap = bk["cap"]; tl = bk["trades"]; pl = cap - GAP_CAPITAL
+            cap = bk["cap"]; pl = cap - GAP_CAPITAL
+            _all = bk["trades"]
+            tl = [x for x in _all if x.get("res") != "SKIP_FUND"]
+            sk = len(_all) - len(tl)
             gw = sum(1 for x in tl if x["usd"] > 0)
             wr = f"{gw/len(tl)*100:.0f}%" if tl else "—"
             peak = GAP_CAPITAL; mdd = 0.0; c = GAP_CAPITAL
             for x in tl:
                 c += x["usd"]; peak = max(peak, c); mdd = max(mdd, (peak - c) / peak * 100)
             cls = "pos" if pl > 0 else ("neg" if pl < 0 else "")
+            _skmark = f' <span class="rs">+{sk}미매수</span>' if sk else ""
             rows += (f'<tr><td><b>{k}%</b></td><td>${cap:,.0f}</td>'
-                     f'<td class="{cls}">{pl:+,.0f}</td><td>{len(tl)}</td>'
+                     f'<td class="{cls}">{pl:+,.0f}</td>'
+                     f'<td>{len(tl)}{_skmark}</td>'
                      f'<td>{wr}</td><td class="rs">{mdd:.1f}%</td></tr>')
         return rows
 
