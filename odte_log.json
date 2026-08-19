@@ -151,7 +151,10 @@
   "asof": "2026-07-17"
  },
  "pm": null,
- "gap": null,
+ "gap": {
+  "state": "ERR",
+  "msg": "NameError: name 'GAP_STOP_FRAC' is not defined"
+ },
  "gap_track": {
   "2026-08-17": {
    "entry": 732.96,
