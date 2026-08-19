@@ -61,6 +61,8 @@ GAP_SIZES = [0.30, 0.40, 0.50, 0.60, 0.70]   # 병렬 비교할 사이징
 # 커버 판정 기준선 3종 병렬 (봉 크기별 진입 타이밍 비교)
 GAP_TFS = {"5m": 1, "15m": 2, "1h": 11}      # 키: 이름, 값: 5분봉 인덱스(0-base)
 GAP_TF_LABEL = {"5m": "5분(09:35)", "15m": "15분(09:45)", "1h": "1시간(10:30)"}
+GAP_TF_TIME = {"5m": "09:35", "15m": "09:45", "1h": "10:30"}
+GAP_DELTA = 0.69                              # 소급 환산용 (실측: 콜0.698/풋0.685)
 GAP_CAPITAL = 2000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
 
 # ── 매크로 유사일 브리핑 (참고용, 매매 신호 아님) ──────────
@@ -498,7 +500,12 @@ def step():
                     oside = "put" if gsig["sgn"] > 0 else "call"
                     gopt = itm_opt(info["entry"], today_expiry(today), oside, 1e9)
                     if gopt:
-                        prem = gopt["premium"]; cost = prem * 100
+                        prem = gopt["premium"]
+                        if late:
+                            # 발견이 늦었으면 기준선 시점 프리미엄을 델타로 소급
+                            _d = gsig["sgn"] * (info["entry"] - gsig["cur"]) * GAP_DELTA
+                            prem = round(max(prem - _d, 0.05), 2)
+                        cost = prem * 100
                         ent = {}
                         for f in GAP_SIZES:
                             k = str(int(f * 100))
@@ -508,8 +515,11 @@ def step():
                         tr["open"] = dict(date=dstr, tf=tf, late=late,
                             dir=gsig["dir"], sgn=gsig["sgn"],
                             gap=gsig["gap"], cover=info["cover"], entry=info["entry"],
-                            target=gsig["target"], room=info["room"], at=now.strftime("%H:%M"),
+                            target=gsig["target"], room=info["room"],
+                            at=(GAP_TF_TIME[tf] if late else now.strftime("%H:%M")),
+                            found_at=now.strftime("%H:%M"),
                             opt_side=oside, strike=gopt["strike"], premium=prem, contracts=ent,
+                            prem_src=("소급" if late else "실시간"),
                             band_px=None, band_t=None, mfe=0.0, mfe_t=None,
                             mfe_prem=-99.0, mfe_prem_t=None, filled=False, fill_t=None, res=None)
                         print(f"  [갭/{tf}] 진입 커버{info['cover']:.2f} {oside.upper()} "
@@ -531,7 +541,10 @@ def step():
                     if _p > gopen.get("mfe_prem", -99):
                         gopen["mfe_prem"] = round(_p, 1); gopen["mfe_prem_t"] = now.strftime("%H:%M")
                 res = None
-                if not gopen["filled"] and now.time() >= GAP_TIMECUT:
+                same_tick = (gopen.get("found_at") == now.strftime("%H:%M"))
+                if same_tick:
+                    pass                       # 진입 직후 같은 실행에서는 청산 판정 보류
+                elif not gopen["filled"] and now.time() >= GAP_TIMECUT:
                     res = "TIMECUT"
                 elif gopen["filled"] and gsig.get("trail"):
                     tp = gsig["trail"]
@@ -539,6 +552,8 @@ def step():
                         res = "TRAIL"
                 elif now.time() >= GAP_CUT:
                     res = "CUT"
+                if res is None and not same_tick and now.time() >= dt.time(15, 55):
+                    res = "EOD"
                 if res:
                     ex = gcur if (gcur and gcur > 0) else gopen["premium"]
                     pct = round((ex / gopen["premium"] - 1) * 100, 1)
