@@ -473,6 +473,14 @@ def step():
     if gsig and gsig.get("state") == "ACTIVE":
         gopen = log.get("gap_open")
         if gopen is None and log.get("gap_track", {}).get(dstr) is None:
+            if gsig.get("filled"):
+                log.setdefault("gap_track", {})[dstr] = "LATE"
+                print("  [갭] 이미 갭필 완료 — 진입 시점 놓침, 이 날은 스킵")
+                log["gap_skip"] = dict(date=dstr, reason="갭필 후 발견",
+                                       cover=gsig["cover"], gap=gsig["gap"],
+                                       mfe=gsig.get("mfe"))
+                gsig = None
+        if gsig and gopen is None and log.get("gap_track", {}).get(dstr) is None:
             oside = "put" if gsig["sgn"] > 0 else "call"
             gopt = itm_opt(gsig["entry"], today_expiry(today), oside, 1e9)
             if gopt is None:
@@ -532,6 +540,8 @@ def step():
                      else ((cur - gopen["entry"]) / gopen["entry"] * 100)
                 books = log.setdefault("gap_books", {})
                 for key, nc in gopen["contracts"].items():
+                    if nc < 1:
+                        continue                      # 자본 부족으로 미체결
                     bk = books.setdefault(key, dict(cap=GAP_CAPITAL, trades=[]))
                     usd = round(per_ct * nc, 2)
                     bk["cap"] = round(bk["cap"] + usd, 2)

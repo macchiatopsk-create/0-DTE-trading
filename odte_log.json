@@ -191,21 +191,6 @@
   "mfe_t": "10:15",
   "mfe_px": 712.61
  },
- "gap_track": {
-  "2026-08-17": {
-   "entry": 732.96,
-   "target": 731.05,
-   "stop": 733.92,
-   "dir": "숏",
-   "sgn": 1,
-   "gap": 0.261,
-   "room": 0.261,
-   "r50": 731.12,
-   "at": "23:31",
-   "res": null
-  },
-  "2026-08-19": true
- },
  "gap_open": null,
  "gap_trades": [
   {
@@ -223,44 +208,6 @@
    "exit": 731.05,
    "pnl": 0.261,
    "exit_at": "23:31"
-  },
-  {
-   "date": "2026-08-19",
-   "dir": "숏",
-   "sgn": 1,
-   "gap": 0.393,
-   "cover": 1.86,
-   "entry": 715.17,
-   "target": 717.59,
-   "room": 0.338,
-   "r50": 716.51,
-   "at": "10:37",
-   "opt_side": "put",
-   "strike": 721.0,
-   "premium": 7.37,
-   "contracts": {
-    "30": 0,
-    "40": 1,
-    "50": 1,
-    "60": 1,
-    "70": 1
-   },
-   "band_px": null,
-   "band_t": null,
-   "band_room": null,
-   "mfe": 1.083,
-   "mfe_t": "10:15",
-   "mfe_prem": 0.0,
-   "mfe_prem_t": "10:37",
-   "filled": true,
-   "fill_t": "10:37",
-   "res": "TRAIL",
-   "exit": 716.08,
-   "exit_at": "10:37",
-   "exit_premium": 7.37,
-   "pnl_pct": 0.0,
-   "per_contract": 0.0,
-   "ux": -0.127
   }
  ],
  "macro": {
@@ -398,63 +345,23 @@
  "gap_books": {
   "30": {
    "cap": 2000.0,
-   "trades": [
-    {
-     "d": "2026-08-19",
-     "nc": 0,
-     "usd": 0.0,
-     "pct": 0.0,
-     "res": "TRAIL"
-    }
-   ]
+   "trades": []
   },
   "40": {
    "cap": 2000.0,
-   "trades": [
-    {
-     "d": "2026-08-19",
-     "nc": 1,
-     "usd": 0.0,
-     "pct": 0.0,
-     "res": "TRAIL"
-    }
-   ]
+   "trades": []
   },
   "50": {
    "cap": 2000.0,
-   "trades": [
-    {
-     "d": "2026-08-19",
-     "nc": 1,
-     "usd": 0.0,
-     "pct": 0.0,
-     "res": "TRAIL"
-    }
-   ]
+   "trades": []
   },
   "60": {
    "cap": 2000.0,
-   "trades": [
-    {
-     "d": "2026-08-19",
-     "nc": 1,
-     "usd": 0.0,
-     "pct": 0.0,
-     "res": "TRAIL"
-    }
-   ]
+   "trades": []
   },
   "70": {
    "cap": 2000.0,
-   "trades": [
-    {
-     "d": "2026-08-19",
-     "nc": 1,
-     "usd": 0.0,
-     "pct": 0.0,
-     "res": "TRAIL"
-    }
-   ]
+   "trades": []
   }
  }
 }
