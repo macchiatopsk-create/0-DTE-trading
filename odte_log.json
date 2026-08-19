@@ -159,7 +159,7 @@
  },
  "vix": {
   "state": "ERR",
-  "msg": "수집실패 9D=False 3M=True",
+  "msg": "수집실패 9D=False 3M=False",
   "pct": 0.0,
   "ratio": 0.0,
   "asof": "-"
@@ -301,7 +301,7 @@
   "dn": [
    {
     "d": "2024-11-13",
-    "dist": 1.74,
+    "dist": 1.73,
     "gap": -0.1,
     "ret": -0.03,
     "lo": -0.48,
