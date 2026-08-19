@@ -751,6 +751,9 @@ def render(log, st):
     elif gs.get("state") == "WAIT":
         gstat, gcls = "WAIT", "stby"
         gdesc = f'갭 {gs["gap"]:+.2f}% · 첫봉(10:30) 확정 대기'
+    elif gs.get("state") == "ERR" or "sgn" not in gs:
+        gstat, gcls = "STANDBY", "stby"
+        gdesc = f'신호 계산 실패: {gs.get("msg", "사유 불명")}'
     elif gs.get("state") == "LOW_COVER":
         gstat, gcls = "NO-GO", "nogo"
         gdesc = f'갭 {gs["gap"]:+.2f}% · 커버 {gs["cover"]:.2f} &lt; {GAP_COVER_MIN} — 진입 안 함'
