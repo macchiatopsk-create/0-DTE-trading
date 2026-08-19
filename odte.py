@@ -802,20 +802,43 @@ def render(log, st):
                   f'<td class="rs">{tr[-1]["nc"] if tr else 0}</td></tr>')
 
     grows = ""
-    for t in reversed([x for x in gts if "cover" in x][-30:]):
+    for i, t in enumerate(reversed([x for x in gts if "cover" in x][-30:])):
         c = "pos" if (t.get("pnl_pct") or 0) > 0 else "neg"
         _a = "PUT" if t["sgn"] > 0 else "CALL"
         mf = t.get("mfe_prem"); mf = None if (mf is None or mf < -90) else mf
-        grows += (f'<tr><td>{t["date"][5:]}</td><td>{_a}<br><span class="rs">{t["cover"]:.2f}</span></td>'
-                  f'<td>{t["gap"]:+.2f}%</td>'
-                  f'<td>{t["at"]}→{t.get("exit_at","")}<br><span class="rs">갭필 {t.get("fill_t") or "X"}</span></td>'
-                  f'<td class="{c}">{t.get("pnl_pct",0):+.0f}%<br><span class="rs">${t.get("per_contract",0):+.0f}/계약</span></td>'
-                  f'<td class="rs">{t.get("ux",0):+.2f}%</td>'
-                  f'<td class="pos">{f"{mf:+.0f}%" if mf is not None else "—"}<br>'
-                  f'<span class="rs">{t.get("mfe_prem_t") or ""}</span></td>'
-                  f'<td class="rs">{t["res"]}</td></tr>')
+        ct = " · ".join(f'{k}%: {v}계약' for k, v in
+                        sorted(t.get("contracts", {}).items(), key=lambda x: int(x[0])))
+        bp = t.get("band_px")
+        mfe_str = f"{mf:+.0f}% @ {t.get('mfe_prem_t') or ''}" if mf is not None else "—"
+        band_str = f"{bp} ({t.get('band_t') or ''})" if bp else "미도달"
+        det = (
+          f'<div class="dgrid">'
+          f'<div><span class="dk">갭 커버</span><span class="dv">{t["cover"]:.2f}</span></div>'
+          f'<div><span class="dk">갭 크기</span><span class="dv">{t["gap"]:+.2f}%</span></div>'
+          f'<div><span class="dk">진입 시각</span><span class="dv">{t["at"]}</span></div>'
+          f'<div><span class="dk">진입가(기초)</span><span class="dv">{t["entry"]}</span></div>'
+          f'<div><span class="dk">갭필 시각</span><span class="dv">{t.get("fill_t") or "미달성"}</span></div>'
+          f'<div><span class="dk">타깃</span><span class="dv">{t["target"]}</span></div>'
+          f'<div><span class="dk">청산 시각</span><span class="dv">{t.get("exit_at","")}</span></div>'
+          f'<div><span class="dk">청산 사유</span><span class="dv">{t["res"]}</span></div>'
+          f'<div><span class="dk">계약</span><span class="dv">{_a} {t["strike"]:.0f}</span></div>'
+          f'<div><span class="dk">프리미엄</span><span class="dv">${t["premium"]}→${t.get("exit_premium","")}</span></div>'
+          f'<div><span class="dk">옵션 손익</span><span class="dv {c}">{t.get("pnl_pct",0):+.1f}% '
+          f'(${t.get("per_contract",0):+.0f}/계약)</span></div>'
+          f'<div><span class="dk">기초 손익</span><span class="dv">{t.get("ux",0):+.3f}%</span></div>'
+          f'<div><span class="dk">최고 지점</span><span class="dv pos">'
+          f'{f"{mf:+.0f}% @ {t.get(chr(34)+chr(34)) or t.get("mfe_prem_t") or ""}" if mf is not None else "—"}</span></div>'
+          f'<div><span class="dk">VWAP밴드 자리</span><span class="dv">'
+          f'{f"{bp} ({t.get(chr(39)+chr(39)) or t.get(chr(34)+chr(34)) or t.get("band_t") or ""})" if bp else "미도달"}</span></div>'
+          f'<div class="dfull"><span class="dk">사이징별 계약수</span><span class="dv">{ct or "—"}</span></div>'
+          f'</div>')
+        grows += (f'<tr class="crow" data-i="{i}"><td>{t["date"][5:]}</td>'
+                  f'<td>{_a}</td><td>{t["gap"]:+.2f}%</td><td>{t["cover"]:.2f}</td>'
+                  f'<td class="{c}">{t.get("pnl_pct",0):+.0f}%</td>'
+                  f'<td class="rs">{t["res"]}</td><td class="rs">▾</td></tr>'
+                  f'<tr class="drow" id="d{i}"><td colspan="7">{det}</td></tr>')
     if not grows:
-        grows = '<tr><td colspan="8" class="rs">NO OPERATIONS — 갭 0.2~1.5% & 커버 40%+ 발생 시 개시</td></tr>'
+        grows = '<tr><td colspan="7" class="rs">NO OPERATIONS — 갭 0.2~1.5% & 커버 40%+ 발생 시 개시</td></tr>'
 
     # ── 매크로 유사일 패널 ──
     mm = log.get("macro")
@@ -956,6 +979,18 @@ tr:last-child td{{border-bottom:none}}
 .sup{{background:var(--grn);opacity:.75}}
 .sdn{{background:var(--red);opacity:.75}}
 .slab{{display:flex;justify-content:space-between;font-size:10.5px;margin-top:6px}}
+.ltab .crow{{cursor:pointer}}
+.ltab .crow:active{{background:rgba(232,176,75,.06)}}
+.ltab .drow{{display:none}}
+.ltab .drow.on{{display:table-row}}
+.ltab .drow td{{background:rgba(255,255,255,.02);padding:12px 10px}}
+.dgrid{{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}}
+.dgrid>div{{display:flex;justify-content:space-between;gap:8px;
+  border-bottom:1px dashed rgba(95,114,104,.2);padding-bottom:5px}}
+.dgrid .dfull{{grid-column:1/-1}}
+.dk{{font-size:9.5px;color:var(--mut);letter-spacing:.06em}}
+.dv{{font-size:11px;color:var(--tx);text-align:right}}
+@media (max-width:520px){{.dgrid{{grid-template-columns:1fr}}}}
 .mgrid{{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
 .mcol{{min-width:0}}
 .mh{{font-size:10px;letter-spacing:.12em;padding:0 0 8px;text-transform:uppercase;
@@ -1015,7 +1050,7 @@ LEGACY {legacy}건은 구버전(vwap-1.x) 기록으로 본 통계에서 제외. 
 <table><tr><th>사이징</th><th>잔고</th><th>P/L</th><th>거래</th><th>승률</th><th>MDD</th><th>최근계약</th></tr>{srows}</table>
 </div>
 <div class="panel"><div class="ph">GAP LEDGER · ITM 0DTE 매수</div>
-<table><tr><th>DATE</th><th>TYPE<br>커버</th><th>GAP</th><th>WINDOW<br>갭필</th><th>옵션 P/L</th><th>기초</th><th>MFE·시각</th><th>EXIT</th></tr>{grows}</table>
+<table class="ltab"><tr><th>DATE</th><th>TYPE</th><th>GAP</th><th>커버</th><th>P/L</th><th>EXIT</th><th></th></tr>{grows}</table>
 </div>
 <div class="brief">
 <b>GAP FILL · FORWARD TEST</b> — 갭 0.2~1.5% & 첫봉(10:30) 커버 40%+ → 갭 메우는 방향 진입<br>
