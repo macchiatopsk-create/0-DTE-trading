@@ -823,105 +823,30 @@
   },
   "5m|vwap": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "5m",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.94,
-     "entry": 717.77,
-     "target": 717.59,
-     "room": 0.025,
-     "at": "09:35",
-     "found_at": "14:29",
-     "opt_side": "put",
-     "strike": 725.0,
-     "premium": 7.83,
-     "contracts": {
-      "30": 0,
-      "40": 1,
-      "50": 1,
-      "60": 1,
-      "70": 1
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 12.9,
-     "mfe_prem_t": "14:29",
-     "filled": true,
-     "fill_t": "14:29",
-     "res": "TRAIL",
-     "exit": 716.35,
-     "exit_at": "14:56",
-     "exit_premium": 8.23,
-     "pnl_pct": 5.1,
-     "per_contract": 40.0,
-     "ux": 0.198
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
      "cap": 2000.0,
      "trades": []
     },
     "40": {
-     "cap": 2040.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 40.0,
-       "pct": 5.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 2040.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 40.0,
-       "pct": 5.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 2040.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 40.0,
-       "pct": 5.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 2040.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 40.0,
-       "pct": 5.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
-   "done": {
-    "2026-08-19": true
-   }
+   "done": {}
   },
   "15m|now": {
    "open": null,
@@ -1035,113 +960,30 @@
   },
   "15m|vwap": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "15m",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 0.76,
-     "entry": 718.26,
-     "target": 717.59,
-     "room": 0.093,
-     "at": "09:45",
-     "found_at": "14:29",
-     "opt_side": "put",
-     "strike": 722.0,
-     "premium": 4.62,
-     "contracts": {
-      "30": 1,
-      "40": 1,
-      "50": 2,
-      "60": 2,
-      "70": 3
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": 29.2,
-     "mfe_prem_t": "14:29",
-     "filled": true,
-     "fill_t": "14:29",
-     "res": "TRAIL",
-     "exit": 716.35,
-     "exit_at": "14:56",
-     "exit_premium": 5.19,
-     "pnl_pct": 12.3,
-     "per_contract": 57.0,
-     "ux": 0.266
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
-     "cap": 2057.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 57.0,
-       "pct": 12.3,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "40": {
-     "cap": 2057.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": 57.0,
-       "pct": 12.3,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 2114.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 114.0,
-       "pct": 12.3,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 2114.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": 114.0,
-       "pct": 12.3,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 2171.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 3,
-       "usd": 171.0,
-       "pct": 12.3,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
-   "done": {
-    "2026-08-19": true
-   }
+   "done": {}
   },
   "1h|now": {
    "open": null,
@@ -1255,105 +1097,30 @@
   },
   "1h|vwap": {
    "open": null,
-   "trades": [
-    {
-     "date": "2026-08-19",
-     "tf": "1h",
-     "late": true,
-     "dir": "숏",
-     "sgn": 1,
-     "gap": 0.393,
-     "cover": 1.86,
-     "entry": 715.17,
-     "target": 717.59,
-     "room": 0.338,
-     "at": "10:30",
-     "found_at": "14:29",
-     "opt_side": "put",
-     "strike": 722.0,
-     "premium": 6.75,
-     "contracts": {
-      "30": 0,
-      "40": 1,
-      "50": 1,
-      "60": 1,
-      "70": 2
-     },
-     "prem_src": "소급",
-     "band_px": 718.99,
-     "band_t": "12:05",
-     "mfe": 1.083,
-     "mfe_t": "10:15",
-     "mfe_prem": -11.6,
-     "mfe_prem_t": "14:29",
-     "filled": true,
-     "fill_t": "14:29",
-     "res": "TRAIL",
-     "exit": 716.35,
-     "exit_at": "14:56",
-     "exit_premium": 5.19,
-     "pnl_pct": -23.1,
-     "per_contract": -156.0,
-     "ux": -0.165
-    }
-   ],
+   "trades": [],
    "books": {
     "30": {
      "cap": 2000.0,
      "trades": []
     },
     "40": {
-     "cap": 1844.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -156.0,
-       "pct": -23.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "50": {
-     "cap": 1844.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -156.0,
-       "pct": -23.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "60": {
-     "cap": 1844.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 1,
-       "usd": -156.0,
-       "pct": -23.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     },
     "70": {
-     "cap": 1688.0,
-     "trades": [
-      {
-       "d": "2026-08-19",
-       "nc": 2,
-       "usd": -312.0,
-       "pct": -23.1,
-       "res": "TRAIL"
-      }
-     ]
+     "cap": 2000.0,
+     "trades": []
     }
    },
-   "done": {
-    "2026-08-19": true
-   }
+   "done": {}
   }
  }
 }

@@ -2,7 +2,7 @@ name: odte-mock
 on:
   schedule:
     # 장중 15분 간격 (UTC). 미 동부 09:45~16:00 ET 대응 (서머타임 기준)
-    - cron: "*/15 13-20 * * 1-5"
+    - cron: "*/5 13-20 * * 1-5"
   workflow_dispatch:
 
 permissions:
