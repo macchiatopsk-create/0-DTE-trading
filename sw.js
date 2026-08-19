@@ -4,7 +4,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(e.request).then(r => {
       const c = r.clone();
-      caches.open('odte-v1').then(k => k.put(e.request, c)).catch(()=>{});
+      caches.open('odte-v1.1').then(k => k.put(e.request, c)).catch(()=>{});
       return r;
     }).catch(() => caches.match(e.request))
   );
