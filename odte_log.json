@@ -158,7 +158,7 @@
   }
  },
  "vix": {
-  "ratio": 0.6731,
+  "ratio": 0.6729,
   "pct": 11.2,
   "state": "DEAD",
   "asof": "2026-08-19"
@@ -182,7 +182,7 @@
   "room": 0.338,
   "cover": 1.86,
   "r50": 716.51,
-  "cur": 716.97,
+  "cur": 716.6,
   "filled": true,
   "trail": 714.14,
   "tfs": {
@@ -822,7 +822,40 @@
    }
   },
   "5m|vwap": {
-   "open": null,
+   "open": {
+    "date": "2026-08-19",
+    "tf": "5m",
+    "late": true,
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.393,
+    "cover": 0.94,
+    "entry": 717.77,
+    "target": 717.59,
+    "room": 0.025,
+    "at": "09:35",
+    "found_at": "15:42",
+    "opt_side": "put",
+    "strike": 725.0,
+    "premium": 6.93,
+    "contracts": {
+     "30": 0,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 2
+    },
+    "prem_src": "소급",
+    "band_px": 718.99,
+    "band_t": "12:05",
+    "mfe": 1.083,
+    "mfe_t": "10:15",
+    "mfe_prem": 11.7,
+    "mfe_prem_t": "15:42",
+    "filled": true,
+    "fill_t": "15:42",
+    "res": null
+   },
    "trades": [],
    "books": {
     "30": {
@@ -846,7 +879,9 @@
      "trades": []
     }
    },
-   "done": {}
+   "done": {
+    "2026-08-19": true
+   }
   },
   "15m|now": {
    "open": null,
@@ -959,7 +994,40 @@
    }
   },
   "15m|vwap": {
-   "open": null,
+   "open": {
+    "date": "2026-08-19",
+    "tf": "15m",
+    "late": true,
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.393,
+    "cover": 0.76,
+    "entry": 718.26,
+    "target": 717.59,
+    "room": 0.093,
+    "at": "09:45",
+    "found_at": "15:42",
+    "opt_side": "put",
+    "strike": 722.0,
+    "premium": 3.46,
+    "contracts": {
+     "30": 1,
+     "40": 2,
+     "50": 2,
+     "60": 3,
+     "70": 4
+    },
+    "prem_src": "소급",
+    "band_px": 718.99,
+    "band_t": "12:05",
+    "mfe": 1.083,
+    "mfe_t": "10:15",
+    "mfe_prem": 33.2,
+    "mfe_prem_t": "15:42",
+    "filled": true,
+    "fill_t": "15:42",
+    "res": null
+   },
    "trades": [],
    "books": {
     "30": {
@@ -983,7 +1051,9 @@
      "trades": []
     }
    },
-   "done": {}
+   "done": {
+    "2026-08-19": true
+   }
   },
   "1h|now": {
    "open": null,
@@ -1096,7 +1166,40 @@
    }
   },
   "1h|vwap": {
-   "open": null,
+   "open": {
+    "date": "2026-08-19",
+    "tf": "1h",
+    "late": true,
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.393,
+    "cover": 1.86,
+    "entry": 715.17,
+    "target": 717.59,
+    "room": 0.338,
+    "at": "10:30",
+    "found_at": "15:42",
+    "opt_side": "put",
+    "strike": 722.0,
+    "premium": 5.6,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 2,
+     "70": 2
+    },
+    "prem_src": "소급",
+    "band_px": 718.99,
+    "band_t": "12:05",
+    "mfe": 1.083,
+    "mfe_t": "10:15",
+    "mfe_prem": -17.7,
+    "mfe_prem_t": "15:42",
+    "filled": true,
+    "fill_t": "15:42",
+    "res": null
+   },
    "trades": [],
    "books": {
     "30": {
@@ -1120,7 +1223,9 @@
      "trades": []
     }
    },
-   "done": {}
+   "done": {
+    "2026-08-19": true
+   }
   }
  }
 }
