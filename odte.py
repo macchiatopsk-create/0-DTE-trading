@@ -532,10 +532,10 @@ def step():
                             bk = tr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
                             ent[k] = int((bk["cap"] * f) // cost)
                         tr["done"][dstr] = True
-                        tr["open"] = dict(date=dstr, tf=tf, late=late,
+                        tr["open"] = dict(date=dstr, tf=tf, em=em, late=late,
                             dir=gsig["dir"], sgn=gsig["sgn"],
-                            gap=gsig["gap"], cover=info["cover"], entry=info["entry"],
-                            target=gsig["target"], room=info["room"],
+                            gap=gsig["gap"], cover=info["cover"], entry=ep_use,
+                            target=gsig["target"], room=rm_use,
                             at=(GAP_TF_TIME[tf] if late else now.strftime("%H:%M")),
                             found_at=now.strftime("%H:%M"),
                             opt_side=oside, strike=gopt["strike"], premium=prem, contracts=ent,
