@@ -1217,6 +1217,34 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
   }},{{passive:true}});
 }})();
 (function(){{
+  document.querySelectorAll('.stab').forEach(function(b){{
+    b.addEventListener('click',function(){{
+      document.querySelectorAll('.stab').forEach(function(x){{x.classList.remove('on')}});
+      document.querySelectorAll('.spane').forEach(function(x){{x.classList.remove('on')}});
+      b.classList.add('on');
+      var p=document.getElementById('s'+b.dataset.s); if(p) p.classList.add('on');
+    }});
+  }});
+  document.querySelectorAll('.etab').forEach(function(b){{
+    b.addEventListener('click',function(){{
+      var pane=b.closest('.spane') || document;
+      pane.querySelectorAll('.etab').forEach(function(x){{x.classList.remove('on')}});
+      pane.querySelectorAll('.epane').forEach(function(x){{x.classList.remove('on')}});
+      b.classList.add('on');
+      var p=document.getElementById('e'+b.dataset.e); if(p) p.classList.add('on');
+    }});
+  }});
+  document.querySelectorAll('.ltab .crow').forEach(function(r){{
+    r.addEventListener('click',function(){{
+      var d=document.getElementById('d'+r.dataset.i);
+      if(!d) return;
+      var on=d.classList.toggle('on');
+      var c=r.querySelector('td:last-child');
+      if(c) c.textContent = on ? '\u25b4' : '\u25be';
+    }});
+  }});
+}})();
+(function(){{
   var f=new Intl.DateTimeFormat("en-US",{{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",weekday:"short",hour12:false}});
   function live(){{var o={{}};f.formatToParts(new Date()).forEach(function(p){{o[p.type]=p.value}});
     if(o.weekday==="Sat"||o.weekday==="Sun")return false;
@@ -1258,7 +1286,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(e.request).then(r => {
       const c = r.clone();
-      caches.open('odte-v1').then(k => k.put(e.request, c)).catch(()=>{});
+      caches.open('odte-v1.1').then(k => k.put(e.request, c)).catch(()=>{});
       return r;
     }).catch(() => caches.match(e.request))
   );
