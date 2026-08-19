@@ -291,7 +291,8 @@ def gap_signal(df, st):
         if gfilled and gext is not None:
             trail_px = round(gext * (1 + GAP_TRAIL/100) if sgn > 0
                              else gext * (1 - GAP_TRAIL/100), 2)
-        return dict(state=("ACTIVE" if ok else ("WAIT" if not ready else "LOW_COVER")),
+        return dict(date=str(today),
+                    state=("ACTIVE" if ok else ("WAIT" if not ready else "LOW_COVER")),
                     gap=round(gp, 3), dir=("숏" if sgn > 0 else "롱"),
                     sgn=sgn, prev_close=round(pcl, 2), open=round(op, 2),
                     entry=round(c1h, 2), target=round(pcl, 2),
@@ -850,14 +851,25 @@ def render(log, st):
     else:
         _tf = gs.get("tfs", {})
         anyok = any(v.get("ok") for v in _tf.values())
-        gstat, gcls = ("SIGNAL", "go") if anyok else ("WATCH", "stby")
+        _today = gs.get("date") or (log.get("days") and max(log["days"])) or ""
+        _open_any = any(tr.get("open") for tr in tracks.values())
+        _done_any = any(any(x.get("date") == _today for x in tr.get("trades", []))
+                        for tr in tracks.values())
+        if _done_any and not _open_any:
+            gstat, gcls = "DONE", "stby"
+        elif _open_any:
+            gstat, gcls = "IN TRADE", "go"
+        else:
+            gstat, gcls = ("SIGNAL", "go") if anyok else ("WATCH", "stby")
         _a = "BUY PUT" if gs["sgn"] > 0 else "BUY CALL"
         cvs = " · ".join(f'{GAP_TF_LABEL[k].split("(")[0]} {v["cover"]:.2f}'
                          + ("✓" if v.get("ok") else "")
                          for k, v in _tf.items())
+        _tail = ("<br>오늘 거래 종료 — 결과는 서브탭 원장 참조" if gstat == "DONE"
+                 else (f'<br>갭필 완료 · 트레일 {gs.get("trail")}' if gs.get("filled")
+                       else '<br>갭필 대기 · 11:30 미달성 시 청산'))
         gdesc = (f'갭 {gs["gap"]:+.2f}% · <b style="color:var(--amb)">{_a}</b> · '
-                 f'타깃까지 {gs.get("room",0):.3f}%<br>커버: {cvs}'
-                 + (f'<br>갭필 완료 · 트레일 {gs.get("trail")}' if gs.get("filled") else '<br>갭필 대기'))
+                 f'타깃까지 {gs.get("room",0):.3f}%<br>커버: {cvs}' + _tail)
 
     def _sizing_tbl(tr):
         rows = ""
