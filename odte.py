@@ -255,12 +255,18 @@ def gap_signal(df, st):
             if fav > best:
                 best = fav; best_t = T[i]; best_px = round(L[i] if sgn > 0 else H[i], 2)
 
-        return dict(state="ACTIVE", gap=round(gp, 3), dir=("숏" if sgn > 0 else "롱"),
+        ok = ready and cover >= GAP_COVER_MIN
+        trail_px = None
+        if gfilled and gext is not None:
+            trail_px = round(gext * (1 + GAP_TRAIL/100) if sgn > 0
+                             else gext * (1 - GAP_TRAIL/100), 2)
+        return dict(state=("ACTIVE" if ok else ("WAIT" if not ready else "LOW_COVER")),
+                    gap=round(gp, 3), dir=("숏" if sgn > 0 else "롱"),
                     sgn=sgn, prev_close=round(pcl, 2), open=round(op, 2),
-                    entry=round(op, 2), target=round(pcl, 2),
-                    stop=round(op + sgn * gapabs * GAP_STOP_FRAC, 2),
-                    room=round(abs(pcl - op) / op * 100, 3),
+                    entry=round(c1h, 2), target=round(pcl, 2),
+                    room=round(abs(pcl - c1h) / c1h * 100, 3),
                     cover=round(cover, 2), r50=round(r50, 2), cur=round(cur, 2),
+                    filled=gfilled, trail=trail_px,
                     band_px=band_px, band_t=band_t,
                     band_room=(round(abs(pcl - band_px) / band_px * 100, 3) if band_px else None),
                     mfe=round(best / op * 100, 3), mfe_t=best_t, mfe_px=best_px)
