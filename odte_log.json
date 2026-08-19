@@ -144,14 +144,14 @@
    "pm_pos": 0.025
   },
   "2026-08-19": {
-   "status": "WAIT · 3층 통과 (VIX 0% · PM 0.81) · VWAP -1σ 터치 대기 (현재 +0.23σ)",
+   "status": "WAIT · 3층 통과 (VIX 0% · PM 0.81) · VWAP -1σ 터치 대기 (현재 +0.64σ)",
    "score": 3,
-   "rsi": 54.2,
+   "rsi": 51.6,
    "direction": 1,
    "gap": 0.39,
-   "px": 717.79,
-   "vwap": 717.5,
-   "at": "11:49",
+   "px": 718.31,
+   "vwap": 716.91,
+   "at": "12:34",
    "vix_pct": 0.0,
    "vix_state": "ERR",
    "pm_pos": 0.814
@@ -159,7 +159,7 @@
  },
  "vix": {
   "state": "ERR",
-  "msg": "수집실패 9D=False 3M=True",
+  "msg": "수집실패 9D=False 3M=False",
   "pct": 0.0,
   "ratio": 0.0,
   "asof": "-"
@@ -182,12 +182,12 @@
   "room": 0.338,
   "cover": 1.86,
   "r50": 716.51,
-  "cur": 717.79,
+  "cur": 718.31,
   "filled": true,
   "trail": 714.14,
-  "band_px": 717.35,
-  "band_t": "10:40",
-  "band_room": 0.033,
+  "band_px": 718.99,
+  "band_t": "12:05",
+  "band_room": 0.195,
   "mfe": 1.083,
   "mfe_t": "10:15",
   "mfe_px": 712.61
