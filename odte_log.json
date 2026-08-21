@@ -209,7 +209,7 @@
   "room": 0.051,
   "cover": 1.08,
   "r50": 712.22,
-  "cur": 713.71,
+  "cur": 713.41,
   "filled": true,
   "trail": 711.0,
   "tfs": {
@@ -250,7 +250,7 @@
  },
  "macro": {
   "date": "2026-08-21",
-  "n_hist": 500,
+  "n_hist": 499,
   "n_feat": 17,
   "extremes": [
    {
@@ -375,10 +375,10 @@
    }
   ],
   "rng": 1.259,
-  "base_rng": 1.474,
+  "base_rng": 1.472,
   "lo_avg": -0.617,
   "hi_avg": 0.642,
-  "base_up": 53.6
+  "base_up": 53.7
  },
  "gap_skip": {
   "date": "2026-08-19",
