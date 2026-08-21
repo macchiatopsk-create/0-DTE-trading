@@ -170,17 +170,24 @@
    "pm_pos": 0.268
   },
   "2026-08-21": {
-   "status": "WAIT_OPEN",
-   "bars": 5,
-   "at": "09:51"
+   "status": "NO TRADE · VIX게이트 (백분위 28% < 50)",
+   "score": -1,
+   "rsi": 48.6,
+   "direction": 0,
+   "gap": 0.6,
+   "px": 710.68,
+   "vwap": 711.8,
+   "at": "10:31",
+   "vix_pct": 27.5,
+   "vix_state": "DEAD",
+   "pm_pos": 0.749
   }
  },
  "vix": {
-  "state": "ERR",
-  "msg": "수집실패 9D=False 3M=False",
-  "pct": 0.0,
-  "ratio": 0.0,
-  "asof": "-"
+  "ratio": 0.7176,
+  "pct": 27.5,
+  "state": "DEAD",
+  "asof": "2026-08-21"
  },
  "pm": {
   "pos": 0.749,
@@ -190,20 +197,20 @@
  },
  "gap": {
   "date": "2026-08-21",
-  "state": "WAIT",
+  "state": "ACTIVE",
   "gap": 0.602,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 710.95,
   "open": 715.23,
-  "entry": 711.61,
+  "entry": 710.59,
   "target": 710.95,
-  "room": 0.093,
-  "cover": 0.85,
-  "r50": 713.26,
-  "cur": 711.61,
-  "filled": false,
-  "trail": null,
+  "room": 0.051,
+  "cover": 1.08,
+  "r50": 712.22,
+  "cur": 710.68,
+  "filled": true,
+  "trail": 711.0,
   "tfs": {
    "5m": {
     "cover": 0.68,
@@ -224,11 +231,11 @@
     "vw_room": null
    },
    "1h": {
-    "cover": 0.85,
-    "entry": 711.61,
-    "ready": false,
-    "ok": false,
-    "room": 0.093,
+    "cover": 1.08,
+    "entry": 710.59,
+    "ready": true,
+    "ok": true,
+    "room": 0.051,
     "vw_entry": null,
     "vw_room": null
    }
@@ -236,14 +243,14 @@
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.551,
-  "mfe_t": "09:45",
-  "mfe_px": 711.29
+  "mfe": 0.842,
+  "mfe_t": "10:20",
+  "mfe_px": 709.21
  },
  "macro": {
   "date": "2026-08-21",
   "n_hist": 500,
-  "n_feat": 15,
+  "n_feat": 17,
   "extremes": [
    {
     "name": "WTI",
@@ -269,31 +276,31 @@
   "up": [
    {
     "d": "2026-02-20",
-    "dist": 2.16,
+    "dist": 2.23,
     "gap": -0.56,
     "ret": 1.45,
     "lo": -0.15,
     "hi": 1.7
    },
    {
-    "d": "2026-08-06",
-    "dist": 2.2,
-    "gap": -0.9,
-    "ret": 0.54,
-    "lo": -0.33,
-    "hi": 1.2
-   },
-   {
     "d": "2026-01-21",
-    "dist": 2.4,
+    "dist": 2.43,
     "gap": 0.23,
     "ret": 1.12,
     "lo": -0.26,
     "hi": 1.8
    },
    {
+    "d": "2026-08-06",
+    "dist": 2.49,
+    "gap": -0.9,
+    "ret": 0.54,
+    "lo": -0.33,
+    "hi": 1.2
+   },
+   {
     "d": "2026-05-05",
-    "dist": 2.45,
+    "dist": 2.51,
     "gap": 0.75,
     "ret": 0.54,
     "lo": -0.07,
@@ -301,25 +308,25 @@
    },
    {
     "d": "2026-05-13",
-    "dist": 2.71,
+    "dist": 2.74,
     "gap": 0.38,
     "ret": 0.67,
     "lo": -0.72,
     "hi": 0.94
    },
    {
-    "d": "2024-12-13",
-    "dist": 2.82,
-    "gap": 0.75,
-    "ret": 0.01,
-    "lo": -0.6,
-    "hi": 0.51
+    "d": "2025-09-26",
+    "dist": 2.89,
+    "gap": 0.14,
+    "ret": 0.27,
+    "lo": -0.55,
+    "hi": 0.33
    }
   ],
   "dn": [
    {
     "d": "2026-06-26",
-    "dist": 2.43,
+    "dist": 2.44,
     "gap": -1.29,
     "ret": -0.09,
     "lo": -0.61,
@@ -327,7 +334,7 @@
    },
    {
     "d": "2026-07-24",
-    "dist": 2.56,
+    "dist": 2.61,
     "gap": -0.22,
     "ret": -0.9,
     "lo": -1.15,
@@ -342,16 +349,8 @@
     "hi": 0.45
    },
    {
-    "d": "2025-12-30",
-    "dist": 2.63,
-    "gap": -0.17,
-    "ret": -0.07,
-    "lo": -0.1,
-    "hi": 0.38
-   },
-   {
     "d": "2026-08-11",
-    "dist": 2.63,
+    "dist": 2.64,
     "gap": 0.34,
     "ret": -0.67,
     "lo": -1.08,
@@ -359,17 +358,25 @@
    },
    {
     "d": "2025-10-22",
-    "dist": 2.67,
+    "dist": 2.76,
     "gap": -0.09,
     "ret": -0.87,
     "lo": -1.81,
     "hi": 0.1
+   },
+   {
+    "d": "2025-12-30",
+    "dist": 2.85,
+    "gap": -0.17,
+    "ret": -0.07,
+    "lo": -0.1,
+    "hi": 0.38
    }
   ],
-  "rng": 1.482,
+  "rng": 1.463,
   "base_rng": 1.474,
-  "lo_avg": -0.706,
-  "hi_avg": 0.775,
+  "lo_avg": -0.703,
+  "hi_avg": 0.76,
   "base_up": 53.6
  },
  "gap_skip": {
@@ -408,12 +415,12 @@
     "prem_src": "실시간",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.1,
-    "mfe_t": "09:51",
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:51",
-    "filled": false,
-    "fill_t": null,
+    "mfe": 0.23,
+    "mfe_t": "10:31",
+    "mfe_prem": 27.9,
+    "mfe_prem_t": "10:31",
+    "filled": true,
+    "fill_t": "10:31",
     "res": null
    },
    "trades": [
@@ -685,12 +692,12 @@
     "prem_src": "실시간",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.0,
-    "mfe_t": null,
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:51",
-    "filled": false,
-    "fill_t": null,
+    "mfe": 0.129,
+    "mfe_t": "10:31",
+    "mfe_prem": 16.2,
+    "mfe_prem_t": "10:31",
+    "filled": true,
+    "fill_t": "10:31",
     "res": null
    },
    "trades": [
@@ -960,7 +967,8 @@
     }
    },
    "done": {
-    "2026-08-19": true
+    "2026-08-19": true,
+    "2026-08-21": true
    },
    "skips": [
     {
@@ -969,6 +977,13 @@
      "cover": 1.86,
      "gap": 0.393,
      "at": "--:--"
+    },
+    {
+     "d": "2026-08-21",
+     "reason": "갭필 후 발견",
+     "cover": 1.08,
+     "gap": 0.602,
+     "at": "10:31"
     }
    ]
   },
