@@ -184,11 +184,10 @@
   }
  },
  "vix": {
-  "state": "ERR",
-  "msg": "수집실패 9D=False 3M=False",
-  "pct": 0.0,
-  "ratio": 0.0,
-  "asof": "-"
+  "ratio": 0.6992,
+  "pct": 19.1,
+  "state": "DEAD",
+  "asof": "2026-08-21"
  },
  "pm": {
   "pos": 0.749,
@@ -209,7 +208,7 @@
   "room": 0.051,
   "cover": 1.08,
   "r50": 712.22,
-  "cur": 713.48,
+  "cur": 713.59,
   "filled": true,
   "trail": 711.0,
   "tfs": {
@@ -219,8 +218,8 @@
     "ready": true,
     "ok": true,
     "room": 0.192,
-    "vw_entry": 710.96,
-    "vw_room": 0.001
+    "vw_entry": 711.69,
+    "vw_room": 0.104
    },
    "15m": {
     "cover": 0.85,
@@ -228,8 +227,8 @@
     "ready": true,
     "ok": true,
     "room": 0.091,
-    "vw_entry": 710.96,
-    "vw_room": 0.001
+    "vw_entry": 711.69,
+    "vw_room": 0.104
    },
    "1h": {
     "cover": 1.08,
@@ -237,13 +236,13 @@
     "ready": true,
     "ok": true,
     "room": 0.051,
-    "vw_entry": 710.96,
-    "vw_room": 0.001
+    "vw_entry": 711.69,
+    "vw_room": 0.104
    }
   },
-  "band_px": 711.68,
-  "band_t": "10:50",
-  "band_room": 0.103,
+  "band_px": 713.1,
+  "band_t": "11:30",
+  "band_room": 0.301,
   "mfe": 0.842,
   "mfe_t": "10:20",
   "mfe_px": 709.21
