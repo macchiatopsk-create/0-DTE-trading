@@ -73,6 +73,42 @@ MOM_TRAIL = 0.30                  # 트레일 (%) — 갭필 0.15보다 넓게 (
 MOM_COVER_MAX = 0.40              # 09:45 커버 < 이 값 = 스킵데이
 MOM_ENTRY_LAST = dt.time(10, 30)  # 이후 발견 시 진입 포기 (소급 방지)
 
+# ── 통합 계좌: 한 북으로 두 전략 (09:45 한 번 판정) ──
+# 커버≥0.40 → 갭필(15m|now 변형) / 커버<0.40+VIX확인 → 모멘텀 / 역행 → 관망.
+# 같은 $2,000 북에서 실제 잔고 기준으로 계약수 산정 — 합산표가 아니라 진짜 한 계좌.
+COMB_FILL_KEY = "15m|now"         # 통합에 편입되는 갭필 변형 (모멘텀과 같은 09:45 판정)
+
+
+def comb_state(log):
+    return log.setdefault("comb", dict(books={}, trades=[], open_by=None, skips=[]))
+
+
+def comb_contracts(cb, cost):
+    ent = {}
+    for f in GAP_SIZES:
+        k = str(int(f * 100))
+        bk = cb["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+        ent[k] = int((bk["cap"] * f) // cost)
+    return ent
+
+
+def comb_settle(cb, rec, per, strat):
+    """통합 북 정산: rec['comb']의 계약수로 각 사이징 잔고 갱신 + 통합 원장 기록."""
+    for k, nc in rec["comb"].items():
+        bk = cb["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+        if nc < 1:
+            bk["trades"].append(dict(d=rec["date"], nc=0, usd=0.0, pct=0.0, res="SKIP_FUND"))
+            continue
+        usd = round(per * nc, 2)
+        bk["cap"] = round(bk["cap"] + usd, 2)
+        bk["trades"].append(dict(d=rec["date"], nc=nc, usd=usd,
+                                 pct=rec.get("pnl_pct", 0.0), res=rec.get("res")))
+    r2 = dict(rec)
+    r2["strat"] = strat
+    r2["contracts"] = rec["comb"]
+    cb["trades"].append(r2)
+    cb["open_by"] = None
+
 # ── 매크로 유사일 브리핑 (참고용, 매매 신호 아님) ──────────
 MACRO_FEATS = {"^TNX":"10Y","^TYX":"30Y","^FVX":"5Y","CL=F":"WTI","DX-Y.NYB":"DXY",
                "^VIX":"VIX","GC=F":"GOLD","HG=F":"COPPER","HYG":"HY","TLT":"TLT",
@@ -571,8 +607,18 @@ def step():
                             k = str(int(f * 100))
                             bk = tr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
                             ent[k] = int((bk["cap"] * f) // cost)
+                        cent = None
+                        if tk == COMB_FILL_KEY:
+                            cb = comb_state(log)
+                            if cb.get("open_by") is None:
+                                cent = comb_contracts(cb, cost)
+                                cb["open_by"] = "갭필"
+                            else:
+                                cb["skips"].append(dict(d=dstr, strat="갭필",
+                                    reason=f"계좌 점유({cb['open_by']})"))
                         tr["done"][dstr] = True
                         tr["open"] = dict(date=dstr, tf=tf, em=em, late=late,
+                            comb=cent,
                             dir=gsig["dir"], sgn=gsig["sgn"],
                             gap=gsig["gap"], cover=info["cover"], entry=ep_use,
                             target=gsig["target"], room=rm_use,
@@ -636,6 +682,8 @@ def step():
                     rec = dict(gopen); rec.update(res=res, exit=round(cur, 2),
                         exit_at=now.strftime("%H:%M"), exit_premium=ex,
                         pnl_pct=pct, per_contract=per, ux=round(ux, 3))
+                    if gopen.get("comb") is not None:
+                        comb_settle(comb_state(log), rec, per, "갭필")
                     tr["trades"].append(rec); tr["open"] = None
                     print(f"  [갭/{tk}] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
 
@@ -684,8 +732,17 @@ def step():
                                 k = str(int(f * 100))
                                 bk = mtr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
                                 ent[k] = int((bk["cap"] * f) // cost)
+                            cb = comb_state(log)
+                            if cb.get("open_by") is None:
+                                cent = comb_contracts(cb, cost)
+                                cb["open_by"] = "모멘텀"
+                            else:
+                                cent = None
+                                cb["skips"].append(dict(d=dstr, strat="모멘텀",
+                                    reason=f"계좌 점유({cb['open_by']})"))
                             mtr["done"][dstr] = True
                             mtr["open"] = dict(date=dstr, tf="mom", em="vix",
+                                comb=cent,
                                 dir=("롱" if sgn > 0 else "숏"), sgn=sgn, gap=gsig["gap"],
                                 cover=cov15, vchg=vchg, entry=ep, target="러너",
                                 room=None, at=now.strftime("%H:%M"),
@@ -755,6 +812,8 @@ def step():
                     rec = dict(mo); rec.update(res=res, exit=round(cur, 2),
                         exit_at=now.strftime("%H:%M"), exit_premium=ex,
                         pnl_pct=pct, per_contract=per, ux=round(ux, 3))
+                    if mo.get("comb") is not None:
+                        comb_settle(comb_state(log), rec, per, "모멘텀")
                     mtr["trades"].append(rec); mtr["open"] = None
                     print(f"  [모멘텀] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
         log["mom_sig"] = msig
@@ -1088,7 +1147,8 @@ def render(log, st):
                    f'<div class="dfull"><span class="dk">최고 지점</span><span class="dv pos">{mfe_str}</span></div>'
                    f'<div class="dfull"><span class="dk">사이징별 계약</span><span class="dv">{ct or "—"}</span></div>'
                    f'</div>')
-            rows += (f'<tr class="crow" data-i="{rid}"><td>{t["date"][5:]}</td><td>{_a}</td>'
+            _sb = (f'<br><span class="rs">{t["strat"]}</span>' if t.get("strat") else "")
+            rows += (f'<tr class="crow" data-i="{rid}"><td>{t["date"][5:]}</td><td>{_a}{_sb}</td>'
                      f'<td>{t["gap"]:+.2f}%</td><td>{t["cover"]:.2f}</td>'
                      f'<td class="{c}">{t.get("pnl_pct",0):+.0f}%</td>'
                      f'<td class="rs">{t["res"]}</td><td class="rs">▾</td></tr>'
@@ -1197,14 +1257,49 @@ def render(log, st):
         '※ 275일 재심 전 mock 검증 트랙입니다. 갭필(승률형)과 모멘텀(러너형)은 같은 갭일을 '
         '커버·VIX로 나눠 갖는 상호 배타 구조입니다.'
         '</div>')
+    # ── 통합 계좌 pane ──
+    cb = log.get("comb") or {}
+    n_cb = len(cb.get("trades", []))
+    cbo = cb.get("open_by")
+    _cbsk = (cb.get("skips") or [])[-3:]
+    _cbskh = "".join(f'<div class="mrow"><span class="md">{x["d"][5:]}</span>'
+                     f'<span class="mg">{x["strat"]}</span>'
+                     f'<span class="mr rs">{x["reason"]}</span></div>' for x in reversed(_cbsk))
+    comb_pane = (
+        f'<div class="panel"><div class="ph">한 계좌 · 09:45 단일 판정</div>'
+        f'<div class="meta">커버 ≥{GAP_COVER_MIN} → <b>갭필</b> (갭 반대로) &nbsp;·&nbsp; '
+        f'커버 &lt;{MOM_COVER_MAX} + VIX확인 → <b>모멘텀</b> (갭 방향) &nbsp;·&nbsp; '
+        f'VIX역행 → 관망<br>'
+        f'두 전략이 <b>같은 북</b>을 씁니다 — 계약수는 통합 잔고 기준 · 동시 진입 불가(선착순)<br>'
+        f'지금: {("<b class=\"pos\">" + cbo + " 보유 중</b>") if cbo else "대기"}</div></div>'
+        f'<div class="panel"><div class="ph">사이징 · 각 ${GAP_CAPITAL:.0f} · 두 전략 합산 아님, 실제 한 북</div>'
+        f'<table><tr><th>사이징</th><th>잔고</th><th>P/L</th><th>거래</th>'
+        f'<th>승률</th><th>MDD</th></tr>{_sizing_tbl(dict(books=cb.get("books", {})))}</table></div>'
+        f'<div class="panel"><div class="ph">통합 원장 · TYPE 아래 전략 표시</div>'
+        f'<table class="ltab"><tr><th>DATE</th><th>TYPE</th><th>GAP</th>'
+        f'<th>커버</th><th>P/L</th><th>EXIT</th><th></th></tr>'
+        f'{_ledger(dict(trades=cb.get("trades", [])), "comb")}</table></div>'
+        + (f'<div class="panel"><div class="ph">계좌 점유로 못 들어간 날</div>{_cbskh}</div>'
+           if _cbskh else "")
+        + '<div class="brief">'
+          '<b>COMBINED · FORWARD TEST</b> — 형님 지시: 한 계좌에 두 전략을 실제 적용한 기록<br>'
+          '09:45 커버 판정 한 번으로 갈립니다. 갭필과 모멘텀은 조건이 상호 배타라 원칙상 겹치지 않고, '
+          '겹치는 예외가 생기면 선착순 + "계좌 점유" 기록<br>'
+          '갭필 쪽은 15분(09:45)·즉시 진입 변형이 통합 계좌에 편입됩니다 (모멘텀과 같은 판정 시점)<br>'
+          '개별 전략 성적은 옆 탭에서 각자 독립 북으로 계속 기록됩니다'
+          '</div>')
+
     gap_groups = (
         '<div class="gtabs">'
-        f'<button class="gtab on" data-g="fill">갭필 · 되돌림<br>'
+        f'<button class="gtab on" data-g="comb">통합 · 한 계좌<br>'
+        f'<span class="gsub">갭필+모멘텀 같은 북 · {n_cb}건</span></button>'
+        f'<button class="gtab" data-g="fill">갭필 · 되돌림<br>'
         f'<span class="gsub">커버≥{GAP_COVER_MIN} → 갭 반대로 · {n_fill}건</span></button>'
         f'<button class="gtab" data-g="mom">모멘텀 · 추세<br>'
         f'<span class="gsub">커버&lt;{MOM_COVER_MAX}+VIX확인 → 갭 방향 · {n_mm}건</span></button>'
         '</div>'
-        f'<div class="gpane on" id="gfill"><div class="stabs">{subtabs}</div>'
+        f'<div class="gpane on" id="gcomb">{comb_pane}</div>'
+        f'<div class="gpane" id="gfill"><div class="stabs">{subtabs}</div>'
         f'{subpanes}{fill_brief}</div>'
         f'<div class="gpane" id="gmom">{mom_pane}{mom_brief}</div>')
 
@@ -1272,6 +1367,7 @@ def render(log, st):
 :root{{--bg:#050807;--pn:#0a0f0c;--ln:#1c2822;--amb:#e8b04b;--ambd:#8a6c33;--tx:#cfe0d6;--mut:#5f7268;--red:#e84545;--grn:#49d17c}}
 *{{margin:0;padding:0;box-sizing:border-box}}
 html{{background:var(--bg)}}
+html{{overflow-x:hidden}}
 body{{background:
   repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),
   radial-gradient(1200px 500px at 50% -10%,rgba(232,176,75,.05),transparent),
@@ -1286,7 +1382,7 @@ header{{display:flex;align-items:baseline;gap:12px;padding:16px 2px 12px;border-
   text-shadow:0 0 12px rgba(232,176,75,.45)}}
 .sub{{font-size:9px;letter-spacing:.2em;color:var(--mut);text-transform:uppercase}}
 .ts{{margin-left:auto;font-size:10.5px;color:var(--ambd);text-align:right;line-height:1.6}}
-.panel{{position:relative;background:var(--pn);border:1px solid var(--ln);padding:14px 16px;margin:14px 0}}
+.panel{{position:relative;background:var(--pn);border:1px solid var(--ln);padding:14px 16px;margin:14px 0;overflow-x:auto}}
 .panel::before,.panel::after{{content:"";position:absolute;width:12px;height:12px;border:1px solid var(--amb);opacity:.7}}
 .panel::before{{top:-1px;left:-1px;border-right:0;border-bottom:0}}
 .panel::after{{bottom:-1px;right:-1px;border-left:0;border-top:0}}
@@ -1330,7 +1426,7 @@ tr:last-child td{{border-bottom:none}}
 .track{{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -14px;padding:0 14px;gap:28px}}
 .track::-webkit-scrollbar{{display:none}}
-.tabpane{{flex:0 0 100%;scroll-snap-align:start;min-width:0}}
+.tabpane{{flex:0 0 100%;scroll-snap-align:start;min-width:0;max-width:100%;overflow-x:hidden}}
 .dots{{display:flex;justify-content:center;gap:7px;margin:16px 0 4px}}
 .dot{{width:6px;height:6px;border-radius:50%;background:var(--ln);transition:all .25s}}
 .dot.on{{background:var(--amb);width:20px;border-radius:3px;box-shadow:0 0 8px rgba(232,176,75,.5)}}
