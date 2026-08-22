@@ -1423,7 +1423,7 @@ tr:last-child td{{border-bottom:none}}
   text-transform:uppercase;background:transparent;font-family:'IBM Plex Mono',monospace}}
 .tab.on{{color:var(--amb);border-color:var(--ln);background:var(--pn);
   text-shadow:0 0 10px rgba(232,176,75,.4)}}
-.track{{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+.track{{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 14px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -14px;padding:0 14px;gap:28px}}
 .track::-webkit-scrollbar{{display:none}}
 .tabpane{{flex:0 0 100%;scroll-snap-align:start;min-width:0;max-width:100%;overflow-x:hidden}}
