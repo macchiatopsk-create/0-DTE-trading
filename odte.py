@@ -65,6 +65,14 @@ GAP_ENTRIES = {"now": "즉시 진입", "vwap": "VWAP 중간선 대기"}
 GAP_TF_TIME = {"5m": "09:35", "15m": "09:45", "1h": "10:30"}
 GAP_CAPITAL = 2000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
 
+# ── 모멘텀 트랙 (VIX확인 스킵데이) — orbvix 백테스트 스펙 그대로 ──
+# 커버<0.40(못 메움) + VIX 개장변화가 갭 방향 확인(갭업&VIX↓/갭다운&VIX↑)
+# → 갭 "방향"으로 진입 (갭필과 반대). 74일 백테스트 PF 3.08/상위2제외 1.90(A모드),
+#   D모드 2.28/1.49. 275일 재심 전 mock 검증 트랙.
+MOM_TRAIL = 0.30                  # 트레일 (%) — 갭필 0.15보다 넓게 (러너 프로필)
+MOM_COVER_MAX = 0.40              # 09:45 커버 < 이 값 = 스킵데이
+MOM_ENTRY_LAST = dt.time(10, 30)  # 이후 발견 시 진입 포기 (소급 방지)
+
 # ── 매크로 유사일 브리핑 (참고용, 매매 신호 아님) ──────────
 MACRO_FEATS = {"^TNX":"10Y","^TYX":"30Y","^FVX":"5Y","CL=F":"WTI","DX-Y.NYB":"DXY",
                "^VIX":"VIX","GC=F":"GOLD","HG=F":"COPPER","HYG":"HY","TLT":"TLT",
@@ -142,6 +150,18 @@ def vix_gate():
         print(f"  VIX 게이트 조회 실패: {type(e).__name__}: {e}")
         return dict(state="ERR", msg=f"{type(e).__name__}: {e}"[:200],
                     pct=0.0, ratio=0.0, asof="-")
+
+
+def vix_open_chg():
+    """당일 VIX 시가 vs 전일 종가 변화 (%). 실패 시 None."""
+    try:
+        h = yf.Ticker("^VIX").history(period="5d")[["Open", "Close"]].dropna()
+        if len(h) < 2:
+            return None
+        return round((float(h["Open"].iloc[-1]) / float(h["Close"].iloc[-2]) - 1) * 100, 2)
+    except Exception as e:
+        print(f"  VIX 개장변화 조회 실패: {type(e).__name__}: {e}")
+        return None
 
 
 def macro_match():
@@ -290,7 +310,7 @@ def gap_signal(df, st):
         if gfilled and gext is not None:
             trail_px = round(gext * (1 + GAP_TRAIL/100) if sgn > 0
                              else gext * (1 - GAP_TRAIL/100), 2)
-        return dict(date=str(today),
+        return dict(date=str(today), orh=round(H[0], 2), orl=round(L[0], 2),
                     state=("ACTIVE" if ok else ("WAIT" if not ready else "LOW_COVER")),
                     gap=round(gp, 3), dir=("숏" if sgn > 0 else "롱"),
                     sgn=sgn, prev_close=round(pcl, 2), open=round(op, 2),
@@ -602,6 +622,138 @@ def step():
                     tr["trades"].append(rec); tr["open"] = None
                     print(f"  [갭/{tk}] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
 
+    # ── 모멘텀 트랙 (VIX확인 스킵데이 → 갭 방향) ──
+    try:
+        vchg = None
+        vc = log.get("vixchg")
+        if vc and vc.get("d") == dstr and vc.get("v") is not None:
+            vchg = vc["v"]
+        else:
+            vchg = vix_open_chg()
+            if vchg is not None:
+                log["vixchg"] = dict(d=dstr, v=vchg)
+        msig = dict(d=dstr, vchg=vchg, state="OFF", why="")
+        if gsig and "sgn" in gsig and gsig.get("tfs"):
+            sgn = gsig["sgn"]
+            i15 = gsig["tfs"].get("15m", {})
+            cov15 = i15.get("cover")
+            mtr = log.setdefault("mom_track",
+                                 dict(open=None, trades=[], books={}, done={}, skips=[]))
+            conf = (vchg is not None
+                    and ((sgn > 0 and vchg < 0) or (sgn < 0 and vchg > 0)))
+            if not i15.get("ready"):
+                msig.update(state="WAIT", why="09:45 대기")
+            elif cov15 is None or cov15 >= MOM_COVER_MAX:
+                msig.update(state="NO", why=f"커버 {cov15:.2f} ≥ {MOM_COVER_MAX} — 갭필 우주")
+            elif vchg is None:
+                msig.update(state="WAIT", why="VIX 개장변화 조회 실패 — 재시도")
+            elif abs(vchg) >= GAP_VIX_SKIP:
+                msig.update(state="NO", why=f"VIX 변화 {vchg:+.1f}% — |{GAP_VIX_SKIP}%| 밖")
+            elif not conf:
+                msig.update(state="VETO", why=f"VIX역행 (갭 {gsig['gap']:+.2f}% · VIX {vchg:+.1f}%) — 관망")
+                if mtr["done"].get(dstr) is None and mtr["open"] is None:
+                    mtr["done"][dstr] = "veto"
+                    mtr["skips"].append(dict(d=dstr, reason="VIX역행", gap=gsig["gap"],
+                                             vchg=vchg, cover=cov15))
+            else:
+                msig.update(state="GO", why=f"확인 (갭 {gsig['gap']:+.2f}% · VIX {vchg:+.1f}%)")
+                if mtr["open"] is None and mtr["done"].get(dstr) is None:
+                    if now.time() > MOM_ENTRY_LAST:
+                        mtr["done"][dstr] = "late"
+                        mtr["skips"].append(dict(d=dstr, reason="늦은 발견", gap=gsig["gap"],
+                                                 vchg=vchg, cover=cov15,
+                                                 at=now.strftime("%H:%M")))
+                        print(f"  [모멘텀] 스킵 — {MOM_ENTRY_LAST} 이후 발견")
+                    else:
+                        oside = "call" if sgn > 0 else "put"     # 갭 방향 (갭필과 반대)
+                        ep = gsig["cur"]
+                        mopt = itm_opt(ep, today_expiry(today), oside, 1e9)
+                        if mopt:
+                            cost = mopt["premium"] * 100
+                            ent = {}
+                            for f in GAP_SIZES:
+                                k = str(int(f * 100))
+                                bk = mtr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+                                ent[k] = int((bk["cap"] * f) // cost)
+                            mtr["done"][dstr] = True
+                            mtr["open"] = dict(date=dstr, tf="mom", em="vix",
+                                dir=("롱" if sgn > 0 else "숏"), sgn=sgn, gap=gsig["gap"],
+                                cover=cov15, vchg=vchg, entry=ep, target="러너",
+                                room=None, at=now.strftime("%H:%M"),
+                                found_at=now.strftime("%H:%M"), opt_side=oside,
+                                strike=mopt["strike"], premium=mopt["premium"],
+                                contracts=ent, prem_src="실시간",
+                                or_stop=(gsig["orl"] if sgn > 0 else gsig["orh"]),
+                                ext=ep, mfe=0.0, mfe_t=None,
+                                mfe_prem=-99.0, mfe_prem_t=None,
+                                filled=False, fill_t=None, res=None)
+                            print(f"  [모멘텀] 진입 커버{cov15:.2f} VIX{vchg:+.1f}% @{ep} "
+                                  f"{oside.upper()} {mopt['strike']:.0f} @${mopt['premium']}")
+            # ── 관리·청산 ──
+            mo = mtr.get("open")
+            if mo and mo.get("res") is None:
+                s2 = mo["sgn"]; cur = gsig["cur"]
+                _adv = ((cur - mo["entry"]) / mo["entry"] * 100) if s2 > 0 \
+                       else ((mo["entry"] - cur) / mo["entry"] * 100)
+                if _adv > mo.get("mfe", 0.0):
+                    mo["mfe"], mo["mfe_t"] = round(_adv, 3), now.strftime("%H:%M")
+                mcur = opt_premium(mo["strike"], mo["opt_side"], today_expiry(today))
+                if mcur and mcur > 0:
+                    _p = (mcur / mo["premium"] - 1) * 100
+                    if _p > mo.get("mfe_prem", -99):
+                        mo["mfe_prem"] = round(_p, 1)
+                        mo["mfe_prem_t"] = now.strftime("%H:%M")
+                # 진입 이후 봉 극점으로 ext 갱신 (D모드 재현: 극점=봉 H/L, 판정=현재가)
+                try:
+                    ent_t = dt.datetime.strptime(mo["at"], "%H:%M").time()
+                    rt2 = df[(df.index.date == today)
+                             & (df.index.time >= ent_t) & (df.index.time < dt.time(16, 0))]
+                    if len(rt2):
+                        bx = float(rt2["High"].max()) if s2 > 0 else float(rt2["Low"].min())
+                        mo["ext"] = max(mo["ext"], bx) if s2 > 0 else min(mo["ext"], bx)
+                except Exception:
+                    pass
+                mo["ext"] = max(mo["ext"], cur) if s2 > 0 else min(mo["ext"], cur)
+                tpx = mo["ext"] * (1 - MOM_TRAIL / 100) if s2 > 0 \
+                      else mo["ext"] * (1 + MOM_TRAIL / 100)
+                mo["trail_px"] = round(tpx, 2)
+                res = None
+                if mo.get("found_at") == now.strftime("%H:%M"):
+                    pass                     # 진입 직후 같은 실행에서는 판정 보류
+                elif (cur <= mo["or_stop"]) if s2 > 0 else (cur >= mo["or_stop"]):
+                    res = "STOP(OR)"
+                elif (cur <= tpx) if s2 > 0 else (cur >= tpx):
+                    res = "TRAIL"
+                elif now.time() >= GAP_CUT:
+                    res = "CUT"
+                elif now.time() >= dt.time(15, 55):
+                    res = "EOD"
+                if res:
+                    ex = mcur if (mcur and mcur > 0) else mo["premium"]
+                    pct = round((ex / mo["premium"] - 1) * 100, 1)
+                    per = round((ex - mo["premium"]) * 100, 2)
+                    ux = ((cur - mo["entry"]) / mo["entry"] * 100) if s2 > 0 \
+                         else ((mo["entry"] - cur) / mo["entry"] * 100)
+                    for k, nc in mo["contracts"].items():
+                        bk = mtr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+                        if nc < 1:
+                            bk["trades"].append(dict(d=dstr, nc=0, usd=0.0, pct=0.0,
+                                                     res="SKIP_FUND"))
+                            continue
+                        usd = round(per * nc, 2)
+                        bk["cap"] = round(bk["cap"] + usd, 2)
+                        bk["trades"].append(dict(d=dstr, nc=nc, usd=usd, pct=pct, res=res))
+                    rec = dict(mo); rec.update(res=res, exit=round(cur, 2),
+                        exit_at=now.strftime("%H:%M"), exit_premium=ex,
+                        pnl_pct=pct, per_contract=per, ux=round(ux, 3))
+                    mtr["trades"].append(rec); mtr["open"] = None
+                    print(f"  [모멘텀] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
+        log["mom_sig"] = msig
+    except Exception as e:
+        import traceback
+        print(f"  모멘텀 트랙 실패: {e}")
+        log["mom_sig"] = dict(d=dstr, state="ERR", why=f"{type(e).__name__}: {e}"[:150])
+
     log["vix"] = vg                      # early return 경로에서도 화면에 남도록 즉시 저장
     log["pm"] = pmv
     if vg:
@@ -907,7 +1059,7 @@ def render(log, st):
         rows = ""
         for i, t in enumerate(reversed(tr.get("trades", [])[-20:])):
             c = "pos" if (t.get("pnl_pct") or 0) > 0 else "neg"
-            _a = "PUT" if t["sgn"] > 0 else "CALL"
+            _a = (t.get("opt_side") or ("put" if t["sgn"] > 0 else "call")).upper()
             mf = t.get("mfe_prem"); mf = None if (mf is None or mf < -90) else mf
             mfe_str = f"{mf:+.0f}% @ {t.get('mfe_prem_t') or ''}" if mf is not None else "—"
             ct = " · ".join(f'{k}%: {v}' for k, v in
@@ -966,6 +1118,46 @@ def render(log, st):
                         f'{_ledger(tr, tf + em)}</table></div></div>')
         subpanes += (f'<div class="spane{" on" if j==0 else ""}" id="s{tf}">'
                      f'<div class="etabs">{inner_t}</div>{inner_p}</div>')
+
+    # ── 모멘텀(VIX확인) 서브탭 — 갭필의 거울: 커버<0.40 + VIX 방향일치 → 갭 방향 ──
+    mtr = log.get("mom_track", {})
+    ms = log.get("mom_sig") or {}
+    n_mm = len(mtr.get("trades", []))
+    subtabs += (f'<button class="stab" data-s="mom">모멘텀(VIX)<br>'
+                f'<span class="rs">{n_mm}건</span></button>')
+    _mst = ms.get("state", "OFF")
+    _mcl = {"GO": "pos", "VETO": "neg", "ERR": "neg"}.get(_mst, "rs")
+    mo = mtr.get("open")
+    moh = ""
+    if mo:
+        moh = (f'<div class="panel hot"><div class="ph">진행 중</div>'
+               f'<div class="big">BUY {mo["opt_side"].upper()} {mo["strike"]:.0f} '
+               f'<span class="dim">@ ${mo["premium"]}</span></div>'
+               f'<div class="meta">진입 {mo["at"]} @ {mo["entry"]} · 커버 {mo["cover"]:.2f}'
+               f' · VIX {mo.get("vchg",0):+.1f}%<br>트레일 {MOM_TRAIL}% → '
+               f'{mo.get("trail_px","—")} · OR손절 {mo["or_stop"]} · 14:00 컷</div></div>')
+    _sk = mtr.get("skips", [])[-3:]
+    _skh = "".join(f'<div class="mrow"><span class="md">{x["d"][5:]}</span>'
+                   f'<span class="mg">갭 {x.get("gap",0):+.2f} · VIX {x.get("vchg",0) or 0:+.1f}%</span>'
+                   f'<span class="mr rs">{x["reason"]}</span></div>' for x in reversed(_sk))
+    subpanes += (
+        f'<div class="spane" id="smom">'
+        f'<div class="panel"><div class="ph">조건 — 갭필의 거울 트랙</div>'
+        f'<div class="meta">커버&lt;{MOM_COVER_MAX}(못 메움) + VIX 개장변화 갭방향 확인 → '
+        f'<b>갭 방향</b> 진입 09:45 · 트레일 {MOM_TRAIL}% · OR극점 손절 · 14:00 컷<br>'
+        f'백테스트(74일 n=35): PF 3.08 · 상위2제외 1.90 · VIX역행은 관망<br>'
+        f'오늘: <b class="{_mcl}">{_mst}</b> · {ms.get("why","—")}</div></div>'
+        f'{moh}'
+        f'<div class="panel"><div class="ph">사이징 · 각 ${GAP_CAPITAL:.0f}</div>'
+        f'<table><tr><th>사이징</th><th>잔고</th><th>P/L</th><th>거래</th>'
+        f'<th>승률</th><th>MDD</th></tr>{_sizing_tbl(mtr)}</table></div>'
+        f'<div class="panel"><div class="ph">원장 · 행을 누르면 상세</div>'
+        f'<table class="ltab"><tr><th>DATE</th><th>TYPE</th><th>GAP</th>'
+        f'<th>커버</th><th>P/L</th><th>EXIT</th><th></th></tr>'
+        f'{_ledger(mtr, "momvix")}</table></div>'
+        + (f'<div class="panel"><div class="ph">최근 관망 (VIX역행 등)</div>{_skh}</div>'
+           if _skh else "")
+        + '</div>')
 
     # ── 매크로 유사일 패널 ──
     mm = log.get("macro")
