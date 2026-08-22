@@ -1382,7 +1382,7 @@ header{{display:flex;align-items:baseline;gap:12px;padding:16px 2px 12px;border-
   text-shadow:0 0 12px rgba(232,176,75,.45)}}
 .sub{{font-size:9px;letter-spacing:.2em;color:var(--mut);text-transform:uppercase}}
 .ts{{margin-left:auto;font-size:10.5px;color:var(--ambd);text-align:right;line-height:1.6}}
-.panel{{position:relative;background:var(--pn);border:1px solid var(--ln);padding:14px 16px;margin:14px 0;overflow-x:auto}}
+.panel{{position:relative;background:var(--pn);border:1px solid var(--ln);padding:14px 16px;margin:14px 0}}
 .panel::before,.panel::after{{content:"";position:absolute;width:12px;height:12px;border:1px solid var(--amb);opacity:.7}}
 .panel::before{{top:-1px;left:-1px;border-right:0;border-bottom:0}}
 .panel::after{{bottom:-1px;right:-1px;border-left:0;border-top:0}}
@@ -1426,7 +1426,7 @@ tr:last-child td{{border-bottom:none}}
 .track{{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 14px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -14px;padding:0 14px;gap:28px}}
 .track::-webkit-scrollbar{{display:none}}
-.tabpane{{flex:0 0 100%;scroll-snap-align:start;min-width:0;max-width:100%;overflow-x:hidden}}
+.tabpane{{flex:0 0 100%;scroll-snap-align:start;min-width:0}}
 .dots{{display:flex;justify-content:center;gap:7px;margin:16px 0 4px}}
 .dot{{width:6px;height:6px;border-radius:50%;background:var(--ln);transition:all .25s}}
 .dot.on{{background:var(--amb);width:20px;border-radius:3px;box-shadow:0 0 8px rgba(232,176,75,.5)}}
