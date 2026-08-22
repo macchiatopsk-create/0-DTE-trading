@@ -521,6 +521,15 @@ def step():
     gsig = gap_signal(df, st)
     log["gap"] = gsig
     log["macro"] = macro_match()
+    # VIX 개장변화 — 갭필·모멘텀 공용 (당일 캐시)
+    vchg = None
+    vc = log.get("vixchg")
+    if vc and vc.get("d") == dstr and vc.get("v") is not None:
+        vchg = vc["v"]
+    else:
+        vchg = vix_open_chg()
+        if vchg is not None:
+            log["vixchg"] = dict(d=dstr, v=vchg)
     if gsig and gsig.get("state") in ("ACTIVE", "WAIT", "LOW_COVER") and gsig.get("tfs"):
         tracks = log.setdefault("gap_tracks", {})
         for tf in GAP_TFS:
@@ -534,7 +543,15 @@ def step():
 
             # ── 진입 ──
             if gopen is None and tr["done"].get(dstr) is None and info["ok"] and ep_use:
-                if bool(gsig.get("filled")):
+                if vchg is not None and abs(vchg) >= GAP_VIX_SKIP:
+                    # 백테스트 우주 필터: 개장 VIX |변화|>=5% 는 대상 밖.
+                    # (조회 실패 시에는 통과 — 일시 장애로 거래를 잃지 않게 fail-open)
+                    tr["done"][dstr] = True
+                    tr.setdefault("skips", []).append(dict(
+                        d=dstr, reason=f"VIX변화 {vchg:+.1f}%", cover=round(info["cover"], 2),
+                        gap=gsig["gap"], at=now.strftime("%H:%M")))
+                    print(f"  [갭/{tk}] 스킵 — VIX 개장변화 {vchg:+.1f}% (|{GAP_VIX_SKIP}%| 밖)")
+                elif bool(gsig.get("filled")):
                     # 갭필이 끝난 뒤 발견 = 소급 진입. 델타 보정으로도 세타 복원이 불가능해
                     # 프리미엄 기준값이 조작되므로 진입하지 않고 스킵 기록만 남긴다.
                     tr["done"][dstr] = True
@@ -624,14 +641,6 @@ def step():
 
     # ── 모멘텀 트랙 (VIX확인 스킵데이 → 갭 방향) ──
     try:
-        vchg = None
-        vc = log.get("vixchg")
-        if vc and vc.get("d") == dstr and vc.get("v") is not None:
-            vchg = vc["v"]
-        else:
-            vchg = vix_open_chg()
-            if vchg is not None:
-                log["vixchg"] = dict(d=dstr, v=vchg)
         msig = dict(d=dstr, vchg=vchg, state="OFF", why="")
         if gsig and "sgn" in gsig and gsig.get("tfs"):
             sgn = gsig["sgn"]
