@@ -1128,12 +1128,10 @@ def render(log, st):
         subpanes += (f'<div class="spane{" on" if j==0 else ""}" id="s{tf}">'
                      f'<div class="etabs">{inner_t}</div>{inner_p}</div>')
 
-    # ── 모멘텀(VIX확인) 서브탭 — 갭필의 거울: 커버<0.40 + VIX 방향일치 → 갭 방향 ──
+    # ── 모멘텀(VIX확인) — 갭필과 분리된 독립 그룹 pane ──
     mtr = log.get("mom_track", {})
     ms = log.get("mom_sig") or {}
     n_mm = len(mtr.get("trades", []))
-    subtabs += (f'<button class="stab" data-s="mom">모멘텀<br>'
-                f'<span class="rs">{n_mm}건</span></button>')
     _mst = ms.get("state", "OFF")
     _mcl = {"GO": "pos", "VETO": "neg", "ERR": "neg"}.get(_mst, "rs")
     mo = mtr.get("open")
@@ -1149,8 +1147,7 @@ def render(log, st):
     _skh = "".join(f'<div class="mrow"><span class="md">{x["d"][5:]}</span>'
                    f'<span class="mg">갭 {x.get("gap",0):+.2f} · VIX {x.get("vchg",0) or 0:+.1f}%</span>'
                    f'<span class="mr rs">{x["reason"]}</span></div>' for x in reversed(_sk))
-    subpanes += (
-        f'<div class="spane" id="smom">'
+    mom_pane = (
         f'<div class="panel"><div class="ph">조건 — 갭필의 거울 트랙</div>'
         f'<div class="meta">커버&lt;{MOM_COVER_MAX}(못 메움) + VIX 개장변화 갭방향 확인 → '
         f'<b>갭 방향</b> 진입 09:45 · 트레일 {MOM_TRAIL}% · OR극점 손절 · 14:00 컷<br>'
@@ -1166,7 +1163,50 @@ def render(log, st):
         f'{_ledger(mtr, "momvix")}</table></div>'
         + (f'<div class="panel"><div class="ph">최근 관망 (VIX역행 등)</div>{_skh}</div>'
            if _skh else "")
-        + '</div>')
+        )
+
+    # ── 갭 탭 2분할: [갭필·되돌림] vs [모멘텀·추세] ──
+    _ms0 = log.get("mom_sig") or {}
+    if _ms0.get("state") and _ms0["state"] != "OFF":
+        gdesc += (f'<br><span class="rs">모멘텀 트랙: {_ms0["state"]} — '
+                  f'{_ms0.get("why", "")}</span>')
+    n_fill = sum(len(tr.get("trades", [])) for tr in tracks.values())
+    fill_brief = (
+        '<div class="brief">'
+        '<b>GAP FILL · FORWARD TEST</b> — 갭 0.2~1.5% & 첫봉(10:30) 커버 40%+ → 갭 메우는 방향 진입<br>'
+        '갭필 도달 → 트레일 0.15% · <b>11:30까지 갭필 실패 시 청산</b>(세타 방어) · 14:00 최종컷<br>'
+        '가격 손절 없음 — 사이징이 손실 상한<br>'
+        '<b>2단 서브탭</b> — 위: 커버 판정 기준선 5분(09:35)/15분(09:45)/1시간(10:30), '
+        '아래: 진입 방식 즉시/VWAP 중간선 대기. '
+        '6개 조합 × 사이징 5종 = 30계좌가 같은 갭을 각각 기록합니다<br>'
+        '집행 — <b>전부 매수(BUY)</b>. 갭업 → <b>ITM PUT</b> / 갭다운 → <b>ITM CALL</b> (Δ0.7)<br>'
+        '백테스트 — 1시간봉 2년 n=87 · 승률 62.1% · PF 4.01 · 대손실(-50%↓) 0건<br>'
+        '사이징별: 30% MDD 26% / 40% MDD 38% / 50% MDD 48% / 최장 5연패 · 최악 1회 -13~31%<br>'
+        '※ 11:30 시간컷이 핵심입니다 — 갭필 실패한 날 6시간 끌면서 세타로 프리미엄이 전액 날아갔고, '
+        '2시간에 끊자 대손실 4건이 0건이 됐습니다. MFE로 더 나은 청산 시점이 있었는지 계속 검증합니다.'
+        '</div>')
+    mom_brief = (
+        '<div class="brief">'
+        '<b>MOMENTUM · FORWARD TEST</b> — 갭필과 <b>반대 발상</b>: 갭을 못 메우는 날은 갭 방향으로<br>'
+        f'조건 — 09:45 커버 &lt;{MOM_COVER_MAX} (갭이 버팀) + VIX 개장변화가 갭 방향 확인 '
+        '(갭업&amp;VIX↓ / 갭다운&amp;VIX↑)<br>'
+        '집행 — <b>전부 매수(BUY)</b>. 갭업 → <b>ITM CALL</b> / 갭다운 → <b>ITM PUT</b> (갭필과 반대)<br>'
+        f'청산 — 트레일 {MOM_TRAIL}% (갭필 0.15보다 넓게 = 러너 프로필) · OR극점 재난손절 · 14:00 컷<br>'
+        'VIX가 역행하는 날(갭업인데 VIX↑)은 <b>관망</b> — 아래 관망 기록으로 대조<br>'
+        '백테스트 — 74일 n=35 · PF 3.08 · 상위2제외 1.90 · 역행 그룹 PF 0.4~0.7 (독)<br>'
+        '※ 275일 재심 전 mock 검증 트랙입니다. 갭필(승률형)과 모멘텀(러너형)은 같은 갭일을 '
+        '커버·VIX로 나눠 갖는 상호 배타 구조입니다.'
+        '</div>')
+    gap_groups = (
+        '<div class="gtabs">'
+        f'<button class="gtab on" data-g="fill">갭필 · 되돌림<br>'
+        f'<span class="gsub">커버≥{GAP_COVER_MIN} → 갭 반대로 · {n_fill}건</span></button>'
+        f'<button class="gtab" data-g="mom">모멘텀 · 추세<br>'
+        f'<span class="gsub">커버&lt;{MOM_COVER_MAX}+VIX확인 → 갭 방향 · {n_mm}건</span></button>'
+        '</div>'
+        f'<div class="gpane on" id="gfill"><div class="stabs">{subtabs}</div>'
+        f'{subpanes}{fill_brief}</div>'
+        f'<div class="gpane" id="gmom">{mom_pane}{mom_brief}</div>')
 
     # ── 매크로 유사일 패널 ──
     mm = log.get("macro")
@@ -1322,6 +1362,15 @@ tr:last-child td{{border-bottom:none}}
 .stab.on{{color:var(--amb);border-color:var(--amb);background:rgba(232,176,75,.07)}}
 .spane{{display:none}}
 .spane.on{{display:block}}
+.gtabs{{display:flex;gap:8px;margin:14px 0 12px}}
+.gtab{{flex:1;min-width:0;overflow:hidden;padding:11px 6px;font-size:11px;line-height:1.7;
+  letter-spacing:.04em;background:var(--pn);border:1px solid var(--ln);color:var(--mut);
+  cursor:pointer;font-family:'IBM Plex Mono',monospace;text-align:center}}
+.gtab .gsub{{display:block;font-size:8.5px;opacity:.75;letter-spacing:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.gtab.on{{color:var(--amb);border-color:var(--amb);background:rgba(232,176,75,.07)}}
+.gpane{{display:none}}
+.gpane.on{{display:block}}
 .ltab .crow{{cursor:pointer}}
 .ltab .crow:active{{background:rgba(232,176,75,.06)}}
 .ltab .drow{{display:none}}
@@ -1387,21 +1436,7 @@ LEGACY {legacy}건은 구버전 기록으로 통계 제외 · 프리미엄은 �
 <div class="gr"><span class="lamp {gcls}"></span><span class="gl">GAP FILL</span>
 <span class="gs">{gstat} · {gdesc}</span></div>
 <div class="verdict {gcls}">▶ {gstat}</div></div>
-<div class="stabs">{subtabs}</div>
-{subpanes}
-<div class="brief">
-<b>GAP FILL · FORWARD TEST</b> — 갭 0.2~1.5% & 첫봉(10:30) 커버 40%+ → 갭 메우는 방향 진입<br>
-갭필 도달 → 트레일 0.15% · <b>11:30까지 갭필 실패 시 청산</b>(세타 방어) · 14:00 최종컷<br>
-가격 손절 없음 — 사이징이 손실 상한<br>
-<b>2단 서브탭</b> — 위: 커버 판정 기준선 5분(09:35)/15분(09:45)/1시간(10:30),
-아래: 진입 방식 즉시/VWAP 중간선 대기.
-6개 조합 × 사이징 5종 = 30계좌가 같은 갭을 각각 기록합니다<br>
-집행 — <b>전부 매수(BUY)</b>. 갭업 → <b>ITM PUT</b> / 갭다운 → <b>ITM CALL</b> (Δ0.7)<br>
-백테스트 — 1시간봉 2년 n=87 · 승률 62.1% · PF 4.01 · 대손실(-50%↓) 0건<br>
-사이징별: 30% MDD 26% / 40% MDD 38% / 50% MDD 48% / 최장 5연패 · 최악 1회 -13~31%<br>
-※ 11:30 시간컷이 핵심입니다 — 갭필 실패한 날 6시간 끌면서 세타로 프리미엄이 전액 날아갔고,
-   2시간에 끊자 대손실 4건이 0건이 됐습니다. MFE로 더 나은 청산 시점이 있었는지 계속 검증합니다.
-</div>
+{gap_groups}
 </div>
 <div class="tabpane">
 {mac_html}
@@ -1446,6 +1481,14 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
   }},{{passive:true}});
 }})();
 (function(){{
+  document.querySelectorAll('.gtab').forEach(function(b){{
+    b.addEventListener('click',function(){{
+      document.querySelectorAll('.gtab').forEach(function(x){{x.classList.remove('on')}});
+      document.querySelectorAll('.gpane').forEach(function(x){{x.classList.remove('on')}});
+      b.classList.add('on');
+      var p=document.getElementById('g'+b.dataset.g); if(p) p.classList.add('on');
+    }});
+  }});
   document.querySelectorAll('.stab').forEach(function(b){{
     b.addEventListener('click',function(){{
       document.querySelectorAll('.stab').forEach(function(x){{x.classList.remove('on')}});
