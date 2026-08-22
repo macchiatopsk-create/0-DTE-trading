@@ -1132,7 +1132,7 @@ def render(log, st):
     mtr = log.get("mom_track", {})
     ms = log.get("mom_sig") or {}
     n_mm = len(mtr.get("trades", []))
-    subtabs += (f'<button class="stab" data-s="mom">모멘텀(VIX)<br>'
+    subtabs += (f'<button class="stab" data-s="mom">모멘텀<br>'
                 f'<span class="rs">{n_mm}건</span></button>')
     _mst = ms.get("state", "OFF")
     _mcl = {"GO": "pos", "VETO": "neg", "ERR": "neg"}.get(_mst, "rs")
@@ -1315,7 +1315,8 @@ tr:last-child td{{border-bottom:none}}
 .etab.on{{color:var(--amb);border-style:solid;border-color:var(--amb)}}
 .epane{{display:none}}
 .epane.on{{display:block}}
-.stab{{flex:1;padding:9px 4px;font-size:10px;line-height:1.5;letter-spacing:.06em;
+.stab{{flex:1;min-width:0;overflow:hidden;padding:9px 2px;font-size:9.5px;line-height:1.5;
+  letter-spacing:.02em;white-space:nowrap;text-overflow:ellipsis;
   background:var(--pn);border:1px solid var(--ln);color:var(--mut);cursor:pointer;
   font-family:'IBM Plex Mono',monospace;text-align:center}}
 .stab.on{{color:var(--amb);border-color:var(--amb);background:rgba(232,176,75,.07)}}
