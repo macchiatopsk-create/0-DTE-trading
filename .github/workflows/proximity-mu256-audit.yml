@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - research/proximity-mu256-audit
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
