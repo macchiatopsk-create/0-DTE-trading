@@ -17,10 +17,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install lattice tools
+        run: python -m pip install --quiet fpylll cysignals
       - name: Run exact audit
         run: python research/proximity_mu256_audit.py | tee proximity_mu256_audit.txt
+      - name: Run mod4 lattice search
+        run: python research/proximity_mod4_lattice.py | tee proximity_mod4_lattice.txt
       - name: Upload audit
         uses: actions/upload-artifact@v4
         with:
           name: proximity-mu256-audit
-          path: proximity_mu256_audit.txt
+          path: |
+            proximity_mu256_audit.txt
+            proximity_mod4_lattice.txt
