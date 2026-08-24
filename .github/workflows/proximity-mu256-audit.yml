@@ -1,4 +1,4 @@
-name: Proximity mu256 audit
+name: Proximity h11 shell audit
 
 on:
   push:
@@ -17,24 +17,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install lattice tools
-        run: python -m pip install --quiet fpylll cysignals
-      - name: Run exact audit
-        run: python research/proximity_mu256_audit.py | tee proximity_mu256_audit.txt
-      - name: Run mod4 lattice search
-        run: python research/proximity_mod4_lattice.py | tee proximity_mod4_lattice.txt
-      - name: Run full product-parity lattice search
-        run: python research/proximity_mod2_lattice.py | tee proximity_mod2_lattice.txt
-      - name: Run exact 4-subset scan
-        run: |
-          g++ -O3 -std=c++20 research/proximity_mod4_mitm.cpp -o /tmp/proximity_mod4_mitm
-          /tmp/proximity_mod4_mitm | tee proximity_mod4_mitm.txt
+      - name: Run exact h11 second-moment ledger
+        run: python research/proximity_h11_shell.py | tee proximity_h11_shell.txt
       - name: Upload audit
         uses: actions/upload-artifact@v4
         with:
-          name: proximity-mu256-audit
-          path: |
-            proximity_mu256_audit.txt
-            proximity_mod4_lattice.txt
-            proximity_mod2_lattice.txt
-            proximity_mod4_mitm.txt
+          name: proximity-h11-shell-audit
+          path: proximity_h11_shell.txt
