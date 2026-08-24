@@ -183,9 +183,17 @@
    "pm_pos": 0.749
   },
   "2026-08-24": {
-   "status": "WAIT_OPEN",
-   "bars": 6,
-   "at": "09:55"
+   "status": "WAIT · 3층 통과 (VIX 0% · PM 0.43) · VWAP -1σ 터치 대기 (현재 +0.92σ)",
+   "score": 0,
+   "rsi": 70.7,
+   "direction": 0,
+   "gap": -0.53,
+   "px": 706.13,
+   "vwap": 704.91,
+   "at": "10:51",
+   "vix_pct": 0.0,
+   "vix_state": "ERR",
+   "pm_pos": 0.426
   }
  },
  "vix": {
@@ -205,18 +213,18 @@
   "date": "2026-08-24",
   "orh": 709.79,
   "orl": 706.0,
-  "state": "WAIT",
+  "state": "LOW_COVER",
   "gap": -0.531,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 713.41,
   "open": 709.62,
-  "entry": 704.4,
+  "entry": 704.23,
   "target": 713.41,
-  "room": 1.279,
-  "cover": -1.38,
+  "room": 1.304,
+  "cover": -1.43,
   "r50": 709.71,
-  "cur": 704.4,
+  "cur": 706.13,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -239,13 +247,13 @@
     "vw_room": 0.965
    },
    "1h": {
-    "cover": -1.38,
-    "entry": 704.4,
-    "ready": false,
+    "cover": -1.43,
+    "entry": 704.23,
+    "ready": true,
     "ok": false,
-    "room": 1.279,
-    "vw_entry": 705.79,
-    "vw_room": 1.08
+    "room": 1.304,
+    "vw_entry": 704.04,
+    "vw_room": 1.331
    }
   },
   "band_px": 706.69,
