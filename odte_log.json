@@ -197,11 +197,10 @@
   }
  },
  "vix": {
-  "state": "ERR",
-  "msg": "수집실패 9D=False 3M=False",
-  "pct": 0.0,
-  "ratio": 0.0,
-  "asof": "-"
+  "ratio": 0.761,
+  "pct": 46.2,
+  "state": "DEAD",
+  "asof": "2026-08-24"
  },
  "pm": {
   "pos": 0.426,
@@ -224,7 +223,7 @@
   "room": 1.304,
   "cover": -1.43,
   "r50": 709.71,
-  "cur": 708.71,
+  "cur": 707.99,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -252,8 +251,8 @@
     "ready": true,
     "ok": false,
     "room": 1.304,
-    "vw_entry": 704.04,
-    "vw_room": 1.331
+    "vw_entry": 705.03,
+    "vw_room": 1.189
    }
   },
   "band_px": 706.69,
