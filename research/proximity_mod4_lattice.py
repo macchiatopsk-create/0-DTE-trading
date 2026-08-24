@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from itertools import combinations
+import random
 
 P = 2**31 - 2**24 + 1
 N = 128
@@ -39,14 +39,49 @@ def centered(x,p):
 
 def verify_relation(d,z128):
     assert len(d)==128
-    # reduced problem: equal cardinality and first 3 moments on mu128
     assert sum(d)==0
+    assert max(abs(x) for x in d)<=1
     for k in range(1,4):
         s=sum(di*pow(pow(z128,r,P),k,P) for r,di in enumerate(d))%P
         assert s==0,(k,s)
-    # Lift each label r to the mu2 coset {z256^r,z256^(r+128)}.
-    weighted=sum(r*di for r,di in enumerate(d))
-    return weighted
+    return sum(r*di for r,di in enumerate(d))
+
+
+def recenter_mu4(v):
+    """Add integer multiples of complete mu4 cosets j+32*t.
+
+    Such shifts preserve x,x^2,x^3 moments exactly.  Choose shifts so every
+    coordinate lands in {-1,0,1} and total cardinality remains zero.
+    """
+    intervals=[]
+    for j in range(32):
+        vals=[v[j+32*t] for t in range(4)]
+        lo=max(-1-x for x in vals)
+        hi=min( 1-x for x in vals)
+        if lo>hi:
+            return None
+        intervals.append([lo,hi])
+    sv=sum(v)
+    if sv % 4:
+        return None
+    target=-sv//4
+    lo_sum=sum(a for a,b in intervals)
+    hi_sum=sum(b for a,b in intervals)
+    if not (lo_sum<=target<=hi_sum):
+        return None
+    cs=[a for a,b in intervals]
+    rem=target-lo_sum
+    for j,(lo,hi) in enumerate(intervals):
+        add=min(rem,hi-lo)
+        cs[j]+=add
+        rem-=add
+    assert rem==0 and sum(cs)==target
+    w=v[:]
+    for j,c in enumerate(cs):
+        for t in range(4):
+            w[j+32*t]+=c
+    assert sum(w)==0 and max(abs(x) for x in w)<=1
+    return w
 
 
 def main():
@@ -55,8 +90,6 @@ def main():
     g=primitive_root(P)
     z128=pow(g,(P-1)//128,P)
     xs=[pow(z128,r,P) for r in range(128)]
-
-    # A*d=0 mod p for rows [1, x, x^2, x^3].
     A=[
         [1]*128,
         xs,
@@ -67,10 +100,8 @@ def main():
     Binv=inv_matrix_mod(B,P)
 
     rows=[]
-    # p*e_i for the four pivot variables.
     for i in range(4):
         v=[0]*128; v[i]=P; rows.append(v)
-    # One lattice vector for each free coordinate.
     for j in range(4,128):
         c=[A[i][j] for i in range(4)]
         dep=[-sum(Binv[i][t]*c[t] for t in range(4)) % P for i in range(4)]
@@ -81,43 +112,61 @@ def main():
         rows.append(v)
 
     M=IntegerMatrix.from_matrix(rows)
-    print('lattice dimension=',M.nrows,'det exponent p^4; running LLL')
+    print('lattice dimension=',M.nrows,'det exponent p^4')
     LLL.reduction(M, delta=0.999)
-
-    def inspect(tag):
-        best=[]
-        for i in range(M.nrows):
-            v=[int(M[i,j]) for j in range(M.ncols)]
-            norm2=sum(x*x for x in v)
-            mx=max(abs(x) for x in v)
-            supp=sum(x!=0 for x in v)
-            best.append((norm2,mx,supp,i,v))
-        best.sort(key=lambda t:t[0])
-        print(tag,'best rows:',[(a,b,c,d) for a,b,c,d,_ in best[:10]])
-        for norm2,mx,supp,i,v in best[:40]:
-            if mx<=1 and any(v):
-                w=verify_relation(v,z128)
-                print('TERNARY RELATION FOUND row=',i,'norm2=',norm2,'support=',supp,
-                      'weighted_mod2=',w%2,'weighted_mod4=',w%4)
-                print('positive=',[r for r,x in enumerate(v) if x==1])
-                print('negative=',[r for r,x in enumerate(v) if x==-1])
-                return v,w
-        return None
-
-    hit=inspect('LLL')
-    if hit and hit[1]%2==1:
-        print('MOD4-CHANGING TRADE FOUND')
-        return
-
-    for bs in [10,20,30]:
+    for bs in [10,20,30,40]:
         print('running BKZ block',bs)
-        BKZ.reduction(M, BKZ.Param(block_size=bs, max_loops=3))
-        hit=inspect(f'BKZ{bs}')
-        if hit and hit[1]%2==1:
-            print('MOD4-CHANGING TRADE FOUND')
+        BKZ.reduction(M, BKZ.Param(block_size=bs, max_loops=4))
+
+    basis=[]
+    for i in range(M.nrows):
+        v=[int(M[i,j]) for j in range(M.ncols)]
+        basis.append(v)
+    basis.sort(key=lambda v:sum(x*x for x in v))
+    print('best raw basis:',[(sum(x*x for x in v),max(abs(x) for x in v),sum(x!=0 for x in v)) for v in basis[:20]])
+
+    checked=0; recentered=0; odd=0
+    def test(v,tag):
+        nonlocal checked,recentered,odd
+        checked+=1
+        # Ignore huge representatives: recenter intervals cannot rescue a coset range >2.
+        w=recenter_mu4(v)
+        if w is None:
+            return False
+        recentered+=1
+        weight=verify_relation(w,z128)
+        parity=weight&1
+        if parity:
+            odd+=1
+            print('MOD4-CHANGING TERNARY TRADE FOUND',tag)
+            print('support=',sum(x!=0 for x in w),'weight_mod2=',parity,'weight_mod4=',weight%4)
+            print('positive=',[i for i,x in enumerate(w) if x==1])
+            print('negative=',[i for i,x in enumerate(w) if x==-1])
+            return True
+        return False
+
+    for i,v in enumerate(basis):
+        if test(v,f'basis[{i}]'):
+            return
+        if test([-x for x in v],f'-basis[{i}]'):
             return
 
-    print('No odd-weighted ternary basis vector found by this LLL/BKZ search.')
+    # Random short combinations of the best BKZ vectors.  Coset recentering can
+    # turn max-coeff 2/3 representatives into ternary relations, so search the
+    # quotient around the structured shortest shell rather than basis rows only.
+    rng=random.Random(20260824)
+    pool=basis[:48]
+    for it in range(200000):
+        terms=rng.sample(range(len(pool)), rng.choice([2,2,2,3,3,4]))
+        coeffs=[rng.choice([-1,1]) for _ in terms]
+        v=[0]*128
+        for idx,c in zip(terms,coeffs):
+            b=pool[idx]
+            for j in range(128): v[j]+=c*b[j]
+        if test(v,f'random[{it}] terms={terms} coeffs={coeffs}'):
+            return
+    print('No odd ternary trade after coset recenter search.')
+    print('checked=',checked,'recentered=',recentered,'odd=',odd)
 
 if __name__=='__main__':
     main()
