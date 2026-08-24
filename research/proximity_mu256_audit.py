@@ -1,88 +1,88 @@
 #!/usr/bin/env python3
 from math import comb, log2
+import random
 
 P = 2**31 - 2**24 + 1
-PHI = P - 1
-K = 136
+Q = P**6
+BSTAR = Q // 2**128
+CAND = comb(255,136)
 
 
 def primitive_root(p: int) -> int:
-    factors = [2, 127]
-    for g in range(2, 1000):
-        if all(pow(g, (p - 1)//q, p) != 1 for q in factors):
+    for g in range(2,1000):
+        if pow(g,(p-1)//2,p) != 1 and pow(g,(p-1)//127,p) != 1:
             return g
-    raise RuntimeError('no primitive root found')
+    raise RuntimeError
 
 
-def dlog_table(order: int, g: int):
-    root = pow(g, PHI//order, P)
-    table = {}
-    cur = 1
-    for e in range(order):
-        table[cur] = e
-        cur = (cur * root) % P
-    assert len(table) == order
-    return table
+def exact_key_ledger():
+    print('EXACT KEY LEDGER')
+    print('P=',P)
+    print('Q=P^6=',Q)
+    print('B*=floor(Q/2^128)=',BSTAR)
+    print('C=choose(255,136)=',CAND)
+    print('log2 C=',log2(CAND))
+    print('log2 B*=',log2(BSTAR))
+    for product_classes in [256,128,64,32,16]:
+        key_count = Q * product_classes
+        lhs = key_count * BSTAR
+        ok = lhs < CAND
+        avg = CAND / key_count
+        print(f'classes={product_classes:3d}  key*B* < C ? {ok}  '
+              f'log2(avg_fiber)={log2(avg):.9f}  '
+              f'log2(avg/B*)={log2(avg/BSTAR):+.9f}')
 
 
-def char_exponent(x: int, order: int, table: dict[int,int]) -> int:
-    assert x % P != 0
-    return table[pow(x, PHI//order, P)]
+def verify_trade(z256, X, Y):
+    # Lift an r-subset of mu64 labels to a union of mu4 cosets in mu256.
+    def lift(S):
+        return sorted({(r + 64*t) % 256 for r in S for t in range(4)})
+    A=lift(X); B=lift(Y)
+    assert len(A)==len(B)==4*len(X)
+    for k in range(1,7):
+        sa=sum(pow(pow(z256,j,P),k,P) for j in A)%P
+        sb=sum(pow(pow(z256,j,P),k,P) for j in B)%P
+        assert sa==sb, (k,sa,sb)
+    ea=sum(A)%256; eb=sum(B)%256
+    return A,B,(ea-eb)%256
 
 
-def rotate_bits(bits: int, shift: int, mod: int, mask: int) -> int:
-    shift %= mod
-    if shift == 0:
-        return bits
-    return ((bits << shift) | (bits >> (mod-shift))) & mask
-
-
-def theta_norm_factor(u: int) -> int:
-    return (pow(u, 6, P) + pow(u, 3, P) + 1) % P
-
-
-def joint_support_product_norm(items, k: int, mod: int) -> int:
-    # DP over Z/256 (product exponent) x Z/mod (norm character exponent).
-    mask = (1 << mod) - 1
-    dp = [[0]*256 for _ in range(k+1)]
-    dp[0][0] = 1
-    seen = 0
-    for bexp, nexp in items:
-        seen += 1
-        hi = min(k, seen)
-        bexp %= 256
-        nexp %= mod
-        for j in range(hi, 0, -1):
-            prev = dp[j-1]
-            cur = dp[j]
-            for b, bits in enumerate(prev):
-                if bits:
-                    tb = (b + bexp) & 255
-                    cur[tb] |= rotate_bits(bits, nexp, mod, mask)
-    return sum(bits.bit_count() for bits in dp[k])
+def search_h4_trade(g,z256, samples=400000):
+    # mu4-coset unions automatically kill moments 1,2,3,5,6.
+    # Equality of p4 becomes equality of the sum of 8 labels in mu64.
+    # Opposite parity of label-sum => product exponent differs by 4 mod 8.
+    z64=pow(z256,4,P)
+    vals=[pow(z64,r,P) for r in range(64)]
+    rng=random.Random(20260824)
+    seen={}
+    for it in range(samples):
+        S=tuple(sorted(rng.sample(range(64),8)))
+        s=sum(vals[r] for r in S)%P
+        parity=sum(S)&1
+        old=seen.get(s)
+        if old is None:
+            seen[s]=(parity,S)
+        elif old[0] != parity:
+            T=old[1]
+            A,B,diff=verify_trade(z256,S,T)
+            print('\nFOUND H4-COSSET TRADE')
+            print('iterations=',it+1,'sum=',s)
+            print('X=',S,'parity=',parity)
+            print('Y=',T,'parity=',old[0])
+            print('lift_size_each=',len(A),'product_exponent_diff_mod256=',diff,
+                  'diff_mod8=',diff%8,'diff_mod4=',diff%4)
+            print('moments p1..p6 verified equal in KoalaBear')
+            return True
+    print('\nNO H4 trade found in',samples,'samples; distinct sums=',len(seen))
+    return False
 
 
 def main():
-    g = primitive_root(P)
-    z256 = pow(g,PHI//256,P)
-    mu256 = [pow(z256,j,P) for j in range(256)]
-    roots = [(j, pow(z256,j,P)) for j in range(1,256)]
-    assert len(roots) == 255
-
-    print(f'P={P} g={g} z256={z256}')
-    print(f'log2_choose_255_136={log2(comb(255,K)):.12f}')
-    print('Ext6 modulus: X^6 + X^3 + 1')
-    factors = [(j, theta_norm_factor(u)) for j,u in roots]
-    print('distinct_norm_factors=', len({x for _,x in factors}))
-
-    print('\nJOINT PRODUCT-KEY x NORM-CHARACTER SUPPORT')
-    for mod in [2,4,8,16,32,64,127]:
-        table = dlog_table(mod,g)
-        items = [(j, char_exponent(x,mod,table)) for j,x in factors]
-        support = joint_support_product_norm(items,K,mod)
-        full = 256*mod
-        saving = log2(full/support)
-        print(f' mod={mod:3d} support={support:6d}/{full:6d} saving={saving:.6f}bits')
+    exact_key_ledger()
+    g=primitive_root(P)
+    z256=pow(g,(P-1)//256,P)
+    print('\nprimitive_root=',g,'z256=',z256)
+    search_h4_trade(g,z256)
 
 if __name__=='__main__':
     main()
