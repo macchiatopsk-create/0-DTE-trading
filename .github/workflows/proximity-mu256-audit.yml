@@ -19,8 +19,14 @@ jobs:
           python-version: '3.12'
       - name: Run exact h11 second-moment ledger
         run: python research/proximity_h11_shell.py | tee proximity_h11_shell.txt
+      - name: Run KoalaBear h11 cubic-incidence probe
+        run: |
+          g++ -O3 -std=c++20 research/proximity_h11_cubic_probe.cpp -o /tmp/proximity_h11_cubic_probe
+          /tmp/proximity_h11_cubic_probe | tee proximity_h11_cubic_probe.txt
       - name: Upload audit
         uses: actions/upload-artifact@v4
         with:
           name: proximity-h11-shell-audit
-          path: proximity_h11_shell.txt
+          path: |
+            proximity_h11_shell.txt
+            proximity_h11_cubic_probe.txt
