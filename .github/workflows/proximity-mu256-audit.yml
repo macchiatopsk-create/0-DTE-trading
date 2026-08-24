@@ -23,6 +23,10 @@ jobs:
         run: python research/proximity_mu256_audit.py | tee proximity_mu256_audit.txt
       - name: Run mod4 lattice search
         run: python research/proximity_mod4_lattice.py | tee proximity_mod4_lattice.txt
+      - name: Run exact 4-subset scan
+        run: |
+          g++ -O3 -std=c++20 research/proximity_mod4_mitm.cpp -o /tmp/proximity_mod4_mitm
+          /tmp/proximity_mod4_mitm | tee proximity_mod4_mitm.txt
       - name: Upload audit
         uses: actions/upload-artifact@v4
         with:
@@ -30,3 +34,4 @@ jobs:
           path: |
             proximity_mu256_audit.txt
             proximity_mod4_lattice.txt
+            proximity_mod4_mitm.txt
