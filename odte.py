@@ -1253,9 +1253,11 @@ def render(log, st):
         '집행 — <b>전부 매수(BUY)</b>. 갭업 → <b>ITM CALL</b> / 갭다운 → <b>ITM PUT</b> (갭필과 반대)<br>'
         f'청산 — 트레일 {MOM_TRAIL}% (갭필 0.15보다 넓게 = 러너 프로필) · OR극점 재난손절 · 14:00 컷<br>'
         'VIX가 역행하는 날(갭업인데 VIX↑)은 <b>관망</b> — 아래 관망 기록으로 대조<br>'
-        '백테스트 — 74일 n=35 · PF 3.08 · 상위2제외 1.90 · 역행 그룹 PF 0.4~0.7 (독)<br>'
-        '※ 275일 재심 전 mock 검증 트랙입니다. 갭필(승률형)과 모멘텀(러너형)은 같은 갭일을 '
-        '커버·VIX로 나눠 갖는 상호 배타 구조입니다.'
+        '재심(251일, 2024-08~2026-08) — n=119 · A모드 PF 1.94/상위2제외 1.59 · '
+        'D모드 1.67/1.41 · 트레일 0.25~0.35 능선 생존 · 확인/역행 분리 유지<br>'
+        '<b>판정: 실체 있는 엣지지만 갭필의 절반 체급.</b> 74일 때의 PF 3.08은 레짐 신기루였음. '
+        '승률 CI 하한 33% · 단독 MDD 80%+ → <b>mock 전용, 라이브 승격은 mock 30건 후 재론</b><br>'
+        '갭필(승률형)과 모멘텀(러너형)은 같은 갭일을 커버·VIX로 나눠 갖는 상호 배타 구조입니다.'
         '</div>')
     # ── 통합 계좌 pane ──
     cb = log.get("comb") or {}
@@ -1295,13 +1297,10 @@ def render(log, st):
         f'<span class="gsub">갭필+모멘텀 같은 북 · {n_cb}건</span></button>'
         f'<button class="gtab" data-g="fill">갭필 · 되돌림<br>'
         f'<span class="gsub">커버≥{GAP_COVER_MIN} → 갭 반대로 · {n_fill}건</span></button>'
-        f'<button class="gtab" data-g="mom">모멘텀 · 추세<br>'
-        f'<span class="gsub">커버&lt;{MOM_COVER_MAX}+VIX확인 → 갭 방향 · {n_mm}건</span></button>'
         '</div>'
         f'<div class="gpane on" id="gcomb">{comb_pane}</div>'
         f'<div class="gpane" id="gfill"><div class="stabs">{subtabs}</div>'
-        f'{subpanes}{fill_brief}</div>'
-        f'<div class="gpane" id="gmom">{mom_pane}{mom_brief}</div>')
+        f'{subpanes}{fill_brief}</div>')
 
     # ── 매크로 유사일 패널 ──
     mm = log.get("macro")
@@ -1503,7 +1502,8 @@ tr:last-child td{{border-bottom:none}}
 <div class="tabs">
   <button class="tab on" data-i="0">3-LAYER · ITM</button>
   <button class="tab" data-i="1">GAP FILL</button>
-  <button class="tab" data-i="2">MACRO</button>
+  <button class="tab" data-i="2">MOMENTUM</button>
+  <button class="tab" data-i="3">MACRO</button>
 </div>
 <div class="track" id="track">
 <div class="tabpane">
@@ -1535,6 +1535,10 @@ LEGACY {legacy}건은 구버전 기록으로 통계 제외 · 프리미엄은 �
 {gap_groups}
 </div>
 <div class="tabpane">
+{mom_pane}
+{mom_brief}
+</div>
+<div class="tabpane">
 {mac_html}
 <div class="brief">
 <b>참고용 · 매매 신호 아님</b><br>
@@ -1546,7 +1550,7 @@ LEGACY {legacy}건은 구버전 기록으로 통계 제외 · 프리미엄은 �
 </div>
 </div>
 </div>
-<div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
+<div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){{}});
@@ -1571,7 +1575,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
     clearTimeout(tmr);
     tmr=setTimeout(function(){{
       var i=Math.round(tr.scrollLeft/tr.clientWidth);
-      if(i<0)i=0; if(i>2)i=2;
+      if(i<0)i=0; if(i>panes.length-1)i=panes.length-1;
       mark(i);
     }},90);
   }},{{passive:true}});
