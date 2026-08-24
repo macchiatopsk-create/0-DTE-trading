@@ -30,22 +30,6 @@ def char_exponent(x: int, order: int, table: dict[int,int]) -> int:
     return table[pow(x, PHI//order, P)]
 
 
-def subset_sum_counts(exps, k: int, mod: int):
-    dp = [[0]*mod for _ in range(k+1)]
-    dp[0][0] = 1
-    seen = 0
-    for e in exps:
-        seen += 1
-        hi = min(k, seen)
-        e %= mod
-        for j in range(hi, 0, -1):
-            prev, cur = dp[j-1], dp[j]
-            for s, c in enumerate(prev):
-                if c:
-                    cur[(s+e) % mod] += c
-    return dp[k]
-
-
 def rotate_bits(bits: int, shift: int, mod: int, mask: int) -> int:
     shift %= mod
     if shift == 0:
@@ -53,62 +37,52 @@ def rotate_bits(bits: int, shift: int, mod: int, mask: int) -> int:
     return ((bits << shift) | (bits >> (mod-shift))) & mask
 
 
-def subset_sum_support_bitset(exps, k: int, mod: int):
-    mask = (1 << mod) - 1
-    dp = [0]*(k+1)
-    dp[0] = 1
-    seen = 0
-    for e in exps:
-        seen += 1
-        hi = min(k, seen)
-        for j in range(hi, 0, -1):
-            dp[j] |= rotate_bits(dp[j-1], e, mod, mask)
-    return dp[k].bit_count()
-
-
 def theta_norm_factor(u: int) -> int:
-    # KoalaBear.Ext6 = F_p[theta]/(theta^6 + theta^3 + 1).
-    # Norm(theta-u) = product_i(theta_i-u) = u^6 + u^3 + 1 (degree even).
     return (pow(u, 6, P) + pow(u, 3, P) + 1) % P
 
 
-def audit_norm(roots, g):
-    total = comb(255, K)
-    factors = [theta_norm_factor(u) for u in roots]
-    assert all(factors)
-    print('\nEXT6 THETA NORM')
-    print('norm_factor = u^6 + u^3 + 1')
-    print('individual_distinct_norm_factors=', len(set(factors)))
-
-    for mod in [2,4,8,16,32,64,127]:
-        table = dlog_table(mod,g)
-        exps = [char_exponent(x,mod,table) for x in factors]
-        counts = subset_sum_counts(exps,K,mod)
-        support = sum(c>0 for c in counts)
-        avg = total/mod
-        print(f' mod={mod:3d} indiv_support={len(set(exps)):3d} subset_support={support:3d}/{mod:3d} '
-              f'saving={log2(mod/support):.6f}bits max/avg={max(counts)/avg:.12f} '
-              f'min/avg={min(c for c in counts if c)/avg:.12f}')
-
-    mod = 64*127
-    table = dlog_table(mod,g)
-    exps = [char_exponent(x,mod,table) for x in factors]
-    support = subset_sum_support_bitset(exps,K,mod)
-    print(f' mod={mod:4d} indiv_support={len(set(exps)):4d} subset_support={support:4d}/{mod:4d} '
-          f'saving={log2(mod/support):.6f}bits')
+def joint_support_product_norm(items, k: int, mod: int) -> int:
+    # DP over Z/256 (product exponent) x Z/mod (norm character exponent).
+    mask = (1 << mod) - 1
+    dp = [[0]*256 for _ in range(k+1)]
+    dp[0][0] = 1
+    seen = 0
+    for bexp, nexp in items:
+        seen += 1
+        hi = min(k, seen)
+        bexp %= 256
+        nexp %= mod
+        for j in range(hi, 0, -1):
+            prev = dp[j-1]
+            cur = dp[j]
+            for b, bits in enumerate(prev):
+                if bits:
+                    tb = (b + bexp) & 255
+                    cur[tb] |= rotate_bits(bits, nexp, mod, mask)
+    return sum(bits.bit_count() for bits in dp[k])
 
 
 def main():
     g = primitive_root(P)
     z256 = pow(g,PHI//256,P)
     mu256 = [pow(z256,j,P) for j in range(256)]
-    roots = [u for u in mu256 if u != 1]
+    roots = [(j, pow(z256,j,P)) for j in range(1,256)]
     assert len(roots) == 255
 
     print(f'P={P} g={g} z256={z256}')
     print(f'log2_choose_255_136={log2(comb(255,K)):.12f}')
     print('Ext6 modulus: X^6 + X^3 + 1')
-    audit_norm(roots,g)
+    factors = [(j, theta_norm_factor(u)) for j,u in roots]
+    print('distinct_norm_factors=', len({x for _,x in factors}))
+
+    print('\nJOINT PRODUCT-KEY x NORM-CHARACTER SUPPORT')
+    for mod in [2,4,8,16,32,64,127]:
+        table = dlog_table(mod,g)
+        items = [(j, char_exponent(x,mod,table)) for j,x in factors]
+        support = joint_support_product_norm(items,K,mod)
+        full = 256*mod
+        saving = log2(full/support)
+        print(f' mod={mod:3d} support={support:6d}/{full:6d} saving={saving:.6f}bits')
 
 if __name__=='__main__':
     main()
