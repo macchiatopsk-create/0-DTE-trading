@@ -223,9 +223,9 @@
   }
  },
  "vix": {
-  "ratio": 0.7656,
-  "pct": 47.0,
-  "state": "DEAD",
+  "ratio": 0.7891,
+  "pct": 57.4,
+  "state": "LIVE",
   "asof": "2026-09-01"
  },
  "pm": {
@@ -249,7 +249,7 @@
   "room": 1.164,
   "cover": 0.13,
   "r50": 709.86,
-  "cur": 707.98,
+  "cur": 707.56,
   "filled": false,
   "trail": null,
   "tfs": {
