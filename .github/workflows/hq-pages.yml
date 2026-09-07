@@ -55,8 +55,10 @@ jobs:
           console.log('PASS: office, separate boardroom, encrypted records, original homepage');
           NODE
           git diff --check
-      - name: Run office and meeting privacy regressions
-        run: node hq/test-office.cjs
+      - name: Run office and live privacy regressions
+        run: |
+          node hq/test-office.cjs
+          node hq/test-live.cjs
       - name: Prepare existing homepage plus isolated office
         run: |
           mkdir -p _site/hq
@@ -64,7 +66,7 @@ jobs:
           for file in manifest.webmanifest sw.js icon-192.png icon-512.png; do
             if [ -f "$file" ]; then cp "$file" _site/; fi
           done
-          cp hq/index.html hq/status.enc.json hq/office-art.avif _site/hq/
+          python hq/build.py _site
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         with:
