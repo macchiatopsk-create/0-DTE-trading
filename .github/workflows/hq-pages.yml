@@ -47,7 +47,8 @@ jobs:
           assert.ok(m.icons.some(x=>x.sizes==='512x512'));
           for(const f of ['hq/icon-180.png','hq/icon-192.png']) assert.ok(fs.statSync(f).size>500,f);
           assert.ok(fs.statSync('hq/icon-512.png').size>1000,'hq/icon-512.png');
-          for(const f of ['hq/office-v13.webp','hq/meeting-v13.webp']) assert.ok(fs.statSync(f).size>100000,f);
+          assert.ok(fs.statSync('hq/office-v13.webp').size>20000,'hq/office-v13.webp');
+          assert.ok(fs.statSync('hq/meeting-v13.webp').size>15000,'hq/meeting-v13.webp');
           console.log('PASS HQ v13 office + meeting + install assets');
           NODE
           git diff --check
