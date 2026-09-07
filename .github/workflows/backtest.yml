@@ -72,7 +72,7 @@ jobs:
           cp results/index.html _site/index.html
           cp results/*.csv _site/ 2>/dev/null || true
           cp results/summary.json _site/ 2>/dev/null || true
-          if [ -d hq ]; then mkdir -p _site/hq; cp hq/index.html hq/status.enc.json hq/office-art.avif _site/hq/; fi
+          if [ -d hq ]; then python hq/build.py _site; fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
