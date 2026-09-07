@@ -36,6 +36,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html manifest.webmanifest sw.js icon-192.png icon-512.png _site/ 2>/dev/null || true
+          if [ -d hq ]; then mkdir -p _site/hq; cp hq/index.html hq/status.enc.json _site/hq/; fi
           ls -la _site
       - uses: actions/upload-pages-artifact@v3
         with:
