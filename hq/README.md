@@ -1,29 +1,35 @@
-# Last Wall HQ — reference office edition
+# HQ v7 — portrait office and phase-one meeting records
 
-The owner requested the office artwork in their uploaded `last-wall-hq-office-3.html`, not another flat plan or a simplified WebGL scene. This version uses that supplied office scene with real interactive HTML controls and the existing private snapshot reader at the same `/hq/` URL.
+Owner requested a readable portrait-only office, a central owner station overlooking the team, no separate bottom dashboard/navigation, and a first-phase meeting space. The existing /hq/ URL and private viewing key still work.
 
-## Appearance and interactions
+## Implemented
 
-`office-art.avif` is the central office crop of the supplied artwork: original 1672x941; crop (143,179)-(1255,774), resulting in 1112x595. It retains the warm lighting, glass offices, desks, characters, monitors and lounge. It is artwork, not real-time video or a 3D engine.
+- Phone-width portrait office with seven staff/owner stations and a clickable central meeting table. The owner's empty executive chair faces the team workspace; it is not a likeness of the owner.
+- The warm office artwork was newly generated for the approved portrait direction, cropped to the office only and rescaled for the tall scene. Generated example status/name panels were physically blanked in the image before encoding; actual visible labels are HTML controls. It is illustration, not live video or real-time 3D.
+- No KPI ribbon, bottom dashboard sections, team rail, pan/zoom toolbar, or forced landscape mode. Old wide=1 links are normalized without removing the private fragment.
+- Top office/meeting tabs, normal vertical scrolling, room buttons, native modal task details and accessible keyboard tab controls. The scene fills the portrait width; there is no fixed-width landscape canvas.
+- The read-only meeting room has three role badges (owner, lead, Fable) and Agenda / Decisions / Records views. No input box, sending, simulated AI reply, online indicator or worker invocation.
 
-The original picture's top KPI/date bar and right detail panel are excluded. Persistent opaque HTML overlays cover baked example names/status/task IDs/timers in the desk areas. Real counters and details are outside the bitmap. The image and room hit regions share one 1112x595 coordinate space during pan and zoom; no object-fit cover mismatch. Eight room buttons, one-finger pan, two-finger pinch, zoom/fit/light controls, team shortcuts, detail tabs, issue/PR links and mobile bottom sheets are implemented.
+## Sources and privacy
 
-Phones start at a readable office zoom. Drag to other rooms, use the team rail, or choose `전체` to fit the entire office. Desktop retains a right detail panel. Missing artwork produces an explicit message while team navigation stays available.
+The encrypted snapshot now also contains one meeting record from the owner's requests and approval in this conversation, with an explicitly labelled implementation note. Owner text is marked as paraphrase or original quote. No Fable speech was invented. This is not a real multi-agent chat transcript.
 
-## Data and privacy
+The original task values and task observedAt were preserved at the data level when adding meetings. Re-encryption uses a fresh AES-GCM nonce and the existing key. Do not mistake the new deployment/envelope date for a fresh GitHub observation. Old task snapshots are visibly labelled as past snapshots. Actual execution time, heartbeat and Studio ownership remain unknown.
 
-The existing `status.enc.json` is unchanged. The AES-256-GCM viewing key is delivered separately in the private link fragment, never committed in this public repository. Anyone with the full private link can view the snapshot; this is not account-based authentication. Do not share that link or commit plaintext private tasks, tokens or raw worker logs.
+The viewing key is not in this repository. Whoever has the full private-fragment link can read the data; this is not account authentication. Do not commit keys, plaintext project records, private screenshots or raw worker logs. Source text is escaped, numeric GitHub links are constrained, meeting payloads are bounded/validated, and fragment removal cancels old requests and clears private DOM state. There is no localStorage, sessionStorage, cookie or external API requirement.
 
-This is a published GitHub **snapshot**, not live runner telemetry. Claim intervals stop at their recorded end or observation time, not the current wall clock. Claims do not imply a worker is executing. Actual execution time, heartbeat and Studio ownership remain unconfirmed. No fabricated percentages or example task values are used as current data. Refresh checks for a newer published envelope; automatic snapshot collection is not installed.
+Refresh reads a newer published encrypted snapshot only. Automatic data collection, cross-device message writing, model responses and runner commands are NOT installed.
 
-Schema validation and AES integrity checks precede rendering, task text is escaped, issue/PR links use validated positive numeric identifiers, and removing a key invalidates in-flight requests and clears private state. No token entry, localStorage, sessionStorage, cookies, external code or tracking.
+## Actual validation
 
-## Validation performed
+- Node 22 core tests: 58/58 PASS locally. Real generated-key AES-GCM roundtrip, wrong-key/tamper rejection, old snapshot compatibility, time semantics, meeting provenance/schema checks, safe text and image hash.
+- Offline Chromium DOM/interaction tests: 288/288 checks PASS over 320x640, 360x740, 390x844, 430x932, 768x1024 and 1280x900. All eight spatial actions, target sizes >=44 CSS px, native dialog close/Escape, meeting tabs, lack of fake composer/Fable speech, keyboard navigation, XSS escaping, image-error fallback, private-state clearing and no horizontal overflow were exercised. Actual screenshots were inspected.
+- Browser tests used set_content, a data-URI copy of the exact encoded artwork with a test-only CSP allowance, and generated fixtures through the production validator. Browser navigation to the local HTTP server was denied by this environment. Therefore these are offline interaction checks, NOT production-network, native browser fetch/decrypt, physical-phone or Safari acceptance.
+- Original-versus-updated decrypted task objects were compared locally and equal; only meetings were added. The production envelope was authenticated/decrypted locally for verification without publishing the key or plaintext.
+- Tested HTML blob: d72d31c77166320eec14db79eacac09dc0c93f26. Art blob: 3a61d72281f2c82750cda59880c19c02b0335913. Encrypted envelope blob: 6a047e2d43157c946bea30d463d4cd28393ce894.
 
-`node hq/test-office.cjs`: 52/52 core assertions passed locally, including real generated-key AES-GCM roundtrip, wrong-key/tamper rejection, timing semantics, schema safety, image SHA-256 and room coordinate bounds. The core tests run in CI.
+CI executes the core checks before Pages deployment. Deploy success is verified separately; local screenshots are not evidence of a successful cloud deployment.
 
-Offline Chromium DOM/interaction checks: 90/90 passed at 1440x900, 390x844, 360x740 and 705x338, with generated non-production fixtures injected through the production schema/render functions. The provided AVIF actually decoded. Room clicks, pan/pinch, tabs, mobile sheet, zoom, light, keyboard, image-failure handling, source-data escaping and no horizontal viewport overflow were checked. Actual screenshots were visually inspected against the reference. Browser tests were offline and did not test native network fetching/decryption or a physical phone; cryptographic execution was separately tested in Node. No owner viewing key or production plaintext was used in browser fixtures.
+## Boundaries
 
-## Deployment boundaries
-
-The HQ Pages workflow and the two existing trading Pages workflows all copy `index.html`, `status.enc.json` and `office-art.avif` into `/hq/`. Outside HQ, the only scheduled-workflow edits add the asset to the existing copy operation, so future trading deployments retain the background. Root trading HTML, financial scripts/config/data/schedules, LastWall game and runners are untouched. The page cannot start/stop workers, merge code, modify Studio or publish Roblox.
+Only HQ assets, schema/records UI, tests, documentation and the HQ Pages verification step are changed. The two existing scheduled trading workflows already copy the same filenames, so no financial workflow/code/data changes are needed. LastWall gameplay, runner queues, Studio and Roblox publishing are untouched.
