@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify reference office and encrypted payload
+      - name: Verify portrait office and encrypted payload
         shell: bash
         run: |
           node --input-type=module <<'NODE'
@@ -33,12 +33,12 @@ jobs:
           import assert from 'node:assert/strict';
           const html = fs.readFileSync('hq/index.html', 'utf8');
           const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-          assert.equal(scripts.length, 1, 'one inline office implementation');
+          assert.equal(scripts.length, 1);
           for (const [, source] of scripts) new vm.Script(source);
-          assert.match(html, /id="office"/);
-          assert.match(html, /id="people"/);
-          assert.match(html, /src="\.\/office-art\.avif"/);
-          assert.equal((html.match(/<img\b/g) || []).length, 1, 'one local reference artwork');
+          assert.match(html, /id="office-panel"/);
+          assert.match(html, /id="meeting-panel"/);
+          assert.match(html, /office-art\.avif\?v=7/);
+          assert.equal((html.match(/<img\b/g) || []).length, 1);
           assert.match(html, /crypto\.subtle\.decrypt/);
           assert.match(html, /name="referrer" content="no-referrer"/);
           assert.doesNotMatch(html, /<script[^>]+src=/i);
@@ -50,14 +50,12 @@ jobs:
           assert.equal(Buffer.from(record.iv, 'base64url').length, 12);
           assert.ok(Buffer.from(record.data, 'base64url').length > 16);
           assert.ok(!('key' in record));
-          assert.ok(fs.existsSync('index.html'), 'preserve existing trading homepage');
-          console.log('PASS: reference artwork, office JavaScript, encrypted record, original homepage');
+          assert.ok(fs.existsSync('index.html'));
+          console.log('PASS: portrait UI, local art, encrypted records and original homepage');
           NODE
           git diff --check
-      - name: Run office interaction contracts and privacy regressions
-        run: |
-          node hq/test-office.cjs
-          node hq/test-landscape.cjs
+      - name: Run office and meeting privacy regressions
+        run: node hq/test-office.cjs
       - name: Prepare existing homepage plus isolated office
         run: |
           mkdir -p _site/hq
