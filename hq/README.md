@@ -1,35 +1,28 @@
-# HQ v7 — portrait office and phase-one meeting records
+# HQ v8 — separate office and five-seat boardroom
 
-Owner requested a readable portrait-only office, a central owner station overlooking the team, no separate bottom dashboard/navigation, and a first-phase meeting space. The existing /hq/ URL and private viewing key still work.
+The existing /hq/ page now has two actual spaces under its existing top tabs. The office retains owner, lead, Codex, Claude, Opus and Studio/Fable workstations. The separate long-table boardroom has exactly five symbolic avatar seats: owner, lead, Codex, Fable and Astra. No likeness of the owner or any real person is used.
 
-## Implemented
+## Visual and interaction changes
 
-- Phone-width portrait office with seven staff/owner stations and a clickable central meeting table. The owner's empty executive chair faces the team workspace; it is not a likeness of the owner.
-- The warm office artwork was newly generated for the approved portrait direction, cropped to the office only and rescaled for the tall scene. Generated example status/name panels were physically blanked in the image before encoding; actual visible labels are HTML controls. It is illustration, not live video or real-time 3D.
-- No KPI ribbon, bottom dashboard sections, team rail, pan/zoom toolbar, or forced landscape mode. Old wide=1 links are normalized without removing the private fragment.
-- Top office/meeting tabs, normal vertical scrolling, room buttons, native modal task details and accessible keyboard tab controls. The scene fills the portrait width; there is no fixed-width landscape canvas.
-- The read-only meeting room has three role badges (owner, lead, Fable) and Agenda / Decisions / Records views. No input box, sending, simulated AI reply, online indicator or worker invocation.
+- Big office info cards are removed. Compact name plaques sit over the clickable symbolic avatars; all task details appear only after tapping.
+- Both spaces stay portrait-first. No bottom dashboard, orientation hack, new repository or separate installer.
+- The existing office illustration's baked blank status-card patches were repaired with nearby scene textures. A crop of the empty architectural wall from the owner's supplied meeting mockup is combined into the same lightweight local AVIF sprite. The five-seat long table, laptops and avatars are authored CSS/SVG components, not a photograph of a live meeting or a photorealistic scene.
+- Native task dialogs show role, current task, recorded state, actual work time availability, recorded claim interval, progress availability, summary and issue/PR links. Astra has its own explicit unconnected/review-role entry; adding a seat does not launch a model.
+- Meeting records are collapsed by default, then expose Agenda / Decisions / Records. No input, send action, simulated agent response or online indicator.
 
-## Sources and privacy
+## Data truth and privacy
 
-The encrypted snapshot now also contains one meeting record from the owner's requests and approval in this conversation, with an explicitly labelled implementation note. Owner text is marked as paraphrase or original quote. No Fable speech was invented. This is not a real multi-agent chat transcript.
+status.enc.json is byte-for-byte unchanged from v7. The private fragment key and existing /hq/ address are retained. No tokens, plaintext private task records or owner viewing key are committed.
 
-The original task values and task observedAt were preserved at the data level when adding meetings. Re-encryption uses a fresh AES-GCM nonce and the existing key. Do not mistake the new deployment/envelope date for a fresh GitHub observation. Old task snapshots are visibly labelled as past snapshots. Actual execution time, heartbeat and Studio ownership remain unknown.
+Claim intervals are frozen at recorded end/observation and are not execution hours. Progress requires an explicit sourced percent or a sourced completed/total checklist. Missing progress displays unrecorded; raw demo percentages and review/running labels do not generate fake progress. Checklist-derived percentages are labelled as such. Actual runtime, heartbeat, Studio ownership and independent Astra invocation remain unconfirmed.
 
-The viewing key is not in this repository. Whoever has the full private-fragment link can read the data; this is not account authentication. Do not commit keys, plaintext project records, private screenshots or raw worker logs. Source text is escaped, numeric GitHub links are constrained, meeting payloads are bounded/validated, and fragment removal cancels old requests and clears private DOM state. There is no localStorage, sessionStorage, cookie or external API requirement.
+The encrypted meeting records are still read-only. Fable, Astra and Codex messages require the agent-evidence record kind; missing speech stays explicitly absent. This schema validates provenance fields, not real-world truth by itself. There is no continuous ChatGPT session, model API, runner command channel or automatic snapshot publisher behind these seats.
 
-Refresh reads a newer published encrypted snapshot only. Automatic data collection, cross-device message writing, model responses and runner commands are NOT installed.
+## Actual tests on uploaded source
 
-## Actual validation
+- Node 22: 72/72 core assertions passed, including actual generated-key AES-GCM roundtrip and wrong-key/tamper rejection, task/meeting schemas, sourced progress and unknown values, fixed five-role membership, source escaping and asset hash.
+- Offline Chromium: 438 DOM/interaction checks passed across 320x640, 360x740, 390x844, 430x932, 768x1024 and 1280x900. All office and boardroom actions, >=44px hit regions, compact name labels, fully in-bounds meeting seats, native dialog close/Escape, tabs, generated checklist rendering, private-state clearing and no horizontal overflow were exercised. Screenshots were visually reviewed.
+- Browser checks used set_content, a data-URI copy of the exact production AVIF with test-only CSP allowance, and generated fixtures through the production validator. File/HTTP browser navigation is restricted in this environment. These are not physical-phone, Safari, production-network or native fetch/decryption acceptance. Crypto execution was separately verified in Node.
+- Tested and uploaded blobs: HTML b8a4855e73384ec9fbb3057ea8b24364d1593a7b; artwork 90bd7713963205d332738e1157b7298dbfbcb9b3. Unchanged encrypted snapshot 6a047e2d43157c946bea30d463d4cd28393ce894.
 
-- Node 22 core tests: 58/58 PASS locally. Real generated-key AES-GCM roundtrip, wrong-key/tamper rejection, old snapshot compatibility, time semantics, meeting provenance/schema checks, safe text and image hash.
-- Offline Chromium DOM/interaction tests: 288/288 checks PASS over 320x640, 360x740, 390x844, 430x932, 768x1024 and 1280x900. All eight spatial actions, target sizes >=44 CSS px, native dialog close/Escape, meeting tabs, lack of fake composer/Fable speech, keyboard navigation, XSS escaping, image-error fallback, private-state clearing and no horizontal overflow were exercised. Actual screenshots were inspected.
-- Browser tests used set_content, a data-URI copy of the exact encoded artwork with a test-only CSP allowance, and generated fixtures through the production validator. Browser navigation to the local HTTP server was denied by this environment. Therefore these are offline interaction checks, NOT production-network, native browser fetch/decrypt, physical-phone or Safari acceptance.
-- Original-versus-updated decrypted task objects were compared locally and equal; only meetings were added. The production envelope was authenticated/decrypted locally for verification without publishing the key or plaintext.
-- Tested HTML blob: d72d31c77166320eec14db79eacac09dc0c93f26. Art blob: 3a61d72281f2c82750cda59880c19c02b0335913. Encrypted envelope blob: 6a047e2d43157c946bea30d463d4cd28393ce894.
-
-CI executes the core checks before Pages deployment. Deploy success is verified separately; local screenshots are not evidence of a successful cloud deployment.
-
-## Boundaries
-
-Only HQ assets, schema/records UI, tests, documentation and the HQ Pages verification step are changed. The two existing scheduled trading workflows already copy the same filenames, so no financial workflow/code/data changes are needed. LastWall gameplay, runner queues, Studio and Roblox publishing are untouched.
+The Pages workflow executes core tests before deployment. Existing scheduled trading workflows already copy these same three HQ filenames and need no changes. Trading source/homepage/schedules, LastWall gameplay, runner queues and Studio are untouched. Deployment success is verified separately from local tests.

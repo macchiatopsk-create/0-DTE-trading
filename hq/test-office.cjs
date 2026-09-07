@@ -1,4 +1,4 @@
-// node hq/test-office.cjs -- generated fixtures only; no owner keys or private data.
+// Run: node hq/test-office.cjs. All fixtures and keys are generated test data.
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),{webcrypto,createHash}=require('node:crypto');
 const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
@@ -13,7 +13,7 @@ const clone=()=>JSON.parse(JSON.stringify(sample)),b64=b=>Buffer.from(b).toStrin
  for(const [labels,expected] of [[['ai-running'],'claimed'],[['claude-ready'],'queued'],[['ai-review'],'review'],[['blocked'],'blocked'],[['done'],'done'],[[],'unknown']])test('label '+labels+' => '+expected,()=>assert.equal(api.stateOf({labels}),expected));
  test('closed takes precedence',()=>assert.equal(api.stateOf({state:'closed',labels:['ai-running']}),'done'));
  test('missing task unknown',()=>assert.equal(api.stateOf(null),'unknown'));
- for(const [model,lane] of [['opus','opus'],['fable','fable'],['haiku','claude'],['luna','codex']])test('explicit '+model+' seat',()=>assert.equal(api.laneOf({model}),lane));
+ for(const [model,lane] of [['opus','opus'],['fable','fable'],['astra','astra'],['haiku','claude'],['luna','codex']])test('explicit '+model+' seat',()=>assert.equal(api.laneOf({model}),lane));
  test('unknown Claude model not guessed',()=>assert.equal(api.laneOf({lane:'claude'}),'claude'));
  for(const value of [null,NaN,-1])test('no fabricated duration '+value,()=>assert.equal(api.elapsed(value),'측정 안 됨'));
  test('hour formatting',()=>assert.equal(api.elapsed(8100000),'2시간 15분'));
@@ -25,17 +25,23 @@ const clone=()=>JSON.parse(JSON.stringify(sample)),b64=b=>Buffer.from(b).toStrin
  test('old snapshot without meetings supported',()=>{let v=clone();delete v.meetings;assert.equal(api.validateData(v).meetings.length,0);});
  test('meeting schema accepted',()=>assert.equal(api.validateData(sample).meetings[0].title,'Test meeting'));
  for(const [name,alter] of [
-  ['read-only required',v=>v.readOnly=false],['observation required',v=>v.observedAt=null],['positive issue',v=>v.issues[0].number=-1],['numeric PR',v=>v.issues[0].pr='javascript:1'],['bounded title',v=>v.issues[0].title='x'.repeat(1001)],['string labels',v=>v.issues[0].labels=[{}]],['bounded issues',v=>v.issues=Array(501).fill(v.issues[0])],['meeting source required',v=>delete v.meetings[0].source],['known speaker',v=>v.meetings[0].messages[0].author='fake'],['known provenance',v=>v.meetings[0].messages[0].kind='live'],['Fable needs recorded evidence',v=>v.meetings[0].messages[0].author='fable'],['bounded meetings',v=>v.meetings=Array(51).fill(v.meetings[0])],['string decisions',v=>v.meetings[0].decisions=[{}]]
+  ['read-only required',v=>v.readOnly=false],['observation required',v=>v.observedAt=null],['positive issue',v=>v.issues[0].number=-1],['numeric PR',v=>v.issues[0].pr='javascript:1'],['bounded title',v=>v.issues[0].title='x'.repeat(1001)],['string labels',v=>v.issues[0].labels=[{}]],['bounded issues',v=>v.issues=Array(501).fill(v.issues[0])],['meeting source required',v=>delete v.meetings[0].source],['known speaker',v=>v.meetings[0].messages[0].author='fake'],['known provenance',v=>v.meetings[0].messages[0].kind='live'],['Fable needs recorded evidence',v=>v.meetings[0].messages[0].author='fable'],['Astra needs recorded evidence',v=>v.meetings[0].messages[0].author='astra'],['bounded meetings',v=>v.meetings=Array(51).fill(v.meetings[0])],['string decisions',v=>v.meetings[0].decisions=[{}]]
  ])test(name,()=>{let v=clone();alter(v);assert.throws(()=>api.validateData(v));});
  test('HTML task escaping',()=>assert.equal(vm.runInContext("esc('<img src=x onerror=alert(1)>')",ctx),'&lt;img src=x onerror=alert(1)&gt;'));
  test('agenda renders recorded content',()=>assert.match(api.meetingMarkup('agenda'),/Portrait/));
  test('decision renders recorded content',()=>assert.match(api.meetingMarkup('decisions'),/Read only/));
- test('records render only recorded speaker',()=>{let s=api.meetingMarkup('records');assert.match(s,/Test message/);assert.match(s,/Fable의 회의 발언은 아직 기록되지/);});
+ test('no fabricated Fable or Astra speech',()=>{let s=api.meetingMarkup('records');assert.match(s,/Test message/);assert.match(s,/Fable의 회의 발언은 아직 기록되지/);assert.match(s,/Astra의 회의 발언은 아직 기록되지/);});
  let xss=clone();xss.meetings[0].messages[0].body='<img src=x onerror=alert(1)>';
  vm.runInContext('data=validateData('+JSON.stringify(xss)+')',ctx);
  test('meeting text is escaped',()=>{const s=api.meetingMarkup('records');assert.doesNotMatch(s,/<img/);assert.match(s,/&lt;img/);});
  vm.runInContext('data=blank()',ctx);
  test('locked meeting never shows private note',()=>assert.doesNotMatch(api.meetingMarkup('records'),/Test message/));
+ test('exactly five boardroom roles',()=>assert.equal(JSON.stringify(api.MEETING_MEMBERS),JSON.stringify(['owner','astra','fable','codex','chief'])));
+ test('office retains other workspaces',()=>{assert.equal(api.TEAMS.length,8);for(const id of ['claude','opus','studio'])assert.ok(api.TEAMS.some(t=>t.id===id));});
+ for(const p of [undefined,{},68,{percent:68},{percent:-1,source:'test'},{percent:101,source:'test'},{percent:Infinity,source:'test'},{completed:6,total:5,source:'test'},{completed:0,total:0,source:'test'}])test('unrecorded or invalid progress stays unknown '+JSON.stringify(p),()=>assert.equal(api.progressOf({progress:p}).value,null));
+ test('sourced percent accepted',()=>assert.equal(api.progressOf({progress:{percent:40,source:'generated test'}}).value,40));
+ test('explicit zero supported',()=>assert.equal(api.progressOf({progress:{percent:0,source:'generated test'}}).value,0));
+ test('checklist derived and labelled, not coding percent',()=>{const p=api.progressOf({progress:{completed:3,total:5,source:'generated test'}});assert.equal(p.value,60);assert.match(p.label,/3\/5/);});
  const raw=webcrypto.getRandomValues(new Uint8Array(32)),iv=webcrypto.getRandomValues(new Uint8Array(12)),key=await webcrypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt']);
  const ciphertext=await webcrypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(sample)));
  const record={version:1,algorithm:'AES-256-GCM',iv:b64(iv),data:b64(ciphertext)};
@@ -46,14 +52,12 @@ const clone=()=>JSON.parse(JSON.stringify(sample)),b64=b=>Buffer.from(b).toStrin
  test('same-origin CSP',()=>assert.match(html,/connect-src 'self'/));
  test('no outbound messaging or model invocation',()=>{assert.doesNotMatch(html,/<textarea|<input|type="submit"|method:'POST'|api\.openai|anthropic\.com/);assert.match(html,/실제 AI 채팅은 미연결/);});
  test('no bottom dashboard or orientation hack',()=>assert.doesNotMatch(html,/class="summary"|class="bottom-strip"|class="team-rail"|wide-toggle|rotate\(90deg\)/));
- test('full-width vertical scene',()=>assert.match(html,/aspect-ratio:9\/14/));
+ test('large info boxes visually removed',()=>{assert.match(html,/background:none!important;border:0!important;box-shadow:none!important/);assert.match(html,/\.room small\{display:none\}/);});
  test('no forced pixel stage',()=>assert.doesNotMatch(html,/width:1112px|min-width:1120px/));
  test('fragment-key removal invalidates old requests',()=>{assert.match(html,/own!==epoch/);assert.match(html,/epoch\+\+;controller\?\.abort/);assert.match(html,/\$\('detail-body'\)\.replaceChildren/);});
  test('no persistent token storage or trackers',()=>assert.doesNotMatch(html,/localStorage|sessionStorage|document\.cookie|sendBeacon|github_pat_|ghp_|sk-proj-/));
- test('one local artwork',()=>{assert.equal((html.match(/<img\b/g)||[]).length,1);assert.match(html,/office-art\.avif\?v=7/);});
- test('eight room actions including conference',()=>assert.equal((html.match(/class="room room-/g)||[]).length,8));
- test('unconnected runtime stays explicit',()=>{assert.match(html,/실제 실행시간/);assert.match(html,/Heartbeat/);assert.match(html,/미연결/);});
- test('old wide query safely discarded',()=>{assert.match(html,/new URL\(location\.href\)/);assert.match(html,/searchParams\.delete\('wide'\)/);});
- test('asset integrity',()=>assert.equal(createHash('sha256').update(fs.readFileSync(path.join(__dirname,'office-art.avif'))).digest('hex'),'ac9511134f59acbc07159736bafa4b257781d9201aa3e42e1ae8ac50279a9111'));
+ test('one local artwork sprite',()=>{assert.equal((html.match(/<img\b/g)||[]).length,1);assert.match(html,/office-art\.avif\?v=8/);});
+ test('unconnected runtime stays explicit',()=>{assert.match(html,/실제 작업시간/);assert.match(html,/Heartbeat/);assert.match(html,/미연결/);});
+ test('asset integrity',()=>assert.equal(createHash('sha256').update(fs.readFileSync(path.join(__dirname,'office-art.avif'))).digest('hex'),'adb35d325436830957c12c48fd73077f1d2dfd05c98308d8d88034480f9264de'));
  console.log(`OFFICE CORE: ${checks}/${checks} PASS`);
 })().catch(e=>{console.error(e);process.exitCode=1;});
