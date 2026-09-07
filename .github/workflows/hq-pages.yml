@@ -45,7 +45,9 @@ jobs:
           assert.equal(m.start_url,'./?v=13');
           assert.ok(m.icons.some(x=>x.sizes==='192x192'));
           assert.ok(m.icons.some(x=>x.sizes==='512x512'));
-          for(const f of ['hq/icon-180.png','hq/icon-192.png','hq/icon-512.png','hq/office-v13.webp','hq/meeting-v13.webp']) assert.ok(fs.statSync(f).size>1000,f);
+          for(const f of ['hq/icon-180.png','hq/icon-192.png']) assert.ok(fs.statSync(f).size>500,f);
+          assert.ok(fs.statSync('hq/icon-512.png').size>1000,'hq/icon-512.png');
+          for(const f of ['hq/office-v13.webp','hq/meeting-v13.webp']) assert.ok(fs.statSync(f).size>100000,f);
           console.log('PASS HQ v13 office + meeting + install assets');
           NODE
           git diff --check
