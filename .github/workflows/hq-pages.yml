@@ -82,4 +82,5 @@ jobs:
       - name: Record deployed office URL
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: printf 'Office URL (without private fragment): %shq/\n' "$PAGE_URL"
+        run: |
+          printf 'Office URL (without private fragment): %shq/\n' "$PAGE_URL"
