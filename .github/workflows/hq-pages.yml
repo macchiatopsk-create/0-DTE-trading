@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify portrait office and encrypted payload
+      - name: Verify office and five-seat meeting room
         shell: bash
         run: |
           node --input-type=module <<'NODE'
@@ -37,7 +37,8 @@ jobs:
           for (const [, source] of scripts) new vm.Script(source);
           assert.match(html, /id="office-panel"/);
           assert.match(html, /id="meeting-panel"/);
-          assert.match(html, /office-art\.avif\?v=7/);
+          assert.match(html, /id="meeting-seats"/);
+          assert.match(html, /office-art\.avif\?v=8/);
           assert.equal((html.match(/<img\b/g) || []).length, 1);
           assert.match(html, /crypto\.subtle\.decrypt/);
           assert.match(html, /name="referrer" content="no-referrer"/);
@@ -51,7 +52,7 @@ jobs:
           assert.ok(Buffer.from(record.data, 'base64url').length > 16);
           assert.ok(!('key' in record));
           assert.ok(fs.existsSync('index.html'));
-          console.log('PASS: portrait UI, local art, encrypted records and original homepage');
+          console.log('PASS: office, separate boardroom, encrypted records, original homepage');
           NODE
           git diff --check
       - name: Run office and meeting privacy regressions
