@@ -55,7 +55,9 @@ jobs:
           NODE
           git diff --check
       - name: Run office interaction contracts and privacy regressions
-        run: node hq/test-office.cjs
+        run: |
+          node hq/test-office.cjs
+          node hq/test-landscape.cjs
       - name: Prepare existing homepage plus isolated office
         run: |
           mkdir -p _site/hq
