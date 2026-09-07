@@ -1,0 +1,85 @@
+name: HQ Office Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['hq/**', '.github/workflows/hq-pages.yml']
+  pull_request:
+    paths: ['hq/**', '.github/workflows/hq-pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hq-pages-${{ github.event_name }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify office and encrypted payload
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import vm from 'node:vm';
+          import assert from 'node:assert/strict';
+          const html = fs.readFileSync('hq/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+          assert.equal(scripts.length, 1, 'one inline office implementation');
+          for (const [, source] of scripts) new vm.Script(source);
+          assert.match(html, /id="office"/);
+          assert.match(html, /id="people"/);
+          assert.match(html, /crypto\.subtle\.decrypt/);
+          assert.match(html, /name="referrer" content="no-referrer"/);
+          assert.doesNotMatch(html, /<img\b|<script[^>]+src=/i);
+          assert.doesNotMatch(html, /github_pat_|ghp_|sk-proj-/);
+          const record = JSON.parse(fs.readFileSync('hq/status.enc.json', 'utf8'));
+          assert.deepEqual(Object.keys(record).sort(), ['algorithm','data','iv','version']);
+          assert.equal(record.version, 1);
+          assert.equal(record.algorithm, 'AES-256-GCM');
+          assert.equal(Buffer.from(record.iv, 'base64url').length, 12);
+          assert.ok(Buffer.from(record.data, 'base64url').length > 16);
+          assert.ok(!('key' in record));
+          assert.ok(fs.existsSync('index.html'), 'preserve existing trading homepage');
+          console.log('PASS: office JavaScript, mobile shell, private encrypted record, original homepage');
+          NODE
+          git diff --check
+      - name: Prepare existing homepage plus isolated office
+        run: |
+          mkdir -p _site/hq
+          cp index.html _site/index.html
+          for file in manifest.webmanifest sw.js icon-192.png icon-512.png; do
+            if [ -f "$file" ]; then cp "$file" _site/; fi
+          done
+          cp hq/index.html hq/status.enc.json _site/hq/
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Record deployed office URL
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: printf 'Office URL (without private fragment): %shq/\n' "$PAGE_URL"
