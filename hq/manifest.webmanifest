@@ -2,12 +2,13 @@
   "name": "Last Wall HQ",
   "short_name": "Last Wall HQ",
   "description": "Private project command center for Last Wall",
-  "start_url": "./?v=11",
+  "start_url": "./?v=12",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#071018",
-  "theme_color": "#071018",
+  "background_color": "#070b10",
+  "theme_color": "#070b10",
   "icons": [
-    {"src":"./icon-192.png?v=11","sizes":"192x192","type":"image/png","purpose":"any maskable"}
+    {"src":"./icon-192.png?v=12","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icon-512.png?v=12","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ]
 }
