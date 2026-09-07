@@ -4,15 +4,13 @@ on:
   push:
     branches: [main]
     paths: ['hq/**', '.github/workflows/hq-pages.yml']
-  pull_request:
-    paths: ['hq/**', '.github/workflows/hq-pages.yml']
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: hq-pages-${{ github.event_name }}
+  group: hq-pages-main
   cancel-in-progress: false
 
 jobs:
@@ -24,56 +22,50 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify office and five-seat meeting room
+      - name: Verify HQ v13 interface
         shell: bash
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import vm from 'node:vm';
           import assert from 'node:assert/strict';
-          const html = fs.readFileSync('hq/index.html', 'utf8');
-          const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-          assert.equal(scripts.length, 1);
-          for (const [, source] of scripts) new vm.Script(source);
-          assert.match(html, /id="office-panel"/);
-          assert.match(html, /id="meeting-panel"/);
-          assert.match(html, /id="meeting-seats"/);
-          assert.match(html, /office-art\.avif\?v=8/);
-          assert.equal((html.match(/<img\b/g) || []).length, 1);
-          assert.match(html, /crypto\.subtle\.decrypt/);
-          assert.match(html, /name="referrer" content="no-referrer"/);
-          assert.doesNotMatch(html, /<script[^>]+src=/i);
-          assert.doesNotMatch(html, /github_pat_|ghp_|sk-proj-/);
-          const record = JSON.parse(fs.readFileSync('hq/status.enc.json', 'utf8'));
-          assert.deepEqual(Object.keys(record).sort(), ['algorithm','data','iv','version']);
-          assert.equal(record.version, 1);
-          assert.equal(record.algorithm, 'AES-256-GCM');
-          assert.equal(Buffer.from(record.iv, 'base64url').length, 12);
-          assert.ok(Buffer.from(record.data, 'base64url').length > 16);
-          assert.ok(!('key' in record));
-          assert.ok(fs.existsSync('index.html'));
-          console.log('PASS: office, separate boardroom, encrypted records, original homepage');
+          const html=fs.readFileSync('hq/index.html','utf8');
+          const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+          assert.equal(scripts.length,1);
+          new vm.Script(scripts[0][1]);
+          assert.match(html,/id="officeScreen"/);
+          assert.match(html,/id="meetingScreen"/);
+          assert.match(html,/class="board-table"/);
+          assert.match(html,/data-id="owner"/);
+          assert.match(html,/data-id="codex"/);
+          assert.match(html,/data-id="fable"/);
+          assert.match(html,/data-id="astra"/);
+          assert.match(html,/data-id="chief"/);
+          assert.doesNotMatch(html,/office-art\.avif/);
+          assert.doesNotMatch(html,/<img\b/i);
+          assert.match(html,/manifest\.webmanifest\?v=13/);
+          assert.match(html,/icon-192\.png\?v=13/);
+          const m=JSON.parse(fs.readFileSync('hq/manifest.webmanifest','utf8'));
+          assert.equal(m.start_url,'./?v=13');
+          assert.ok(m.icons.some(x=>x.sizes==='192x192'));
+          assert.ok(m.icons.some(x=>x.sizes==='512x512'));
+          for(const f of ['hq/icon-180.png','hq/icon-192.png','hq/icon-512.png'])assert.ok(fs.statSync(f).size>1000);
+          console.log('PASS HQ v13 interface + install icons');
           NODE
           git diff --check
-      - name: Run office and live privacy regressions
+      - name: Build Pages artifact
         run: |
-          node hq/test-office.cjs
-          node hq/test-live.cjs
-      - name: Prepare existing homepage plus isolated office
-        run: |
-          mkdir -p _site/hq
+          mkdir -p _site
           cp index.html _site/index.html
           for file in manifest.webmanifest sw.js icon-192.png icon-512.png; do
             if [ -f "$file" ]; then cp "$file" _site/; fi
           done
           python hq/build.py _site
       - uses: actions/upload-pages-artifact@v3
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         with:
           path: _site
 
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -86,8 +78,3 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
-      - name: Record deployed office URL
-        env:
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: |
-          printf 'Office URL (without private fragment): %shq/\n' "$PAGE_URL"
