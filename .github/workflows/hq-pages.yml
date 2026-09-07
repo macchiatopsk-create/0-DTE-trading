@@ -52,6 +52,8 @@ jobs:
           console.log('PASS: office JavaScript, mobile shell, private encrypted record, original homepage');
           NODE
           git diff --check
+      - name: Run 3D office core and privacy regressions
+        run: node hq/test-office.cjs
       - name: Prepare existing homepage plus isolated office
         run: |
           mkdir -p _site/hq
