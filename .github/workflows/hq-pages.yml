@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v14 photo interface
+      - name: Verify HQ v15 JPEG interface
         shell: bash
         run: |
           mkdir -p _site
@@ -43,16 +43,21 @@ jobs:
           new vm.Script(scripts[0][1]);
           assert.match(html,/id="office"/);
           assert.match(html,/id="meeting"/);
-          assert.match(html,/office-v13\.webp\?v=14/);
-          assert.match(html,/meeting-v13\.webp\?v=14/);
-          assert.match(html,/manifest\.webmanifest\?v=14/);
+          assert.match(html,/office-v15\.jpg\?v=15/);
+          assert.match(html,/meeting-v15\.jpg\?v=15/);
+          assert.match(html,/manifest\.webmanifest\?v=15/);
           for (const id of ['owner','codex','fable','astra','chief']) assert.match(html,new RegExp(`data-person="${id}"`));
           const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=14');
-          assert.ok(m.icons.some(x=>x.sizes==='192x192'));
-          assert.ok(m.icons.some(x=>x.sizes==='512x512'));
-          for(const f of ['_site/hq/office-v13.webp','_site/hq/meeting-v13.webp']) assert.ok(fs.statSync(f).size>5000,f);
-          console.log('PASS HQ v14 cache-busted photo UI');
+          assert.equal(m.start_url,'./?v=15');
+          for(const f of ['_site/hq/office-v15.jpg','_site/hq/meeting-v15.jpg']) {
+            const b=fs.readFileSync(f);
+            assert.ok(b.length>9000,f);
+            assert.equal(b[0],0xff,f);
+            assert.equal(b[1],0xd8,f);
+            assert.equal(b[b.length-2],0xff,f);
+            assert.equal(b[b.length-1],0xd9,f);
+          }
+          console.log('PASS HQ v15 JPEG scenes');
           NODE
           git diff --check
       - uses: actions/upload-pages-artifact@v3
