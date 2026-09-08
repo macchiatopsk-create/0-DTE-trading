@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v17 direct JPEG scenes
+      - name: Verify HQ v18 simple dashboard
         shell: bash
         run: |
           mkdir -p _site
@@ -43,18 +43,16 @@ jobs:
           new vm.Script(scripts[0][1]);
           assert.match(html,/id="office"/);
           assert.match(html,/id="meeting"/);
-          assert.match(html,/office-v17\.jpg\?v=17/);
-          assert.match(html,/meeting-v17\.jpg\?v=17/);
-          assert.doesNotMatch(html,/data:image\/jpeg;base64/);
-          for (const f of ['_site/hq/office-v17.jpg','_site/hq/meeting-v17.jpg']) {
-            const b=fs.readFileSync(f);
-            assert.ok(b.length>7000,f+' too small');
-            assert.equal(b[0],0xff); assert.equal(b[1],0xd8);
-          }
-          assert.match(html,/manifest\.webmanifest\?v=17/);
+          assert.doesNotMatch(html,/<img/);
+          assert.doesNotMatch(html,/office-v1[357]/);
+          assert.doesNotMatch(html,/meeting-v1[357]/);
+          assert.match(html,/Codex/);
+          assert.match(html,/Claude/);
+          assert.match(html,/Studio QA/);
+          assert.match(html,/manifest\.webmanifest\?v=18/);
           const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=17');
-          console.log('PASS HQ v17 direct JPEG scenes');
+          assert.equal(m.start_url,'./?v=18');
+          console.log('PASS HQ v18 simple dashboard');
           NODE
           git diff --check
       - uses: actions/upload-pages-artifact@v3
