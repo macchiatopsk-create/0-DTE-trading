@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v22 swipe console
+      - name: Verify HQ v23 standalone PWA
         shell: bash
         run: |
           mkdir -p _site
@@ -38,15 +38,22 @@ jobs:
           import assert from 'node:assert/strict';
           const html=fs.readFileSync('_site/hq/index.html','utf8');
           const swipe=fs.readFileSync('_site/hq/swipe-v22.js','utf8');
+          const sw=fs.readFileSync('_site/hq/sw.js','utf8');
           for (const id of ['ops','review','logs','system','overlay','closeBtn']) assert.match(html,new RegExp(`id="${id}"`));
           for (const tab of ['ops','review','logs','system']) assert.match(html,new RegExp(`data-tab="${tab}"`));
-          assert.match(html,/swipe-v22\.js\?v=22/);
-          assert.match(swipe,/touchstart/); assert.match(swipe,/touchend/); assert.match(swipe,/popstate/);
-          assert.match(swipe,/현재 실행 클레임 없음/);
-          assert.match(html,/manifest\.webmanifest\?v=22/);
+          assert.match(html,/swipe-v22\.js\?v=23/);
+          assert.match(swipe,/touchstart/); assert.match(swipe,/touchend/); assert.match(swipe,/serviceWorker\.register\('\.\/sw\.js'/);
+          assert.match(sw,/lastwall-hq-v23/);
+          assert.match(html,/manifest\.webmanifest\?v=23/);
           const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=22');
-          console.log('PASS HQ v22 swipe console');
+          assert.equal(m.id,'./');
+          assert.equal(m.start_url,'./?v=23');
+          assert.equal(m.scope,'./');
+          assert.equal(m.display,'standalone');
+          assert.ok(m.icons.some(x=>x.purpose==='any' && x.sizes==='192x192'));
+          assert.ok(m.icons.some(x=>x.purpose==='any' && x.sizes==='512x512'));
+          assert.ok(m.icons.some(x=>x.purpose==='maskable' && x.sizes==='512x512'));
+          console.log('PASS HQ v23 standalone PWA');
           NODE
           git diff --check
       - uses: actions/upload-pages-artifact@v3
