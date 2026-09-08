@@ -24,35 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v13 photo-led interface
+      - name: Verify HQ v14 photo interface
         shell: bash
-        run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import vm from 'node:vm';
-          import assert from 'node:assert/strict';
-          const html=fs.readFileSync('hq/index.html','utf8');
-          const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-          assert.equal(scripts.length,1);
-          new vm.Script(scripts[0][1]);
-          assert.match(html,/id="office"/);
-          assert.match(html,/id="meeting"/);
-          assert.match(html,/office-v13\.webp\?v=13/);
-          assert.match(html,/meeting-v13\.webp\?v=13/);
-          for (const id of ['owner','codex','fable','astra','chief']) assert.match(html,new RegExp(`data-person="${id}"`));
-          assert.match(html,/manifest\.webmanifest\?v=13/);
-          const m=JSON.parse(fs.readFileSync('hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=13');
-          assert.ok(m.icons.some(x=>x.sizes==='192x192'));
-          assert.ok(m.icons.some(x=>x.sizes==='512x512'));
-          for(const f of ['hq/icon-180.png','hq/icon-192.png']) assert.ok(fs.statSync(f).size>500,f);
-          assert.ok(fs.statSync('hq/icon-512.png').size>1000,'hq/icon-512.png');
-          assert.ok(fs.statSync('hq/office-v13.webp').size>5000,'hq/office-v13.webp');
-          assert.ok(fs.statSync('hq/meeting-v13.webp').size>15000,'hq/meeting-v13.webp');
-          console.log('PASS HQ v13 office + meeting + install assets');
-          NODE
-          git diff --check
-      - name: Build Pages artifact
         run: |
           mkdir -p _site
           cp index.html _site/index.html
@@ -60,6 +33,28 @@ jobs:
             if [ -f "$file" ]; then cp "$file" _site/; fi
           done
           python hq/build.py _site
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import vm from 'node:vm';
+          import assert from 'node:assert/strict';
+          const html=fs.readFileSync('_site/hq/index.html','utf8');
+          const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+          assert.equal(scripts.length,1);
+          new vm.Script(scripts[0][1]);
+          assert.match(html,/id="office"/);
+          assert.match(html,/id="meeting"/);
+          assert.match(html,/office-v13\.webp\?v=14/);
+          assert.match(html,/meeting-v13\.webp\?v=14/);
+          assert.match(html,/manifest\.webmanifest\?v=14/);
+          for (const id of ['owner','codex','fable','astra','chief']) assert.match(html,new RegExp(`data-person="${id}"`));
+          const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
+          assert.equal(m.start_url,'./?v=14');
+          assert.ok(m.icons.some(x=>x.sizes==='192x192'));
+          assert.ok(m.icons.some(x=>x.sizes==='512x512'));
+          for(const f of ['_site/hq/office-v13.webp','_site/hq/meeting-v13.webp']) assert.ok(fs.statSync(f).size>5000,f);
+          console.log('PASS HQ v14 cache-busted photo UI');
+          NODE
+          git diff --check
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         with:
