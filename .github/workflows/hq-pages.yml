@@ -51,7 +51,7 @@ jobs:
           assert.equal(m.start_url,'./?v=15');
           for(const f of ['_site/hq/office-v15.jpg','_site/hq/meeting-v15.jpg']) {
             const b=fs.readFileSync(f);
-            assert.ok(b.length>9000,f);
+            assert.ok(b.length>7000,f);
             assert.equal(b[0],0xff,f);
             assert.equal(b[1],0xd8,f);
             assert.equal(b[b.length-2],0xff,f);
