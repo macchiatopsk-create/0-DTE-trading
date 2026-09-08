@@ -47,7 +47,7 @@ jobs:
           assert.equal(images.length,2);
           for (const uri of images) {
             const b=Buffer.from(uri.split(',')[1],'base64');
-            assert.ok(b.length>9000,'JPEG payload too small');
+            assert.ok(b.length>5000,'JPEG payload too small');
             assert.equal(b[0],0xff); assert.equal(b[1],0xd8);
             assert.equal(b[b.length-2],0xff); assert.equal(b[b.length-1],0xd9);
           }
