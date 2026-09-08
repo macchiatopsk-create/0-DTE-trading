@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v16 image payloads
+      - name: Verify HQ v17 direct JPEG scenes
         shell: bash
         run: |
           mkdir -p _site
@@ -43,18 +43,18 @@ jobs:
           new vm.Script(scripts[0][1]);
           assert.match(html,/id="office"/);
           assert.match(html,/id="meeting"/);
-          const images=html.match(/data:image\/jpeg;base64,[A-Za-z0-9+/=]+/g)||[];
-          assert.equal(images.length,2);
-          for (const uri of images) {
-            const b=Buffer.from(uri.split(',')[1],'base64');
-            assert.ok(b.length>5000,'JPEG payload too small');
+          assert.match(html,/office-v17\.jpg\?v=17/);
+          assert.match(html,/meeting-v17\.jpg\?v=17/);
+          assert.doesNotMatch(html,/data:image\/jpeg;base64/);
+          for (const f of ['_site/hq/office-v17.jpg','_site/hq/meeting-v17.jpg']) {
+            const b=fs.readFileSync(f);
+            assert.ok(b.length>7000,f+' too small');
             assert.equal(b[0],0xff); assert.equal(b[1],0xd8);
-            assert.equal(b[b.length-2],0xff); assert.equal(b[b.length-1],0xd9);
           }
-          assert.match(html,/manifest\.webmanifest\?v=16/);
+          assert.match(html,/manifest\.webmanifest\?v=17/);
           const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=16');
-          console.log('PASS HQ v16 verified JPEG payloads');
+          assert.equal(m.start_url,'./?v=17');
+          console.log('PASS HQ v17 direct JPEG scenes');
           NODE
           git diff --check
       - uses: actions/upload-pages-artifact@v3
