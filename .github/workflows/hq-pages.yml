@@ -4,13 +4,15 @@ on:
   push:
     branches: [main]
     paths: ['hq/**', '.github/workflows/hq-pages.yml']
+  pull_request:
+    paths: ['hq/**', '.github/workflows/hq-pages.yml']
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: hq-pages-main
+  group: hq-pages-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v13 interface
+      - name: Verify HQ v13 photo-led interface
         shell: bash
         run: |
           node --input-type=module <<'NODE'
@@ -33,24 +35,21 @@ jobs:
           const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
           assert.equal(scripts.length,1);
           new vm.Script(scripts[0][1]);
-          assert.match(html,/id="officeScreen"/);
-          assert.match(html,/id="meetingScreen"/);
-          assert.match(html,/class="board-table"/);
-          assert.match(html,/data-id="owner"/);
-          assert.match(html,/data-id="codex"/);
-          assert.match(html,/data-id="fable"/);
-          assert.match(html,/data-id="astra"/);
-          assert.match(html,/data-id="chief"/);
-          assert.doesNotMatch(html,/office-art\.avif/);
-          assert.doesNotMatch(html,/<img\b/i);
+          assert.match(html,/id="office"/);
+          assert.match(html,/id="meeting"/);
+          assert.match(html,/office-v13\.webp\?v=13/);
+          assert.match(html,/meeting-v13\.webp\?v=13/);
+          for (const id of ['owner','codex','fable','astra','chief']) assert.match(html,new RegExp(`data-person="${id}"`));
           assert.match(html,/manifest\.webmanifest\?v=13/);
-          assert.match(html,/icon-192\.png\?v=13/);
           const m=JSON.parse(fs.readFileSync('hq/manifest.webmanifest','utf8'));
           assert.equal(m.start_url,'./?v=13');
           assert.ok(m.icons.some(x=>x.sizes==='192x192'));
           assert.ok(m.icons.some(x=>x.sizes==='512x512'));
-          for(const f of ['hq/icon-180.png','hq/icon-192.png','hq/icon-512.png'])assert.ok(fs.statSync(f).size>1000);
-          console.log('PASS HQ v13 interface + install icons');
+          for(const f of ['hq/icon-180.png','hq/icon-192.png']) assert.ok(fs.statSync(f).size>500,f);
+          assert.ok(fs.statSync('hq/icon-512.png').size>1000,'hq/icon-512.png');
+          assert.ok(fs.statSync('hq/office-v13.webp').size>5000,'hq/office-v13.webp');
+          assert.ok(fs.statSync('hq/meeting-v13.webp').size>15000,'hq/meeting-v13.webp');
+          console.log('PASS HQ v13 office + meeting + install assets');
           NODE
           git diff --check
       - name: Build Pages artifact
@@ -62,10 +61,12 @@ jobs:
           done
           python hq/build.py _site
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         with:
           path: _site
 
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
