@@ -6,18 +6,22 @@ out=Path(sys.argv[1] if len(sys.argv)>1 else '_site')/'hq'
 out.mkdir(parents=True,exist_ok=True)
 
 html=(src/'v14.html').read_text(encoding='utf-8')
-office=(src/'office-v15.b64').read_text(encoding='utf-8').strip()
-meeting=(src/'meeting-v15.b64').read_text(encoding='utf-8').strip()
+office=(src/'office-v16.b64').read_text(encoding='utf-8').strip()
+meeting=(src/'meeting-v16.b64').read_text(encoding='utf-8').strip()
 
 html=html.replace('./office-v15.jpg?v=15', 'data:image/jpeg;base64,'+office)
 html=html.replace('./meeting-v15.jpg?v=15', 'data:image/jpeg;base64,'+meeting)
 html=html.replace('./office-v13.webp?v=14', 'data:image/jpeg;base64,'+office)
 html=html.replace('./meeting-v13.webp?v=14', 'data:image/jpeg;base64,'+meeting)
-html=html.replace('manifest.webmanifest?v=14', 'manifest.webmanifest?v=15')
-html=html.replace('icon-192.png?v=14', 'icon-192.png?v=15')
-html=html.replace('icon-180.png?v=14', 'icon-180.png?v=15')
+html=html.replace('manifest.webmanifest?v=15', 'manifest.webmanifest?v=16')
+html=html.replace('manifest.webmanifest?v=14', 'manifest.webmanifest?v=16')
+html=html.replace('icon-192.png?v=15', 'icon-192.png?v=16')
+html=html.replace('icon-180.png?v=15', 'icon-180.png?v=16')
+html=html.replace('icon-192.png?v=14', 'icon-192.png?v=16')
+html=html.replace('icon-180.png?v=14', 'icon-180.png?v=16')
+html=html.replace('HQ v15 · JPEG scene assets', 'HQ v16 · verified image payloads')
 
 (out/'index.html').write_text(html,encoding='utf-8')
 for name in ('manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png'):
     shutil.copyfile(src/name,out/name)
-print('HQ v15 built with inline JPEG scenes',out)
+print('HQ v16 built with verified inline JPEG scenes',out)
