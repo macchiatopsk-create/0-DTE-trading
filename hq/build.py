@@ -5,7 +5,7 @@ src=Path(__file__).resolve().parent
 out=Path(sys.argv[1] if len(sys.argv)>1 else '_site')/'hq'
 out.mkdir(parents=True,exist_ok=True)
 
-shutil.copyfile(src/'v20.html',out/'index.html')
+shutil.copyfile(src/'v21.html',out/'index.html')
 for name in ('manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png'):
     shutil.copyfile(src/name,out/name)
-print('HQ v20 future console built',out)
+print('HQ v21 holographic Korean console built',out)
