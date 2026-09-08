@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v19 functional dashboard
+      - name: Verify HQ v20 future console
         shell: bash
         run: |
           mkdir -p _site
@@ -43,15 +43,14 @@ jobs:
           new vm.Script(scripts[0][1]);
           for (const id of ['office','meeting','logs','more']) assert.match(html,new RegExp(`id="${id}"`));
           for (const tab of ['office','meeting','logs','more']) assert.match(html,new RegExp(`data-tab="${tab}"`));
-          assert.match(html,/작업 기록/);
-          assert.match(html,/더보기/);
-          assert.match(html,/Codex/);
-          assert.match(html,/Claude/);
+          assert.match(html,/Codex #243 · CLAIMED/);
+          assert.match(html,/heartbeat/);
+          assert.doesNotMatch(html,/data-person="owner"/);
           assert.doesNotMatch(html,/<img/);
-          assert.match(html,/manifest\.webmanifest\?v=19/);
+          assert.match(html,/manifest\.webmanifest\?v=20/);
           const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=19');
-          console.log('PASS HQ v19 functional navigation');
+          assert.equal(m.start_url,'./?v=20');
+          console.log('PASS HQ v20 future console');
           NODE
           git diff --check
       - uses: actions/upload-pages-artifact@v3
