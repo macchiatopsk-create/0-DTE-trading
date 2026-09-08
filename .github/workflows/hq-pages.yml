@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v20 future console
+      - name: Verify HQ v21 holographic Korean console
         shell: bash
         run: |
           mkdir -p _site
@@ -41,16 +41,18 @@ jobs:
           const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
           assert.equal(scripts.length,1);
           new vm.Script(scripts[0][1]);
-          for (const id of ['office','meeting','logs','more']) assert.match(html,new RegExp(`id="${id}"`));
-          for (const tab of ['office','meeting','logs','more']) assert.match(html,new RegExp(`data-tab="${tab}"`));
-          assert.match(html,/Codex #243 · CLAIMED/);
-          assert.match(html,/heartbeat/);
+          for (const id of ['ops','review','logs','system','overlay','closeBtn']) assert.match(html,new RegExp(`id="${id}"`));
+          for (const tab of ['ops','review','logs','system']) assert.match(html,new RegExp(`data-tab="${tab}"`));
+          for (const text of ['작전실','검토실','작업 기록','시스템','코덱스','클로드','측정 안 됨']) assert.ok(html.includes(text),text);
           assert.doesNotMatch(html,/data-person="owner"/);
           assert.doesNotMatch(html,/<img/);
-          assert.match(html,/manifest\.webmanifest\?v=20/);
+          assert.match(html,/closeBtn.*addEventListener/);
+          assert.match(html,/overlay\.addEventListener/);
+          assert.match(html,/popstate/);
+          assert.match(html,/manifest\.webmanifest\?v=21/);
           const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=20');
-          console.log('PASS HQ v20 future console');
+          assert.equal(m.start_url,'./?v=21');
+          console.log('PASS HQ v21 holographic Korean console');
           NODE
           git diff --check
       - uses: actions/upload-pages-artifact@v3
