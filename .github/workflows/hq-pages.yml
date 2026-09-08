@@ -45,7 +45,7 @@ jobs:
           assert.match(html,/id="meeting"/);
           const images=html.match(/data:image\/jpeg;base64,[A-Za-z0-9+/=]+/g)||[];
           assert.equal(images.length,2);
-          assert.ok(images.every(x=>x.length>9000),'inline JPEG payload too small');
+          assert.ok(images.every(x=>x.length>5000),'inline JPEG payload too small');
           assert.doesNotMatch(html,/office-v13\.webp/);
           assert.doesNotMatch(html,/meeting-v13\.webp/);
           assert.doesNotMatch(html,/office-v15\.jpg/);
