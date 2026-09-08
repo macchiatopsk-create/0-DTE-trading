@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify HQ v18 simple dashboard
+      - name: Verify HQ v19 functional dashboard
         shell: bash
         run: |
           mkdir -p _site
@@ -41,18 +41,17 @@ jobs:
           const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
           assert.equal(scripts.length,1);
           new vm.Script(scripts[0][1]);
-          assert.match(html,/id="office"/);
-          assert.match(html,/id="meeting"/);
-          assert.doesNotMatch(html,/<img/);
-          assert.doesNotMatch(html,/office-v1[357]/);
-          assert.doesNotMatch(html,/meeting-v1[357]/);
+          for (const id of ['office','meeting','logs','more']) assert.match(html,new RegExp(`id="${id}"`));
+          for (const tab of ['office','meeting','logs','more']) assert.match(html,new RegExp(`data-tab="${tab}"`));
+          assert.match(html,/작업 기록/);
+          assert.match(html,/더보기/);
           assert.match(html,/Codex/);
           assert.match(html,/Claude/);
-          assert.match(html,/Studio QA/);
-          assert.match(html,/manifest\.webmanifest\?v=18/);
+          assert.doesNotMatch(html,/<img/);
+          assert.match(html,/manifest\.webmanifest\?v=19/);
           const m=JSON.parse(fs.readFileSync('_site/hq/manifest.webmanifest','utf8'));
-          assert.equal(m.start_url,'./?v=18');
-          console.log('PASS HQ v18 simple dashboard');
+          assert.equal(m.start_url,'./?v=19');
+          console.log('PASS HQ v19 functional navigation');
           NODE
           git diff --check
       - uses: actions/upload-pages-artifact@v3
