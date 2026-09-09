@@ -41,7 +41,7 @@ VERSION_NOTE = "3layer-itm-forward"
 VERSION  = "itm-2.0"
 
 # ── ITM 포워드 테스트 (2026-08-14 시작) ──
-CAPITAL_START = 2000.0   # mock 자본 (갭 트랙과 동일 조건)
+CAPITAL_START = 3000.0   # mock 자본 (갭 트랙과 동일 조건)
 L3_SIZES = [0.30, 0.40, 0.50, 0.60, 0.70]   # 3층도 사이징 병렬 비교
 DELTA_LO, DELTA_HI = 0.70, 0.80   # ITM 콜 델타 밴드
 ENTRY_BAND_SIG = 1.0     # VWAP -1σ 터치 대기 (v10: 진입대기가 09:30 즉시진입보다 우수)
@@ -63,7 +63,7 @@ GAP_TFS = {"5m": 1, "15m": 2, "1h": 11}      # 키: 이름, 값: 5분봉 인덱�
 GAP_TF_LABEL = {"5m": "5분(09:35)", "15m": "15분(09:45)", "1h": "1시간(10:30)"}
 GAP_ENTRIES = {"now": "즉시 진입", "vwap": "VWAP 중간선 대기"}
 GAP_TF_TIME = {"5m": "09:35", "15m": "09:45", "1h": "10:30"}
-GAP_CAPITAL = 2000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
+GAP_CAPITAL = 3000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
 
 # ── 모멘텀 트랙 (VIX확인 스킵데이) — orbvix 백테스트 스펙 그대로 ──
 # 커버<0.40(못 메움) + VIX 개장변화가 갭 방향 확인(갭업&VIX↓/갭다운&VIX↑)
