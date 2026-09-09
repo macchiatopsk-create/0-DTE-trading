@@ -1,0 +1,23 @@
+name: recon-backfill
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install yfinance pandas
+      - run: python recon.py
+      - name: persist
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add odte_log.json recon_result.json
+          git commit -m "recon $(date -u +%F_%H%M)" || echo "변동 없음"
+          git pull --rebase -X theirs || (git rebase --abort 2>/dev/null; true)
+          git push || echo "푸시 스킵"

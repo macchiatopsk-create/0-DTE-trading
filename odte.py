@@ -1291,16 +1291,14 @@ def render(log, st):
           '개별 전략 성적은 옆 탭에서 각자 독립 북으로 계속 기록됩니다'
           '</div>')
 
-    gap_groups = (
-        '<div class="gtabs">'
-        f'<button class="gtab on" data-g="comb">통합 · 한 계좌<br>'
-        f'<span class="gsub">갭필+모멘텀 같은 북 · {n_cb}건</span></button>'
-        f'<button class="gtab" data-g="fill">갭필 · 되돌림<br>'
-        f'<span class="gsub">커버≥{GAP_COVER_MIN} → 갭 반대로 · {n_fill}건</span></button>'
-        '</div>'
-        f'<div class="gpane on" id="gcomb">{comb_pane}</div>'
-        f'<div class="gpane" id="gfill"><div class="stabs">{subtabs}</div>'
-        f'{subpanes}{fill_brief}</div>')
+    gap_status_html = (
+        '<div class="panel"><div class="ph">GAP STATUS</div>'
+        f'<div class="gr"><span class="lamp {gcls}"></span><span class="gl">GAP FILL</span>'
+        f'<span class="gs">{gstat} · {gdesc}</span></div>'
+        f'<div class="verdict {gcls}">▶ {gstat}</div></div>')
+    comb_html = f'<div class="gpane on">{comb_pane}</div>'
+    fill_html = (gap_status_html + '<div class="gpane on">'
+                 f'<div class="stabs">{subtabs}</div>{subpanes}{fill_brief}</div>')
 
     # ── 매크로 유사일 패널 ──
     mm = log.get("macro")
@@ -1501,9 +1499,10 @@ tr:last-child td{{border-bottom:none}}
 <div class="ts">{now}<br>SYS {VERSION} · UPLINK 15MIN</div></header>
 <div class="tabs">
   <button class="tab on" data-i="0">3-LAYER · ITM</button>
-  <button class="tab" data-i="1">GAP FILL</button>
-  <button class="tab" data-i="2">MOMENTUM</button>
-  <button class="tab" data-i="3">MACRO</button>
+  <button class="tab" data-i="1">통합</button>
+  <button class="tab" data-i="2">갭필</button>
+  <button class="tab" data-i="3">모멘텀</button>
+  <button class="tab" data-i="4">MACRO</button>
 </div>
 <div class="track" id="track">
 <div class="tabpane">
@@ -1528,11 +1527,10 @@ LEGACY {legacy}건은 구버전 기록으로 통계 제외 · 프리미엄은 �
 </div>
 </div>
 <div class="tabpane">
-<div class="panel"><div class="ph">GAP STATUS</div>
-<div class="gr"><span class="lamp {gcls}"></span><span class="gl">GAP FILL</span>
-<span class="gs">{gstat} · {gdesc}</span></div>
-<div class="verdict {gcls}">▶ {gstat}</div></div>
-{gap_groups}
+{comb_html}
+</div>
+<div class="tabpane">
+{fill_html}
 </div>
 <div class="tabpane">
 {mom_pane}
@@ -1550,7 +1548,7 @@ LEGACY {legacy}건은 구버전 기록으로 통계 제외 · 프리미엄은 �
 </div>
 </div>
 </div>
-<div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+<div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
 <div class="cls bt">Mock Simulation // Forward Test Since 2026-08-14 // OP Zero-Day</div>
 <script>
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){{}});
