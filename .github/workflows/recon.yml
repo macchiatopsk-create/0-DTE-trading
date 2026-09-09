@@ -17,6 +17,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase -X theirs || (git rebase --abort 2>/dev/null; true)
           git add odte_log.json recon_result.json
           git commit -m "recon $(date -u +%F_%H%M)" || echo "변동 없음"
           git pull --rebase -X theirs || (git rebase --abort 2>/dev/null; true)
