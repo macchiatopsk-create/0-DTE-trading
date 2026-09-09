@@ -1,33 +1,5 @@
 {
- "open": {
-  "date": "2026-09-09",
-  "side": "call",
-  "mfe": -99.0,
-  "mfe_t": null,
-  "contracts": {
-   "30": 0,
-   "40": 1,
-   "50": 1,
-   "60": 1,
-   "70": 2
-  },
-  "mfe_prem": -99.0,
-  "mfe_prem_t": null,
-  "strike": 709.0,
-  "premium": 6.24,
-  "iv": 0.1874,
-  "symbol": "QQQ260909C00709000",
-  "entry_time": "11:28",
-  "entry_px": 714.69,
-  "score": -3,
-  "gap": -0.29,
-  "rsi": 38.4,
-  "stop_px": 713.66,
-  "version": "itm-2.0",
-  "vix_pct": 74.1,
-  "vix_state": "LIVE",
-  "pm_pos": 0.393
- },
+ "open": null,
  "trades": [
   {
    "date": "2026-08-12",
@@ -98,6 +70,42 @@
    "eff_exit": 5.99,
    "pnl_pct": 14.8,
    "pnl_usd": 77.0,
+   "reason": "CUTOFF(14:30)"
+  },
+  {
+   "date": "2026-09-09",
+   "side": "call",
+   "mfe": 0.168,
+   "mfe_t": "12:08",
+   "contracts": {
+    "30": 0,
+    "40": 1,
+    "50": 1,
+    "60": 1,
+    "70": 2
+   },
+   "mfe_prem": 13.6,
+   "mfe_prem_t": "12:08",
+   "strike": 709.0,
+   "premium": 6.24,
+   "iv": 0.1874,
+   "symbol": "QQQ260909C00709000",
+   "entry_time": "11:28",
+   "entry_px": 714.69,
+   "score": -3,
+   "gap": -0.29,
+   "rsi": 38.4,
+   "stop_px": 713.66,
+   "version": "itm-2.0",
+   "vix_pct": 74.1,
+   "vix_state": "LIVE",
+   "pm_pos": 0.393,
+   "exit_time": "12:08",
+   "exit_px": 715.89,
+   "exit_premium": 7.09,
+   "eff_exit": 7.09,
+   "pnl_pct": 13.6,
+   "pnl_usd": 85.0,
    "reason": "CUTOFF(14:30)"
   }
  ],
@@ -264,8 +272,8 @@
   }
  },
  "vix": {
-  "ratio": 0.8472,
-  "pct": 74.1,
+  "ratio": 0.8281,
+  "pct": 67.7,
   "state": "LIVE",
   "asof": "2026-09-09"
  },
@@ -290,7 +298,7 @@
   "room": 0.013,
   "cover": 0.96,
   "r50": 717.99,
-  "cur": 714.69,
+  "cur": 715.89,
   "filled": true,
   "trail": 717.85,
   "tfs": {
@@ -1972,20 +1980,52 @@
    "trades": []
   },
   "40": {
-   "cap": 2000.0,
-   "trades": []
+   "cap": 2085.0,
+   "trades": [
+    {
+     "d": "2026-09-09",
+     "nc": 1,
+     "usd": 85.0,
+     "pct": 13.6,
+     "res": "CUTOFF(14:30)"
+    }
+   ]
   },
   "50": {
-   "cap": 2000.0,
-   "trades": []
+   "cap": 2085.0,
+   "trades": [
+    {
+     "d": "2026-09-09",
+     "nc": 1,
+     "usd": 85.0,
+     "pct": 13.6,
+     "res": "CUTOFF(14:30)"
+    }
+   ]
   },
   "60": {
-   "cap": 2000.0,
-   "trades": []
+   "cap": 2085.0,
+   "trades": [
+    {
+     "d": "2026-09-09",
+     "nc": 1,
+     "usd": 85.0,
+     "pct": 13.6,
+     "res": "CUTOFF(14:30)"
+    }
+   ]
   },
   "70": {
-   "cap": 2000.0,
-   "trades": []
+   "cap": 2170.0,
+   "trades": [
+    {
+     "d": "2026-09-09",
+     "nc": 2,
+     "usd": 170.0,
+     "pct": 13.6,
+     "res": "CUTOFF(14:30)"
+    }
+   ]
   }
  }
 }
