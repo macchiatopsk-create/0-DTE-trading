@@ -279,8 +279,8 @@
   }
  },
  "vix": {
-  "ratio": 0.8988,
-  "pct": 81.3,
+  "ratio": 0.8945,
+  "pct": 80.5,
   "state": "LIVE",
   "asof": "2026-09-10"
  },
@@ -305,7 +305,7 @@
   "room": 0.826,
   "cover": 0.33,
   "r50": 709.81,
-  "cur": 708.76,
+  "cur": 708.7,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -337,9 +337,9 @@
     "vw_room": 0.944
    }
   },
-  "band_px": null,
-  "band_t": null,
-  "band_room": null,
+  "band_px": 708.46,
+  "band_t": "15:50",
+  "band_room": 1.104,
   "mfe": 0.635,
   "mfe_t": "10:35",
   "mfe_px": 712.06
@@ -397,7 +397,7 @@
    },
    {
     "d": "2025-07-11",
-    "dist": 1.81,
+    "dist": 1.82,
     "gap": -0.39,
     "ret": 0.16,
     "lo": -0.23,
