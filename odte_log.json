@@ -279,11 +279,10 @@
   }
  },
  "vix": {
-  "state": "ERR",
-  "msg": "수집실패 9D=False 3M=False",
-  "pct": 0.0,
-  "ratio": 0.0,
-  "asof": "-"
+  "ratio": 0.9019,
+  "pct": 81.3,
+  "state": "LIVE",
+  "asof": "2026-09-15"
  },
  "pm": {
   "pos": 0.752,
