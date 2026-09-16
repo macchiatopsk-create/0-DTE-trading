@@ -305,10 +305,10 @@
   "target": 704.59,
   "room": 0.703,
   "cover": -0.44,
-  "r50": 706.87,
-  "cur": 705.68,
-  "filled": false,
-  "trail": null,
+  "r50": 706.04,
+  "cur": 704.9,
+  "filled": true,
+  "trail": 705.08,
   "tfs": {
    "5m": {
     "cover": -0.02,
@@ -341,9 +341,9 @@
   "band_px": 708.42,
   "band_t": "09:35",
   "band_room": 0.541,
-  "mfe": 0.336,
+  "mfe": 0.571,
   "mfe_t": "14:55",
-  "mfe_px": 705.68
+  "mfe_px": 704.02
  },
  "macro": {
   "date": "2026-09-16",
