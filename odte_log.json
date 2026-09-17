@@ -299,7 +299,7 @@
  },
  "macro": {
   "date": "2026-09-17",
-  "n_hist": 500,
+  "n_hist": 499,
   "n_feat": 17,
   "extremes": [
    {
@@ -424,10 +424,10 @@
    }
   ],
   "rng": 1.689,
-  "base_rng": 1.444,
+  "base_rng": 1.443,
   "lo_avg": -0.971,
   "hi_avg": 0.718,
-  "base_up": 53.0
+  "base_up": 53.1
  },
  "gap_skip": {
   "date": "2026-08-19",
