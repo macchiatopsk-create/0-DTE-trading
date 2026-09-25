@@ -279,8 +279,8 @@
   }
  },
  "vix": {
-  "ratio": 0.7028,
-  "pct": 23.9,
+  "ratio": 0.7174,
+  "pct": 29.9,
   "state": "DEAD",
   "asof": "2026-09-25"
  },
@@ -305,7 +305,7 @@
   "room": 0.039,
   "cover": 1.16,
   "r50": 741.24,
-  "cur": 744.71,
+  "cur": 744.44,
   "filled": true,
   "trail": 741.6,
   "tfs": {
@@ -346,18 +346,18 @@
  },
  "macro": {
   "date": "2026-09-25",
-  "n_hist": 500,
+  "n_hist": 499,
   "n_feat": 17,
   "extremes": [
    {
     "name": "DAX",
     "chg": 0.69,
-    "pct": 89
+    "pct": 90
    },
    {
     "name": "COPPER",
     "chg": 0.92,
-    "pct": 85
+    "pct": 86
    },
    {
     "name": "ES",
@@ -471,10 +471,10 @@
    }
   ],
   "rng": 1.14,
-  "base_rng": 1.445,
+  "base_rng": 1.444,
   "lo_avg": -0.53,
   "hi_avg": 0.61,
-  "base_up": 53.2
+  "base_up": 53.3
  },
  "gap_skip": {
   "date": "2026-08-19",
