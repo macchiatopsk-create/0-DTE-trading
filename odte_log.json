@@ -279,9 +279,9 @@
   }
  },
  "vix": {
-  "ratio": 0.7797,
-  "pct": 52.2,
-  "state": "LIVE",
+  "ratio": 0.7731,
+  "pct": 49.8,
+  "state": "DEAD",
   "asof": "2026-09-30"
  },
  "pm": {
