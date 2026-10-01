@@ -279,8 +279,8 @@
   }
  },
  "vix": {
-  "ratio": 0.7485,
-  "pct": 41.4,
+  "ratio": 0.7527,
+  "pct": 42.2,
   "state": "DEAD",
   "asof": "2026-10-01"
  },
@@ -305,7 +305,7 @@
   "room": 0.18,
   "cover": 1.47,
   "r50": 739.39,
-  "cur": 741.62,
+  "cur": 742.04,
   "filled": true,
   "trail": 737.37,
   "tfs": {
@@ -324,8 +324,8 @@
     "ready": true,
     "ok": false,
     "room": 0.265,
-    "vw_entry": 742.4,
-    "vw_room": 0.364
+    "vw_entry": 742.41,
+    "vw_room": 0.365
    },
    "1h": {
     "cover": 1.47,
@@ -333,8 +333,8 @@
     "ready": true,
     "ok": true,
     "room": 0.18,
-    "vw_entry": 739.7,
-    "vw_room": 0.0
+    "vw_entry": 739.72,
+    "vw_room": 0.003
    }
   },
   "band_px": 742.63,
@@ -346,7 +346,7 @@
  },
  "macro": {
   "date": "2026-10-01",
-  "n_hist": 500,
+  "n_hist": 499,
   "n_feat": 17,
   "extremes": [
    {
@@ -357,7 +357,7 @@
    {
     "name": "TLT",
     "chg": -1.08,
-    "pct": 3
+    "pct": 2
    },
    {
     "name": "COPPER",
@@ -455,7 +455,7 @@
    },
    {
     "d": "2026-05-12",
-    "dist": 3.29,
+    "dist": 3.3,
     "gap": -0.71,
     "ret": -0.14,
     "lo": -1.64,
@@ -471,10 +471,10 @@
    }
   ],
   "rng": 1.41,
-  "base_rng": 1.44,
+  "base_rng": 1.441,
   "lo_avg": -0.635,
   "hi_avg": 0.776,
-  "base_up": 53.2
+  "base_up": 53.1
  },
  "gap_skip": {
   "date": "2026-08-19",
