@@ -279,8 +279,8 @@
   }
  },
  "vix": {
-  "ratio": 0.7534,
-  "pct": 42.2,
+  "ratio": 0.7535,
+  "pct": 42.6,
   "state": "DEAD",
   "asof": "2026-10-01"
  },
@@ -324,8 +324,8 @@
     "ready": true,
     "ok": false,
     "room": 0.265,
-    "vw_entry": 742.41,
-    "vw_room": 0.365
+    "vw_entry": 742.4,
+    "vw_room": 0.364
    },
    "1h": {
     "cover": 1.47,
@@ -333,8 +333,8 @@
     "ready": true,
     "ok": true,
     "room": 0.18,
-    "vw_entry": 739.72,
-    "vw_room": 0.003
+    "vw_entry": 739.7,
+    "vw_room": 0.0
    }
   },
   "band_px": 742.63,
