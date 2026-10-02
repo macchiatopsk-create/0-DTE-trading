@@ -31,7 +31,7 @@ jobs:
           git commit -m "recon $(date -u +%F_%H%M)"
           echo "commit rc=$?"
           for i in 1 2 3; do
-            git pull --rebase -X theirs && git push && { echo "push OK"; break; }
+            git pull --rebase --autostash -X theirs && git push && { echo "push OK"; break; }
             git rebase --abort 2>/dev/null
             echo "retry $i"; sleep 5
           done
