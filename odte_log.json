@@ -568,11 +568,95 @@
      "pnl_pct": 9.0,
      "per_contract": 56.0,
      "ux": -0.013
+    },
+    {
+     "date": "2026-09-08",
+     "tf": "5m",
+     "em": "now",
+     "late": true,
+     "recon": true,
+     "comb": null,
+     "dir": "숏",
+     "sgn": 1,
+     "gap": 0.28,
+     "cover": 0.56,
+     "entry": 719.84,
+     "target": 718.96,
+     "room": 0.122,
+     "at": "09:35",
+     "found_at": "recon",
+     "opt_side": "put",
+     "strike": 726.0,
+     "premium": 6.26,
+     "prem_src": "소급(모델가)",
+     "iv": 0.2104,
+     "mfe": 0.0,
+     "mfe_t": null,
+     "mfe_prem": -99.0,
+     "mfe_prem_t": null,
+     "filled": true,
+     "fill_t": "09:35",
+     "res": "TRAIL·소급",
+     "exit": 717.99,
+     "exit_at": "09:50",
+     "exit_premium": 7.89,
+     "pnl_pct": 26.0,
+     "per_contract": 163.0,
+     "ux": 0.257,
+     "contracts": {
+      "30": 1,
+      "40": 1,
+      "50": 1,
+      "60": 2,
+      "70": 2
+     }
+    },
+    {
+     "date": "2026-09-29",
+     "tf": "5m",
+     "em": "now",
+     "late": true,
+     "recon": true,
+     "comb": null,
+     "dir": "숏",
+     "sgn": 1,
+     "gap": 0.494,
+     "cover": 0.63,
+     "entry": 737.86,
+     "target": 736.53,
+     "room": 0.18,
+     "at": "09:35",
+     "found_at": "recon",
+     "opt_side": "put",
+     "strike": 744.0,
+     "premium": 6.27,
+     "prem_src": "소급(모델가)",
+     "iv": 0.2152,
+     "mfe": 0.0,
+     "mfe_t": null,
+     "mfe_prem": -99.0,
+     "mfe_prem_t": null,
+     "filled": true,
+     "fill_t": "09:40",
+     "res": "TRAIL·소급",
+     "exit": 738.05,
+     "exit_at": "09:55",
+     "exit_premium": 5.94,
+     "pnl_pct": -5.3,
+     "per_contract": -33.0,
+     "ux": -0.026,
+     "contracts": {
+      "30": 1,
+      "40": 1,
+      "50": 1,
+      "60": 2,
+      "70": 2
+     }
     }
    ],
    "books": {
     "30": {
-     "cap": 2679.95,
+     "cap": 2809.95,
      "trades": [
       {
        "d": "2026-08-20",
@@ -587,11 +671,27 @@
        "usd": 55.89,
        "pct": 9.0,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-08",
+       "nc": 1,
+       "usd": 163.0,
+       "pct": 26.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 1,
+       "usd": -33.0,
+       "pct": -5.3,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "40": {
-     "cap": 2679.95,
+     "cap": 2809.95,
      "trades": [
       {
        "d": "2026-08-20",
@@ -606,11 +706,27 @@
        "usd": 55.89,
        "pct": 9.0,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-08",
+       "nc": 1,
+       "usd": 163.0,
+       "pct": 26.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 1,
+       "usd": -33.0,
+       "pct": -5.3,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "50": {
-     "cap": 2304.02,
+     "cap": 2434.02,
      "trades": [
       {
        "d": "2026-08-20",
@@ -625,11 +741,27 @@
        "usd": 55.89,
        "pct": 9.0,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-08",
+       "nc": 1,
+       "usd": 163.0,
+       "pct": 26.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 1,
+       "usd": -33.0,
+       "pct": -5.3,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "60": {
-     "cap": 2359.91,
+     "cap": 2619.91,
      "trades": [
       {
        "d": "2026-08-20",
@@ -644,11 +776,27 @@
        "usd": 111.78,
        "pct": 9.0,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-08",
+       "nc": 2,
+       "usd": 326.0,
+       "pct": 26.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 2,
+       "usd": -66.0,
+       "pct": -5.3,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "70": {
-     "cap": 2359.91,
+     "cap": 2619.91,
      "trades": [
       {
        "d": "2026-08-20",
@@ -663,6 +811,22 @@
        "usd": 111.78,
        "pct": 9.0,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-08",
+       "nc": 2,
+       "usd": 326.0,
+       "pct": 26.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 2,
+       "usd": -66.0,
+       "pct": -5.3,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     }
@@ -695,13 +859,6 @@
      "at": "09:58"
     },
     {
-     "d": "2026-09-08",
-     "reason": "갭필 후 발견",
-     "cover": 1.01,
-     "gap": 0.266,
-     "at": "13:12"
-    },
-    {
      "d": "2026-08-27",
      "reason": "커버 0.17 미달",
      "cover": 0.17,
@@ -732,13 +889,6 @@
      "gap": 0.235,
      "at": "09:35",
      "recon": true
-    },
-    {
-     "d": "2026-09-29",
-     "reason": "갭필 후 발견",
-     "cover": 0.6,
-     "gap": 0.493,
-     "at": "14:33"
     }
    ]
   },
@@ -979,11 +1129,59 @@
      "pnl_pct": 11.1,
      "per_contract": 64.0,
      "ux": -0.114
+    },
+    {
+     "date": "2026-09-29",
+     "tf": "15m",
+     "em": "now",
+     "late": true,
+     "recon": true,
+     "comb": {
+      "30": 0,
+      "40": 1,
+      "50": 1,
+      "60": 1,
+      "70": 1
+     },
+     "dir": "숏",
+     "sgn": 1,
+     "gap": 0.494,
+     "cover": 0.94,
+     "entry": 736.76,
+     "target": 736.53,
+     "room": 0.031,
+     "at": "09:45",
+     "found_at": "recon",
+     "opt_side": "put",
+     "strike": 743.0,
+     "premium": 6.36,
+     "prem_src": "소급(모델가)",
+     "iv": 0.2152,
+     "mfe": 0.0,
+     "mfe_t": null,
+     "mfe_prem": -99.0,
+     "mfe_prem_t": null,
+     "filled": true,
+     "fill_t": "11:20",
+     "res": "TRAIL·소급",
+     "exit": 737.57,
+     "exit_at": "11:35",
+     "exit_premium": 5.38,
+     "pnl_pct": -15.4,
+     "per_contract": -98.0,
+     "ux": -0.111,
+     "contracts": {
+      "30": 1,
+      "40": 1,
+      "50": 1,
+      "60": 2,
+      "70": 2
+     }
     }
    ],
    "books": {
     "30": {
-     "cap": 2672.61,
+     "cap": 2574.61,
      "trades": [
       {
        "d": "2026-08-20",
@@ -998,11 +1196,19 @@
        "usd": 63.83,
        "pct": 11.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 1,
+       "usd": -98.0,
+       "pct": -15.4,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "40": {
-     "cap": 2672.61,
+     "cap": 2574.61,
      "trades": [
       {
        "d": "2026-08-20",
@@ -1017,11 +1223,19 @@
        "usd": 63.83,
        "pct": 11.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 1,
+       "usd": -98.0,
+       "pct": -15.4,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "50": {
-     "cap": 2281.39,
+     "cap": 2183.39,
      "trades": [
       {
        "d": "2026-08-20",
@@ -1036,11 +1250,19 @@
        "usd": 63.83,
        "pct": 11.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 1,
+       "usd": -98.0,
+       "pct": -15.4,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "60": {
-     "cap": 2345.21,
+     "cap": 2149.21,
      "trades": [
       {
        "d": "2026-08-20",
@@ -1055,11 +1277,19 @@
        "usd": 127.65,
        "pct": 11.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 2,
+       "usd": -196.0,
+       "pct": -15.4,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     },
     "70": {
-     "cap": 1953.99,
+     "cap": 1757.99,
      "trades": [
       {
        "d": "2026-08-20",
@@ -1074,6 +1304,14 @@
        "usd": 127.65,
        "pct": 11.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-09-29",
+       "nc": 2,
+       "usd": -196.0,
+       "pct": -15.4,
+       "res": "TRAIL·소급",
+       "recon": true
       }
      ]
     }
@@ -1104,13 +1342,6 @@
      "cover": 1.24,
      "gap": -0.301,
      "at": "09:58"
-    },
-    {
-     "d": "2026-09-08",
-     "reason": "갭필 후 발견",
-     "cover": 2.23,
-     "gap": 0.266,
-     "at": "13:12"
     },
     {
      "d": "2026-08-27",
@@ -1145,11 +1376,12 @@
      "recon": true
     },
     {
-     "d": "2026-09-29",
-     "reason": "갭필 후 발견",
-     "cover": 0.94,
-     "gap": 0.493,
-     "at": "14:33"
+     "d": "2026-09-08",
+     "reason": "이미 메움(커버≥1.0)",
+     "cover": 2.11,
+     "gap": 0.28,
+     "at": "09:45",
+     "recon": true
     }
    ]
   },
@@ -1308,27 +1540,197 @@
   },
   "1h|now": {
    "open": null,
-   "trades": [],
+   "trades": [
+    {
+     "date": "2026-09-09",
+     "tf": "1h",
+     "em": "now",
+     "late": true,
+     "recon": true,
+     "comb": null,
+     "dir": "롱",
+     "sgn": -1,
+     "gap": -0.288,
+     "cover": 0.97,
+     "entry": 718.29,
+     "target": 718.36,
+     "room": 0.01,
+     "at": "10:30",
+     "found_at": "recon",
+     "opt_side": "call",
+     "strike": 713.0,
+     "premium": 5.47,
+     "prem_src": "소급(모델가)",
+     "iv": 0.2179,
+     "mfe": 0.0,
+     "mfe_t": null,
+     "mfe_prem": -99.0,
+     "mfe_prem_t": null,
+     "filled": true,
+     "fill_t": "10:40",
+     "res": "TRAIL·소급",
+     "exit": 717.31,
+     "exit_at": "11:05",
+     "exit_premium": 4.43,
+     "pnl_pct": -19.0,
+     "per_contract": -104.0,
+     "ux": -0.136,
+     "contracts": {
+      "30": 1,
+      "40": 2,
+      "50": 2,
+      "60": 3,
+      "70": 3
+     }
+    },
+    {
+     "date": "2026-09-24",
+     "tf": "1h",
+     "em": "now",
+     "late": true,
+     "recon": true,
+     "comb": null,
+     "dir": "롱",
+     "sgn": -1,
+     "gap": -0.816,
+     "cover": 0.45,
+     "entry": 737.89,
+     "target": 741.21,
+     "room": 0.45,
+     "at": "10:30",
+     "found_at": "recon",
+     "opt_side": "call",
+     "strike": 732.0,
+     "premium": 6.02,
+     "prem_src": "소급(모델가)",
+     "iv": 0.2101,
+     "mfe": 0.0,
+     "mfe_t": null,
+     "mfe_prem": -99.0,
+     "mfe_prem_t": null,
+     "filled": false,
+     "fill_t": null,
+     "res": "TIMECUT·소급",
+     "exit": 735.16,
+     "exit_at": "11:30",
+     "exit_premium": 3.39,
+     "pnl_pct": -43.7,
+     "per_contract": -263.0,
+     "ux": -0.37,
+     "contracts": {
+      "30": 1,
+      "40": 1,
+      "50": 2,
+      "60": 2,
+      "70": 3
+     }
+    }
+   ],
    "books": {
     "30": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 2633.0,
+     "trades": [
+      {
+       "d": "2026-09-09",
+       "nc": 1,
+       "usd": -104.0,
+       "pct": -19.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-24",
+       "nc": 1,
+       "usd": -263.0,
+       "pct": -43.7,
+       "res": "TIMECUT·소급",
+       "recon": true
+      }
+     ]
     },
     "40": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 2529.0,
+     "trades": [
+      {
+       "d": "2026-09-09",
+       "nc": 2,
+       "usd": -208.0,
+       "pct": -19.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-24",
+       "nc": 1,
+       "usd": -263.0,
+       "pct": -43.7,
+       "res": "TIMECUT·소급",
+       "recon": true
+      }
+     ]
     },
     "50": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 2266.0,
+     "trades": [
+      {
+       "d": "2026-09-09",
+       "nc": 2,
+       "usd": -208.0,
+       "pct": -19.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-24",
+       "nc": 2,
+       "usd": -526.0,
+       "pct": -43.7,
+       "res": "TIMECUT·소급",
+       "recon": true
+      }
+     ]
     },
     "60": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 2162.0,
+     "trades": [
+      {
+       "d": "2026-09-09",
+       "nc": 3,
+       "usd": -312.0,
+       "pct": -19.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-24",
+       "nc": 2,
+       "usd": -526.0,
+       "pct": -43.7,
+       "res": "TIMECUT·소급",
+       "recon": true
+      }
+     ]
     },
     "70": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 1899.0,
+     "trades": [
+      {
+       "d": "2026-09-09",
+       "nc": 3,
+       "usd": -312.0,
+       "pct": -19.0,
+       "res": "TRAIL·소급",
+       "recon": true
+      },
+      {
+       "d": "2026-09-24",
+       "nc": 3,
+       "usd": -789.0,
+       "pct": -43.7,
+       "res": "TIMECUT·소급",
+       "recon": true
+      }
+     ]
     }
    },
    "done": {
@@ -1359,20 +1761,6 @@
      "cover": 1.08,
      "gap": 0.602,
      "at": "10:31"
-    },
-    {
-     "d": "2026-09-08",
-     "reason": "갭필 후 발견",
-     "cover": 1.68,
-     "gap": 0.266,
-     "at": "13:12"
-    },
-    {
-     "d": "2026-09-09",
-     "reason": "갭필 후 발견",
-     "cover": 0.96,
-     "gap": -0.291,
-     "at": "11:28"
     },
     {
      "d": "2026-08-27",
@@ -1407,32 +1795,36 @@
      "recon": true
     },
     {
-     "d": "2026-09-18",
-     "reason": "갭필 후 발견",
-     "cover": 1.09,
-     "gap": 0.275,
-     "at": "13:01"
+     "d": "2026-09-08",
+     "reason": "이미 메움(커버≥1.0)",
+     "cover": 1.6,
+     "gap": 0.28,
+     "at": "10:30",
+     "recon": true
     },
     {
-     "d": "2026-09-24",
-     "reason": "갭필 후 발견",
-     "cover": 0.45,
-     "gap": -0.811,
-     "at": "13:49"
+     "d": "2026-09-18",
+     "reason": "이미 메움(커버≥1.0)",
+     "cover": 1.11,
+     "gap": 0.268,
+     "at": "10:30",
+     "recon": true
     },
     {
      "d": "2026-09-25",
-     "reason": "갭필 후 발견",
-     "cover": 1.16,
-     "gap": 0.24,
-     "at": "13:53"
+     "reason": "이미 메움(커버≥1.0)",
+     "cover": 1.19,
+     "gap": 0.235,
+     "at": "10:30",
+     "recon": true
     },
     {
      "d": "2026-10-01",
-     "reason": "갭필 후 발견",
-     "cover": 1.47,
-     "gap": 0.38,
-     "at": "14:47"
+     "reason": "이미 메움(커버≥1.0)",
+     "cover": 1.51,
+     "gap": 0.37,
+     "at": "10:30",
+     "recon": true
     }
    ]
   },
@@ -1948,11 +2340,511 @@
     "pnl_pct": -43.5,
     "per_contract": -252.0,
     "ux": -0.298
+   },
+   {
+    "date": "2026-08-27",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 2,
+     "70": 2
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.789,
+    "cover": -0.21,
+    "vchg": -1.91,
+    "entry": 718.14,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 712.0,
+    "premium": 6.26,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2069,
+    "or_stop": 715.26,
+    "ext": 718.14,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 715.76,
+    "exit_at": "09:50",
+    "exit_premium": 3.99,
+    "pnl_pct": -36.3,
+    "per_contract": -227.0,
+    "ux": -0.331,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 2,
+     "70": 2
+    }
+   },
+   {
+    "date": "2026-09-01",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 2,
+     "60": 1,
+     "70": 2
+    },
+    "dir": "숏",
+    "sgn": -1,
+    "gap": -1.302,
+    "cover": -0.08,
+    "vchg": 0.2,
+    "entry": 706.69,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "put",
+    "strike": 712.0,
+    "premium": 5.47,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2123,
+    "or_stop": 707.69,
+    "ext": 706.69,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 708.12,
+    "exit_at": "09:50",
+    "exit_premium": 4.1,
+    "pnl_pct": -25.0,
+    "per_contract": -137.0,
+    "ux": -0.202,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 2,
+     "60": 1,
+     "70": 2
+    }
+   },
+   {
+    "date": "2026-09-04",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.235,
+    "cover": -0.4,
+    "vchg": -1.19,
+    "entry": 720.04,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 714.0,
+    "premium": 6.15,
+    "prem_src": "소급(모델가)",
+    "iv": 0.1966,
+    "or_stop": 718.53,
+    "ext": 720.04,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 719.59,
+    "exit_at": "10:25",
+    "exit_premium": 5.56,
+    "pnl_pct": -9.6,
+    "per_contract": -59.0,
+    "ux": -0.062,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
+   },
+   {
+    "date": "2026-09-11",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.952,
+    "cover": -0.08,
+    "vchg": -1.85,
+    "entry": 716.0,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 710.0,
+    "premium": 6.16,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2188,
+    "or_stop": 713.93,
+    "ext": 716.0,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 714.56,
+    "exit_at": "10:45",
+    "exit_premium": 4.66,
+    "pnl_pct": -24.4,
+    "per_contract": -150.0,
+    "ux": -0.201,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
+   },
+   {
+    "date": "2026-09-16",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.5,
+    "cover": -0.09,
+    "vchg": -1.69,
+    "entry": 708.39,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 703.0,
+    "premium": 5.57,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2112,
+    "or_stop": 707.89,
+    "ext": 708.39,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 709.46,
+    "exit_at": "13:05",
+    "exit_premium": 6.36,
+    "pnl_pct": 14.2,
+    "per_contract": 79.0,
+    "ux": 0.152,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
+   },
+   {
+    "date": "2026-09-18",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.268,
+    "cover": -0.02,
+    "vchg": -2.4,
+    "entry": 718.87,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 713.0,
+    "premium": 5.99,
+    "prem_src": "소급(모델가)",
+    "iv": 0.1972,
+    "or_stop": 718.5,
+    "ext": 718.87,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 718.37,
+    "exit_at": "09:50",
+    "exit_premium": 5.39,
+    "pnl_pct": -10.0,
+    "per_contract": -60.0,
+    "ux": -0.07,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
+   },
+   {
+    "date": "2026-09-24",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "숏",
+    "sgn": -1,
+    "gap": -0.816,
+    "cover": 0.28,
+    "vchg": 4.28,
+    "entry": 736.84,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "put",
+    "strike": 743.0,
+    "premium": 6.27,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2101,
+    "or_stop": 736.02,
+    "ext": 736.84,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 736.65,
+    "exit_at": "09:50",
+    "exit_premium": 6.3,
+    "pnl_pct": 0.5,
+    "per_contract": 3.0,
+    "ux": 0.025,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
+   },
+   {
+    "date": "2026-09-25",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.235,
+    "cover": -0.82,
+    "vchg": -0.38,
+    "entry": 744.27,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 738.0,
+    "premium": 6.4,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2092,
+    "or_stop": 741.66,
+    "ext": 744.27,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 742.5,
+    "exit_at": "10:05",
+    "exit_premium": 4.64,
+    "pnl_pct": -27.5,
+    "per_contract": -176.0,
+    "ux": -0.237,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
+   },
+   {
+    "date": "2026-09-30",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.306,
+    "cover": -0.69,
+    "vchg": -0.69,
+    "entry": 741.76,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 736.0,
+    "premium": 5.94,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2136,
+    "or_stop": 739.76,
+    "ext": 741.76,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 742.38,
+    "exit_at": "10:35",
+    "exit_premium": 6.35,
+    "pnl_pct": 6.9,
+    "per_contract": 41.0,
+    "ux": 0.084,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
+   },
+   {
+    "date": "2026-10-01",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.37,
+    "cover": 0.31,
+    "vchg": -0.06,
+    "entry": 741.66,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 736.0,
+    "premium": 5.9,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2266,
+    "or_stop": 741.04,
+    "ext": 741.66,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 740.39,
+    "exit_at": "09:50",
+    "exit_premium": 4.65,
+    "pnl_pct": -21.2,
+    "per_contract": -125.0,
+    "ux": -0.172,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
    }
   ],
   "books": {
    "30": {
-    "cap": 2748.13,
+    "cap": 1937.13,
     "trades": [
      {
       "d": "2026-08-25",
@@ -1960,11 +2852,91 @@
       "usd": -251.87,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 1,
+      "usd": -227.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 1,
+      "usd": -137.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "40": {
-    "cap": 2496.27,
+    "cap": 1685.27,
     "trades": [
      {
       "d": "2026-08-25",
@@ -1972,11 +2944,91 @@
       "usd": -503.73,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 1,
+      "usd": -227.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 1,
+      "usd": -137.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "50": {
-    "cap": 2496.27,
+    "cap": 1548.27,
     "trades": [
      {
       "d": "2026-08-25",
@@ -1984,11 +3036,91 @@
       "usd": -503.73,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 1,
+      "usd": -227.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 2,
+      "usd": -274.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "60": {
-    "cap": 2244.4,
+    "cap": 1206.4,
     "trades": [
      {
       "d": "2026-08-25",
@@ -1996,11 +3128,91 @@
       "usd": -755.6,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 2,
+      "usd": -454.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 1,
+      "usd": -137.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "70": {
-    "cap": 2244.4,
+    "cap": 1069.4,
     "trades": [
      {
       "d": "2026-08-25",
@@ -2008,58 +3220,114 @@
       "usd": -755.6,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 2,
+      "usd": -454.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 2,
+      "usd": -274.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    }
   },
   "done": {
    "2026-08-25": true,
-   "2026-08-27": "late",
-   "2026-09-01": "late",
+   "2026-08-27": true,
+   "2026-09-01": true,
    "2026-09-03": "veto",
-   "2026-09-04": "late",
+   "2026-09-04": true,
    "2026-09-09": "veto",
    "2026-09-10": "veto",
-   "2026-09-11": "late",
-   "2026-09-16": "late",
-   "2026-09-18": "late",
+   "2026-09-11": true,
+   "2026-09-16": true,
+   "2026-09-18": true,
    "2026-09-21": "veto",
-   "2026-09-24": "late",
-   "2026-09-25": "late",
-   "2026-09-30": "late",
-   "2026-10-01": "late"
+   "2026-09-24": true,
+   "2026-09-25": true,
+   "2026-09-30": true,
+   "2026-10-01": true
   },
   "skips": [
-   {
-    "d": "2026-08-27",
-    "reason": "늦은 발견",
-    "gap": 0.799,
-    "vchg": -1.91,
-    "cover": -0.2,
-    "at": "18:54"
-   },
-   {
-    "d": "2026-09-01",
-    "reason": "늦은 발견",
-    "gap": -1.315,
-    "vchg": 0.2,
-    "cover": -0.08,
-    "at": "13:17"
-   },
    {
     "d": "2026-09-03",
     "reason": "VIX역행",
     "gap": 0.226,
     "vchg": 0.33,
     "cover": -1.44
-   },
-   {
-    "d": "2026-09-04",
-    "reason": "늦은 발견",
-    "gap": 0.244,
-    "vchg": -1.19,
-    "cover": -0.39,
-    "at": "12:49"
    },
    {
     "d": "2026-09-09",
@@ -2076,67 +3344,11 @@
     "cover": 0.14
    },
    {
-    "d": "2026-09-11",
-    "reason": "늦은 발견",
-    "gap": 0.957,
-    "vchg": -1.85,
-    "cover": -0.08,
-    "at": "12:59"
-   },
-   {
-    "d": "2026-09-16",
-    "reason": "늦은 발견",
-    "gap": 0.492,
-    "vchg": -1.69,
-    "cover": -0.1,
-    "at": "13:35"
-   },
-   {
-    "d": "2026-09-18",
-    "reason": "늦은 발견",
-    "gap": 0.275,
-    "vchg": -2.4,
-    "cover": -0.02,
-    "at": "13:01"
-   },
-   {
     "d": "2026-09-21",
     "reason": "VIX역행",
     "gap": 0.914,
     "vchg": 1.01,
     "cover": -0.43
-   },
-   {
-    "d": "2026-09-24",
-    "reason": "늦은 발견",
-    "gap": -0.811,
-    "vchg": 4.28,
-    "cover": 0.28,
-    "at": "13:49"
-   },
-   {
-    "d": "2026-09-25",
-    "reason": "늦은 발견",
-    "gap": 0.24,
-    "vchg": -0.38,
-    "cover": -0.8,
-    "at": "13:53"
-   },
-   {
-    "d": "2026-09-30",
-    "reason": "늦은 발견",
-    "gap": 0.302,
-    "vchg": -0.69,
-    "cover": -0.7,
-    "at": "14:21"
-   },
-   {
-    "d": "2026-10-01",
-    "reason": "늦은 발견",
-    "gap": 0.38,
-    "vchg": -0.06,
-    "cover": 0.3,
-    "at": "14:47"
    }
   ]
  },
@@ -2149,7 +3361,7 @@
  "comb": {
   "books": {
    "30": {
-    "cap": 2748.13,
+    "cap": 1937.13,
     "trades": [
      {
       "d": "2026-08-25",
@@ -2157,11 +3369,99 @@
       "usd": -251.87,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 1,
+      "usd": -227.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 1,
+      "usd": -137.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-29",
+      "nc": 0,
+      "usd": 0.0,
+      "pct": 0.0,
+      "res": "SKIP_FUND",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "40": {
-    "cap": 2496.27,
+    "cap": 1587.27,
     "trades": [
      {
       "d": "2026-08-25",
@@ -2169,11 +3469,99 @@
       "usd": -503.73,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 1,
+      "usd": -227.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 1,
+      "usd": -137.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-29",
+      "nc": 1,
+      "usd": -98.0,
+      "pct": -15.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "50": {
-    "cap": 2496.27,
+    "cap": 1450.27,
     "trades": [
      {
       "d": "2026-08-25",
@@ -2181,11 +3569,99 @@
       "usd": -503.73,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 1,
+      "usd": -227.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 2,
+      "usd": -274.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-29",
+      "nc": 1,
+      "usd": -98.0,
+      "pct": -15.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "60": {
-    "cap": 2244.4,
+    "cap": 1108.4,
     "trades": [
      {
       "d": "2026-08-25",
@@ -2193,11 +3669,99 @@
       "usd": -755.6,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 2,
+      "usd": -454.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 1,
+      "usd": -137.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-29",
+      "nc": 1,
+      "usd": -98.0,
+      "pct": -15.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    },
    "70": {
-    "cap": 2244.4,
+    "cap": 971.4,
     "trades": [
      {
       "d": "2026-08-25",
@@ -2205,6 +3769,94 @@
       "usd": -755.6,
       "pct": -43.5,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-08-27",
+      "nc": 2,
+      "usd": -454.0,
+      "pct": -36.3,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-01",
+      "nc": 2,
+      "usd": -274.0,
+      "pct": -25.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-04",
+      "nc": 1,
+      "usd": -59.0,
+      "pct": -9.6,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-11",
+      "nc": 1,
+      "usd": -150.0,
+      "pct": -24.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-16",
+      "nc": 1,
+      "usd": 79.0,
+      "pct": 14.2,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-18",
+      "nc": 1,
+      "usd": -60.0,
+      "pct": -10.0,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-24",
+      "nc": 1,
+      "usd": 3.0,
+      "pct": 0.5,
+      "res": "STOP(OR)·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-25",
+      "nc": 1,
+      "usd": -176.0,
+      "pct": -27.5,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-29",
+      "nc": 1,
+      "usd": -98.0,
+      "pct": -15.4,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-09-30",
+      "nc": 1,
+      "usd": 41.0,
+      "pct": 6.9,
+      "res": "TRAIL·소급",
+      "recon": true
+     },
+     {
+      "d": "2026-10-01",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -21.2,
+      "res": "STOP(OR)·소급",
+      "recon": true
      }
     ]
    }
@@ -2258,6 +3910,565 @@
     "pnl_pct": -43.5,
     "per_contract": -252.0,
     "ux": -0.298,
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-08-27",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 2,
+     "70": 2
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.789,
+    "cover": -0.21,
+    "vchg": -1.91,
+    "entry": 718.14,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 712.0,
+    "premium": 6.26,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2069,
+    "or_stop": 715.26,
+    "ext": 718.14,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 715.76,
+    "exit_at": "09:50",
+    "exit_premium": 3.99,
+    "pnl_pct": -36.3,
+    "per_contract": -227.0,
+    "ux": -0.331,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 2,
+     "70": 2
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-01",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 2,
+     "60": 1,
+     "70": 2
+    },
+    "dir": "숏",
+    "sgn": -1,
+    "gap": -1.302,
+    "cover": -0.08,
+    "vchg": 0.2,
+    "entry": 706.69,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "put",
+    "strike": 712.0,
+    "premium": 5.47,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2123,
+    "or_stop": 707.69,
+    "ext": 706.69,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 708.12,
+    "exit_at": "09:50",
+    "exit_premium": 4.1,
+    "pnl_pct": -25.0,
+    "per_contract": -137.0,
+    "ux": -0.202,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 2,
+     "60": 1,
+     "70": 2
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-04",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.235,
+    "cover": -0.4,
+    "vchg": -1.19,
+    "entry": 720.04,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 714.0,
+    "premium": 6.15,
+    "prem_src": "소급(모델가)",
+    "iv": 0.1966,
+    "or_stop": 718.53,
+    "ext": 720.04,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 719.59,
+    "exit_at": "10:25",
+    "exit_premium": 5.56,
+    "pnl_pct": -9.6,
+    "per_contract": -59.0,
+    "ux": -0.062,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-11",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.952,
+    "cover": -0.08,
+    "vchg": -1.85,
+    "entry": 716.0,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 710.0,
+    "premium": 6.16,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2188,
+    "or_stop": 713.93,
+    "ext": 716.0,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 714.56,
+    "exit_at": "10:45",
+    "exit_premium": 4.66,
+    "pnl_pct": -24.4,
+    "per_contract": -150.0,
+    "ux": -0.201,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-16",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.5,
+    "cover": -0.09,
+    "vchg": -1.69,
+    "entry": 708.39,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 703.0,
+    "premium": 5.57,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2112,
+    "or_stop": 707.89,
+    "ext": 708.39,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 709.46,
+    "exit_at": "13:05",
+    "exit_premium": 6.36,
+    "pnl_pct": 14.2,
+    "per_contract": 79.0,
+    "ux": 0.152,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-18",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.268,
+    "cover": -0.02,
+    "vchg": -2.4,
+    "entry": 718.87,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 713.0,
+    "premium": 5.99,
+    "prem_src": "소급(모델가)",
+    "iv": 0.1972,
+    "or_stop": 718.5,
+    "ext": 718.87,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 718.37,
+    "exit_at": "09:50",
+    "exit_premium": 5.39,
+    "pnl_pct": -10.0,
+    "per_contract": -60.0,
+    "ux": -0.07,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-24",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "숏",
+    "sgn": -1,
+    "gap": -0.816,
+    "cover": 0.28,
+    "vchg": 4.28,
+    "entry": 736.84,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "put",
+    "strike": 743.0,
+    "premium": 6.27,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2101,
+    "or_stop": 736.02,
+    "ext": 736.84,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 736.65,
+    "exit_at": "09:50",
+    "exit_premium": 6.3,
+    "pnl_pct": 0.5,
+    "per_contract": 3.0,
+    "ux": 0.025,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-25",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.235,
+    "cover": -0.82,
+    "vchg": -0.38,
+    "entry": 744.27,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 738.0,
+    "premium": 6.4,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2092,
+    "or_stop": 741.66,
+    "ext": 744.27,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 742.5,
+    "exit_at": "10:05",
+    "exit_premium": 4.64,
+    "pnl_pct": -27.5,
+    "per_contract": -176.0,
+    "ux": -0.237,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-09-29",
+    "tf": "15m",
+    "em": "now",
+    "late": true,
+    "recon": true,
+    "comb": {
+     "30": 0,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.494,
+    "cover": 0.94,
+    "entry": 736.76,
+    "target": 736.53,
+    "room": 0.031,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "put",
+    "strike": 743.0,
+    "premium": 6.36,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2152,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": true,
+    "fill_t": "11:20",
+    "res": "TRAIL·소급",
+    "exit": 737.57,
+    "exit_at": "11:35",
+    "exit_premium": 5.38,
+    "pnl_pct": -15.4,
+    "per_contract": -98.0,
+    "ux": -0.111,
+    "contracts": {
+     "30": 0,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "갭필"
+   },
+   {
+    "date": "2026-09-30",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.306,
+    "cover": -0.69,
+    "vchg": -0.69,
+    "entry": 741.76,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 736.0,
+    "premium": 5.94,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2136,
+    "or_stop": 739.76,
+    "ext": 741.76,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 742.38,
+    "exit_at": "10:35",
+    "exit_premium": 6.35,
+    "pnl_pct": 6.9,
+    "per_contract": 41.0,
+    "ux": 0.084,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "strat": "모멘텀"
+   },
+   {
+    "date": "2026-10-01",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.37,
+    "cover": 0.31,
+    "vchg": -0.06,
+    "entry": 741.66,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "call",
+    "strike": 736.0,
+    "premium": 5.9,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2266,
+    "or_stop": 741.04,
+    "ext": 741.66,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)·소급",
+    "exit": 740.39,
+    "exit_at": "09:50",
+    "exit_premium": 4.65,
+    "pnl_pct": -21.2,
+    "per_contract": -125.0,
+    "ux": -0.172,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
     "strat": "모멘텀"
    }
   ],
