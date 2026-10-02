@@ -400,12 +400,12 @@
   "2026-10-02": {
    "status": "NO TRADE · VIX게이트 (백분위 43% < 50)",
    "score": 0,
-   "rsi": 31.1,
+   "rsi": 24.8,
    "direction": 0,
    "gap": 1.25,
-   "px": 749.98,
-   "vwap": 751.79,
-   "at": "11:15",
+   "px": 748.85,
+   "vwap": 751.71,
+   "at": "11:20",
    "vix_pct": 42.6,
    "vix_state": "DEAD",
    "pm_pos": 0.848
@@ -438,7 +438,7 @@
   "room": 1.607,
   "cover": -0.31,
   "r50": 750.01,
-  "cur": 749.98,
+  "cur": 748.85,
   "filled": false,
   "trail": null,
   "tfs": {
