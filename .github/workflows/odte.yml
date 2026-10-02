@@ -1,8 +1,12 @@
 name: odte-mock
 on:
   schedule:
-    # 장중 15분 간격 (UTC). 미 동부 09:45~16:00 ET 대응 (서머타임 기준)
-    - cron: "*/5 13-20 * * 1-5"
+    # 장중 백업 틱 (UTC). GitHub 예약 실행은 몇 시간씩 밀려 도착하므로 이것만 믿으면 안 된다
+    # (2026-08-27~10-01: 첫 실행이 매일 12:49~14:47 ET에 도착 → 09:45 판정을 5주간 한 번도 못 함).
+    - cron: "*/5 13-21 * * 1-5"
+    # 기상 티켓: 새벽부터 매시 1장. 6~7시간 밀려도 개장 전에 도착한다.
+    # 도착하면 아래 '대기' 모드가 09:20 ET까지 연쇄로 버티다가 장중 모드로 넘어간다.
+    - cron: "17 2-12 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -18,14 +22,36 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
     steps:
+      - id: mode
+        name: mode (뉴욕 시각 기준 — 서머타임 자동)
+        run: |
+          D=$(TZ=America/New_York date +%u); T=$((10#$(TZ=America/New_York date +%H%M)))
+          if   [ "$D" -le 5 ] && [ "$T" -lt 920 ];  then M=wait      # 개장 전: 파이썬 안 돌리고 연쇄만 유지
+          elif [ "$D" -le 5 ] && [ "$T" -lt 1605 ]; then M=live      # 장중
+          else M=off; fi                                             # 장 마감 뒤·주말: 1회 실행 후 종료
+          echo "mode=$M" >> "$GITHUB_OUTPUT"
+          echo "NY $(TZ=America/New_York date '+%a %H:%M:%S') → $M"
       - uses: actions/checkout@v4
+        if: steps.mode.outputs.mode != 'wait'
       - uses: actions/setup-python@v5
+        if: steps.mode.outputs.mode != 'wait'
         with:
           python-version: "3.12"
-      - run: pip install yfinance pandas
-      - run: python odte.py
+      - if: steps.mode.outputs.mode != 'wait'
+        run: pip install yfinance pandas
+      - name: align (5분 경계 +15초에 맞춰 실행 — 09:45 판정을 09:45에)
+        if: steps.mode.outputs.mode == 'live'
+        run: |
+          now=$(date +%s); nxt=$(( (now/300+1)*300 + 15 )); d=$((nxt-now))
+          if [ "$d" -le 150 ]; then echo "정렬 대기 ${d}s"; sleep "$d"; else echo "정렬 생략 (다음 경계까지 ${d}s)"; fi
+      - if: steps.mode.outputs.mode != 'wait'
+        run: python odte.py
       - name: persist
+        if: steps.mode.outputs.mode != 'wait'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -33,33 +59,57 @@ jobs:
           git commit -m "odte $(date -u +%F_%H%M)" || echo "변동 없음"
           git pull --rebase -X theirs || (git rebase --abort 2>/dev/null; true)
           git push || echo "푸시 스킵"
-      - name: self-chain
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          H=$(date -u +%H); D=$(date -u +%u)
-          if [ "$D" -le 5 ] && [ "$H" -ge 13 ] && [ "$H" -le 20 ]; then
-            sleep 240
-            curl -s -X POST \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/odte.yml/dispatches" \
-              -d '{"ref":"main"}' && echo "self-chain 재발사"
-          else
-            echo "장외 — 연쇄 종료"
-          fi
       - name: pages
+        if: steps.mode.outputs.mode != 'wait'
         run: |
           mkdir -p _site
           cp index.html manifest.webmanifest sw.js icon-192.png icon-512.png _site/ 2>/dev/null || true
           if [ -d hq ]; then python hq/build.py _site; fi
           ls -la _site
       - uses: actions/upload-pages-artifact@v3
+        if: steps.mode.outputs.mode != 'wait'
         with:
           path: _site
+
+  # 연쇄: 다음 실행을 스스로 예약한다. 화면 배포(deploy)와 병렬 — 예전에는 연쇄 대기(240초) 뒤에 배포돼 화면이 4분 늦었다.
+  chain:
+    needs: run
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - name: self-chain
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          D=$(TZ=America/New_York date +%u); T=$((10#$(TZ=America/New_York date +%H%M)))
+          now=$(date +%s)
+          if [ "$D" -le 5 ] && [ "$T" -lt 920 ]; then
+            # 개장 전 대기: 09:20 ET까지 남은 시간(최대 50분)만큼 자고 다시 발사
+            tgt=$(TZ=America/New_York date -d "today 09:20" +%s); s=$((tgt-now))
+            [ "$s" -gt 3000 ] && s=3000; [ "$s" -lt 5 ] && s=5
+          elif [ "$D" -le 5 ] && [ "$T" -lt 1600 ]; then
+            # 장중: 다음 5분 경계 75초 전에 발사 → 새 실행이 준비(체크아웃·설치)를 끝내고 경계 +15초에 판정
+            # (이미 75초 안쪽이면 기다리지 않고 바로 발사 — 경계를 건너뛰지 않는다)
+            nxt=$(( (now/300+1)*300 )); s=$((nxt-now-75)); [ "$s" -lt 0 ] && s=0
+          else
+            echo "장외 — 연쇄 종료"; exit 0
+          fi
+          echo "대기 ${s}s 후 재발사"; sleep "$s"
+          for i in 1 2 3 4; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/odte.yml/dispatches" \
+              -d '{"ref":"main"}')
+            if [ "$code" = "204" ]; then echo "self-chain 재발사 OK"; exit 0; fi
+            echo "재발사 실패($code) — 재시도 $i"; sleep 8
+          done
+          echo "::warning::self-chain 재발사 실패 — 다음 예약 틱이 살릴 때까지 공백"
+
   deploy:
     needs: run
+    if: needs.run.outputs.mode != 'wait'
     runs-on: ubuntu-latest
     continue-on-error: true
     environment:

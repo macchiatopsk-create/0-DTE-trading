@@ -53,6 +53,9 @@ ENTRY_BAND_SIG = 1.0     # VWAP -1σ 터치 대기 (v10: 진입대기가 09:30 �
 # ── 검증 스펙 (1시간봉 2년 n=87, 승률 62.1% PF 4.01, 대손실 0건) ──
 GAP_MIN, GAP_MAX = 0.20, 1.50     # 갭 크기 (%)
 GAP_COVER_MIN = 0.40              # 첫봉(09:30~10:30) 갭 커버율 하한
+GAP_COVER_MAX = 1.00              # 커버 상한 — 판정 시점에 이미 전일 종가를 지나친 날은 대상 밖 (스펙 [0.40, 1.0))
+GAP_ENTRY_GRACE = 4               # '즉시 진입'은 기준 시각 + 이 분(分) 안에서만 실시간 체결.
+                                  # 넘기면 '늦은 발견' 스킵 → recon.py가 기준 시각 모델가로 재구성 (1분봉 검증: 09:50 이후 진입은 PF 급락)
 GAP_VIX_SKIP = 5.0                # 개장 VIX 변화 |x|>=5% 이면 스킵
 GAP_TRAIL = 0.15                  # 갭필 후 트레일링 스탑 (%)
 GAP_TIMECUT = dt.time(11, 30)     # 갭필 실패 시 강제청산 (핵심: 세타 방어)
@@ -71,7 +74,7 @@ GAP_CAPITAL = 3000.0              # 갭 트랙 mock 자본 (사이징별 각각 
 #   D모드 2.28/1.49. 275일 재심 전 mock 검증 트랙.
 MOM_TRAIL = 0.30                  # 트레일 (%) — 갭필 0.15보다 넓게 (러너 프로필)
 MOM_COVER_MAX = 0.40              # 09:45 커버 < 이 값 = 스킵데이
-MOM_ENTRY_LAST = dt.time(10, 30)  # 이후 발견 시 진입 포기 (소급 방지)
+MOM_ENTRY_LAST = dt.time(9, 50)   # 이후 발견 시 진입 포기 → recon.py가 09:45 모델가로 재구성 (스펙은 09:45 진입)
 
 # ── 통합 계좌: 한 북으로 두 전략 (09:45 한 번 판정) ──
 # 커버≥0.40 → 갭필(15m|now 변형) / 커버<0.40+VIX확인 → 모멘텀 / 역행 → 관망.
@@ -194,6 +197,11 @@ def vix_open_chg():
         h = yf.Ticker("^VIX").history(period="5d")[["Open", "Close"]].dropna()
         if len(h) < 2:
             return None
+        try:
+            if h.index[-1].date() != dt.datetime.now(NY).date():
+                return None            # 오늘 VIX 시가 미도착 — 다음 실행에서 재시도
+        except Exception:
+            pass
         return round((float(h["Open"].iloc[-1]) / float(h["Close"].iloc[-2]) - 1) * 100, 2)
     except Exception as e:
         print(f"  VIX 개장변화 조회 실패: {type(e).__name__}: {e}")
@@ -290,18 +298,22 @@ def gap_signal(df, st):
             Wm.append(_cpv / _cv if _cv else tp)
         # 3종 기준선 각각의 커버율·진입가
         tfs = {}
+        live_day = (today == dt.datetime.now(NY).date())
         for tf, idx in GAP_TFS.items():
             i = min(idx, len(C) - 1)
             cx = C[i]
             cv = ((op - cx) / (op - pcl)) if sgn > 0 else ((cx - op) / abs(op - pcl))
-            rdy = len(C) > idx
+            # 기준 시각 전에는 판정하지 않는다 (진행 중인 봉 값으로 09:40~09:44에 조기 진입하던 문제)
+            t_ref = dt.datetime.strptime(GAP_TF_TIME[tf], "%H:%M").time()
+            rdy = len(C) > idx and (not live_day or now_t >= t_ref)
             # 기준선 이후 VWAP 중간선 역방향 터치 지점
             vw_px = None
             for j in range(i, len(C)):
                 if (H[j] >= Wm[j]) if sgn > 0 else (L[j] <= Wm[j]):
                     vw_px = round(Wm[j], 2); break
             tfs[tf] = dict(cover=round(cv, 2), entry=round(cx, 2), ready=rdy,
-                           ok=(rdy and cv >= GAP_COVER_MIN),
+                           ok=(rdy and GAP_COVER_MIN <= cv < GAP_COVER_MAX),
+                           over=(rdy and cv >= GAP_COVER_MAX),
                            room=round(abs(pcl - cx) / cx * 100, 3),
                            vw_entry=vw_px,
                            vw_room=(round(abs(pcl - vw_px) / vw_px * 100, 3) if vw_px else None))
@@ -310,8 +322,9 @@ def gap_signal(df, st):
         cover = tfs["1h"]["cover"]
         ready = tfs["1h"]["ready"]
         # 갭필 도달 여부 + 도달 후 극점(트레일링용)
+        # (화면 표시용) 09:45 판정 이후 봉부터 본다. 포지션별 판정은 gap_fill_since()가 진입 시각 기준으로 따로 한다.
         gfilled = False; gext = None
-        for i in range(idx1h, len(C)):
+        for i in range(min(GAP_TFS["15m"] + 1, len(C) - 1), len(C)):
             if (L[i] <= pcl) if sgn > 0 else (H[i] >= pcl):
                 gfilled = True
                 gext = min(L[i:]) if sgn > 0 else max(H[i:])
@@ -361,6 +374,25 @@ def gap_signal(df, st):
         import traceback
         print(f"  갭 신호 계산 실패: {e}")
         return dict(state="ERR", msg=f"{type(e).__name__}: {e}"[:180])
+
+
+def gap_fill_since(df, today, at_hm, sgn, target):
+    """포지션별 갭필 판정: '진입 시각 이후' 5분봉만으로 전일 종가 도달 여부와 트레일 기준가를 계산.
+    반환 (filled, trail_px, fill_bar_time). sgn>0 = 갭업(숏/풋, 타깃이 아래)."""
+    try:
+        m0 = int(at_hm[:2]) * 60 + int(at_hm[3:5])
+        m0 = (m0 // 5) * 5 if (m0 % 5) < 2 else (m0 // 5 + 1) * 5     # 진입 직후 봉부터
+        t0 = dt.time(m0 // 60, m0 % 60)
+        rt = df[(df.index.date == today) & (df.index.time >= t0) & (df.index.time < dt.time(16, 0))]
+        H = [float(x) for x in rt["High"]]; L = [float(x) for x in rt["Low"]]
+        for i in range(len(H)):
+            if (L[i] <= target) if sgn > 0 else (H[i] >= target):
+                ext = min(L[i:]) if sgn > 0 else max(H[i:])
+                tp = ext * (1 + GAP_TRAIL / 100) if sgn > 0 else ext * (1 - GAP_TRAIL / 100)
+                return True, round(tp, 2), rt.index[i].strftime("%H:%M")
+    except Exception as e:
+        print(f"  갭필 판정 실패: {type(e).__name__}: {e}")
+    return False, None, None
 
 
 def premarket_pos():
@@ -552,11 +584,9 @@ def step():
     df = intraday()
     st, today, nbars = session_state(df)
     dstr = str(today)
-    vg = vix_gate()
-    pmv = premarket_pos()
+    is_today = (today == now.date())     # 개장 전에는 마지막 봉이 어제 것 → 신규 진입 판정 금지
     gsig = gap_signal(df, st)
     log["gap"] = gsig
-    log["macro"] = macro_match()
     # VIX 개장변화 — 갭필·모멘텀 공용 (당일 캐시)
     vchg = None
     vc = log.get("vixchg")
@@ -578,23 +608,33 @@ def step():
             gopen = tr["open"]
 
             # ── 진입 ──
-            if gopen is None and tr["done"].get(dstr) is None and info["ok"] and ep_use:
+            _ref = dt.datetime.strptime(GAP_TF_TIME[tf], "%H:%M")
+            _late_min = (now.hour * 60 + now.minute) - (_ref.hour * 60 + _ref.minute)
+            _too_late = (_late_min > GAP_ENTRY_GRACE) if em == "now" else (now.time() >= GAP_TIMECUT)
+
+            def _skip(reason, **kw):
+                tr["done"][dstr] = True
+                tr.setdefault("skips", []).append(dict(
+                    d=dstr, reason=reason, cover=round(info["cover"], 2),
+                    gap=gsig["gap"], at=now.strftime("%H:%M"), **kw))
+                print(f"  [갭/{tk}] 스킵 — {reason} (커버 {info['cover']:.2f})")
+
+            if (gopen is None and tr["done"].get(dstr) is None and is_today
+                    and info.get("ready") and info.get("over")):
+                _skip("이미 메움(커버≥1.0)")
+            elif (gopen is None and tr["done"].get(dstr) is None and is_today
+                    and info["ok"] and (ep_use or _too_late)):
                 if vchg is not None and abs(vchg) >= GAP_VIX_SKIP:
                     # 백테스트 우주 필터: 개장 VIX |변화|>=5% 는 대상 밖.
                     # (조회 실패 시에는 통과 — 일시 장애로 거래를 잃지 않게 fail-open)
-                    tr["done"][dstr] = True
-                    tr.setdefault("skips", []).append(dict(
-                        d=dstr, reason=f"VIX변화 {vchg:+.1f}%", cover=round(info["cover"], 2),
-                        gap=gsig["gap"], at=now.strftime("%H:%M")))
-                    print(f"  [갭/{tk}] 스킵 — VIX 개장변화 {vchg:+.1f}% (|{GAP_VIX_SKIP}%| 밖)")
-                elif bool(gsig.get("filled")):
-                    # 갭필이 끝난 뒤 발견 = 소급 진입. 델타 보정으로도 세타 복원이 불가능해
-                    # 프리미엄 기준값이 조작되므로 진입하지 않고 스킵 기록만 남긴다.
-                    tr["done"][dstr] = True
-                    tr.setdefault("skips", []).append(dict(
-                        d=dstr, reason="갭필 후 발견", cover=round(info["cover"], 2),
-                        gap=gsig["gap"], at=now.strftime("%H:%M")))
-                    print(f"  [갭/{tk}] 스킵 — 갭필 후 발견 (커버 {info['cover']:.2f})")
+                    _skip(f"VIX변화 {vchg:+.1f}%")
+                elif _too_late:
+                    # 기준 시각을 놓친 발견. 지금 호가로 들어가면 스펙과 다른 거래가 되므로 실시간 진입은 하지 않고,
+                    # recon.py가 장 마감 뒤 기준 시각 가격(모델가)으로 재구성한다.
+                    if em == "now":
+                        _skip("늦은 발견", late=True)
+                    else:
+                        _skip("11:30까지 진입 자리 없음")
                 else:
                     late = False
                     oside = "put" if gsig["sgn"] > 0 else "call"
@@ -642,8 +682,9 @@ def step():
                     gopen["mfe"], gopen["mfe_t"] = round(_adv, 3), now.strftime("%H:%M")
                 if gopen.get("band_px") is None and gsig.get("band_px"):
                     gopen["band_px"] = gsig["band_px"]; gopen["band_t"] = gsig["band_t"]
-                if not gopen["filled"] and gsig.get("filled"):
-                    gopen["filled"] = True; gopen["fill_t"] = now.strftime("%H:%M")
+                _gf, _gtrail, _gft = gap_fill_since(df, today, gopen["at"], sgn, gopen["target"])
+                if not gopen["filled"] and _gf:
+                    gopen["filled"] = True; gopen["fill_t"] = _gft
                 gcur = opt_premium(gopen["strike"], gopen["opt_side"], today_expiry(today))
                 if gcur and gcur > 0:
                     _p = (gcur / gopen["premium"] - 1) * 100
@@ -655,11 +696,9 @@ def step():
                     pass                       # 진입 직후 같은 실행에서는 청산 판정 보류
                 elif not gopen["filled"] and now.time() >= GAP_TIMECUT:
                     res = "TIMECUT"
-                elif gopen["filled"] and gsig.get("trail"):
-                    tp = gsig["trail"]
-                    if (cur >= tp) if sgn > 0 else (cur <= tp):
-                        res = "TRAIL"
-                elif now.time() >= GAP_CUT:
+                elif gopen["filled"] and _gtrail and ((cur >= _gtrail) if sgn > 0 else (cur <= _gtrail)):
+                    res = "TRAIL"
+                elif now.time() >= GAP_CUT:        # 갭필 후 트레일이 안 걸린 포지션도 14:00에 닫는다 (기존엔 이 분기에 못 왔음)
                     res = "CUT"
                 if res is None and not same_tick and now.time() >= dt.time(15, 55):
                     res = "EOD"
@@ -708,13 +747,13 @@ def step():
                 msig.update(state="NO", why=f"VIX 변화 {vchg:+.1f}% — |{GAP_VIX_SKIP}%| 밖")
             elif not conf:
                 msig.update(state="VETO", why=f"VIX역행 (갭 {gsig['gap']:+.2f}% · VIX {vchg:+.1f}%) — 관망")
-                if mtr["done"].get(dstr) is None and mtr["open"] is None:
+                if mtr["done"].get(dstr) is None and mtr["open"] is None and is_today:
                     mtr["done"][dstr] = "veto"
                     mtr["skips"].append(dict(d=dstr, reason="VIX역행", gap=gsig["gap"],
                                              vchg=vchg, cover=cov15))
             else:
                 msig.update(state="GO", why=f"확인 (갭 {gsig['gap']:+.2f}% · VIX {vchg:+.1f}%)")
-                if mtr["open"] is None and mtr["done"].get(dstr) is None:
+                if mtr["open"] is None and mtr["done"].get(dstr) is None and is_today:
                     if now.time() > MOM_ENTRY_LAST:
                         mtr["done"][dstr] = "late"
                         mtr["skips"].append(dict(d=dstr, reason="늦은 발견", gap=gsig["gap"],
@@ -822,6 +861,12 @@ def step():
         print(f"  모멘텀 트랙 실패: {e}")
         log["mom_sig"] = dict(d=dstr, state="ERR", why=f"{type(e).__name__}: {e}"[:150])
 
+    # 갭/모멘텀 기록을 먼저 저장 — 아래 3층 로직에서 예외가 나도 방금 한 진입·청산이 사라지지 않게
+    save_log(log)
+    # 무거운 조회(2년치 × 20종목)는 09:45 판정·진입을 늦추지 않도록 갭/모멘텀 처리 뒤에 한다
+    vg = vix_gate()
+    pmv = premarket_pos()
+    log["macro"] = macro_match()
     log["vix"] = vg                      # early return 경로에서도 화면에 남도록 즉시 저장
     log["pm"] = pmv
     if vg:
@@ -920,7 +965,9 @@ def step():
         status = f"NO TRADE · 프리마켓 위치 {pmv['pos']:.2f} <= {PM_POS_MIN} (롱 엣지 없음)"
         print(f"  {status}")
     elif st["dev"] > -ENTRY_BAND_SIG:
-        status = (f"WAIT · 3층 통과 (VIX {vg['pct']:.0f}% · PM {pmv['pos']:.2f}) "
+        _pm_s = f"{pmv['pos']:.2f}" if pmv else "조회실패"
+        _vx_s = f"{vg['pct']:.0f}%" if vg else "조회실패"
+        status = (f"WAIT · 3층 통과 (VIX {_vx_s} · PM {_pm_s}) "
                   f"· VWAP -1σ 터치 대기 (현재 {st['dev']:+.2f}σ)")
     else:
         cap = CAPITAL_START + sum(t.get("pnl_usd", 0) for t in log.get("trades", []))

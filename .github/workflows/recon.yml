@@ -1,11 +1,18 @@
 name: recon-backfill
+# 앱이 기준 시각을 놓친 날('늦은 발견')을 장 마감 뒤 스펙대로 재구성해 원장에 넣는다 (옵션가는 모델가, '·소급' 표시).
 on:
+  schedule:
+    - cron: "40 21,23 * * 1-5"     # 장 마감 뒤 (UTC). 밀려 도착해도 무방 — 멱등
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: odte                      # odte 실행과 같은 그룹 — odte_log.json 동시 수정 방지
+  cancel-in-progress: false
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,7 +27,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           ls -la recon_result.json odte_log.json
-          git add -A
+          git add odte_log.json recon_result.json index.html manifest.webmanifest sw.js icon-192.png icon-512.png 2>/dev/null || git add odte_log.json recon_result.json index.html
           git commit -m "recon $(date -u +%F_%H%M)"
           echo "commit rc=$?"
           for i in 1 2 3; do
