@@ -1,26 +1,44 @@
 name: recon-backfill
-# 앱이 기준 시각을 놓친 날('늦은 발견')을 장 마감 뒤 스펙대로 재구성해 원장에 넣는다 (옵션가는 모델가, '·소급' 표시).
+# 앱이 제때 판정하지 못한 날을 스펙대로 재구성해 원장에 넣고 화면까지 배포한다 (옵션가는 모델가, '·소급' 표시).
 on:
   schedule:
     - cron: "40 21,23 * * 1-5"     # 장 마감 뒤 (UTC). 밀려 도착해도 무방 — 멱등
   workflow_dispatch:
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
-  group: odte                      # odte 실행과 같은 그룹 — odte_log.json 동시 수정 방지
-  cancel-in-progress: false
+  group: odte-recon                # odte 연쇄가 장중 내내 odte 그룹을 잡고 있어 같은 그룹이면 recon이 영영 못 돈다.
+  cancel-in-progress: false        # 대신 아래 가드로 장중(원장을 odte가 쓰는 시간)에는 실행하지 않는다.
 jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      ok: ${{ steps.guard.outputs.ok }}
     steps:
+      - id: guard
+        name: guard (장중에는 원장을 건드리지 않는다)
+        run: |
+          D=$(TZ=America/New_York date +%u); T=$((10#$(TZ=America/New_York date +%H%M)))
+          if [ "$D" -le 5 ] && [ "$T" -ge 915 ] && [ "$T" -lt 1610 ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::warning::장중(09:15~16:10 ET)이라 recon을 건너뜀"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@v4
+        if: steps.guard.outputs.ok == 'true'
       - uses: actions/setup-python@v5
+        if: steps.guard.outputs.ok == 'true'
         with:
           python-version: "3.12"
-      - run: pip install yfinance pandas
-      - run: python recon.py
+      - if: steps.guard.outputs.ok == 'true'
+        run: pip install yfinance pandas
+      - if: steps.guard.outputs.ok == 'true'
+        run: python recon.py
       - name: persist
+        if: steps.guard.outputs.ok == 'true'
         continue-on-error: true
         run: |
           set +e
@@ -36,3 +54,25 @@ jobs:
             echo "retry $i"; sleep 5
           done
           exit 0
+      - name: pages
+        if: steps.guard.outputs.ok == 'true'
+        run: |
+          mkdir -p _site
+          cp index.html manifest.webmanifest sw.js icon-192.png icon-512.png _site/ 2>/dev/null || true
+          if [ -d hq ]; then python hq/build.py _site; fi
+          ls -la _site
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.guard.outputs.ok == 'true'
+        with:
+          path: _site
+  deploy:
+    needs: run
+    if: needs.run.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

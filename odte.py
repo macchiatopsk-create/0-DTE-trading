@@ -179,6 +179,8 @@ def vix_gate():
             try: x.index = x.index.tz_localize(None)
             except (TypeError, AttributeError): pass
         ts = (a / b.reindex(a.index).ffill()).dropna()
+        _today = dt.datetime.now(NY).date()
+        ts = ts[[x.date() < _today for x in ts.index]]        # 스펙: 전일 종가 (장중에는 오늘 행이 실시간 값으로 붙는다)
         w = ts.tail(VIX_LOOKBACK).values
         cur = float(w[-1])
         pct = float((w[:-1] < cur).sum()) / (len(w) - 1) * 100
@@ -587,6 +589,11 @@ def step():
     is_today = (today == now.date())     # 개장 전에는 마지막 봉이 어제 것 → 신규 진입 판정 금지
     gsig = gap_signal(df, st)
     log["gap"] = gsig
+    if is_today and now.time() >= dt.time(9, 30):
+        fp = log.setdefault("first_poll", {})
+        fp.setdefault(dstr, now.strftime("%H:%M"))
+        for _k in sorted(fp)[:-90]:
+            fp.pop(_k, None)
     # VIX 개장변화 — 갭필·모멘텀 공용 (당일 캐시)
     vchg = None
     vc = log.get("vixchg")
@@ -922,7 +929,7 @@ def step():
         elif open_pos.get("tp1_prem") and runner_hit:
             reason = "RUNNER(+1σ)"
         elif now.time() >= CUTOFF:
-            reason = "CUTOFF(14:30)"
+            reason = f"CUTOFF({CUTOFF.strftime('%H:%M')})"
         if reason:
             exit_prem = cur_prem
             if exit_prem is None or exit_prem <= 0:
@@ -952,17 +959,25 @@ def step():
         save_log(log); return log, st
 
     # ── 2) 신규 진입 체크 ──
+    if not is_today:
+        print("  오늘 봉 없음(개장 전) — 3층 판정 보류"); save_log(log); return log, st
     if now.time() >= CUTOFF:
-        print("  15:45 이후 — 신규 진입 없음"); save_log(log); return log, st
+        print(f"  {CUTOFF.strftime('%H:%M')} 이후 — 신규 진입 없음"); save_log(log); return log, st
     done_today = sum(1 for t in log.get("trades", []) if t.get("date") == dstr)
     if done_today >= MAX_PER_DAY:
         print(f"  오늘 {done_today}회 완료 (상한 {MAX_PER_DAY}) — 종료"); save_log(log); return log, st
 
-    if VIX_GATE_ON and vg and vg["state"] == "DEAD":
-        status = f"NO TRADE · VIX게이트 (백분위 {vg['pct']:.0f}% < {VIX_GATE_PCT:.0f})"
+    # 3층 스펙: L1(변동성)·L2(프리마켓 위치) 둘 다 '통과 확인'이어야 L3를 본다.
+    # (기존: L1 조회 실패 시 통과, L2는 방향 점수>0일 때만 적용 → 8/18·9/9 진입은 L2 미달인데 들어갔음)
+    if VIX_GATE_ON and (not vg or vg.get("state") != "LIVE"):
+        if vg and vg.get("state") == "DEAD":
+            status = f"NO TRADE · VIX게이트 (백분위 {vg['pct']:.0f}% < {VIX_GATE_PCT:.0f})"
+        else:
+            status = "NO TRADE · L1 VIX게이트 조회 실패 (판정 불가)"
         print(f"  {status}")
-    elif PM_GATE_ON and pmv and not pmv["ok"] and st["direction"] > 0:
-        status = f"NO TRADE · 프리마켓 위치 {pmv['pos']:.2f} <= {PM_POS_MIN} (롱 엣지 없음)"
+    elif PM_GATE_ON and (not pmv or not pmv["ok"]):
+        status = (f"NO TRADE · 프리마켓 위치 {pmv['pos']:.2f} <= {PM_POS_MIN} (롱 엣지 없음)" if pmv
+                  else "NO TRADE · L2 프리마켓 조회 실패 (판정 불가)")
         print(f"  {status}")
     elif st["dev"] > -ENTRY_BAND_SIG:
         _pm_s = f"{pmv['pos']:.2f}" if pmv else "조회실패"
@@ -1104,7 +1119,8 @@ def render(log, st):
                f'<div><span class="dk">최고 지점</span><span class="dv pos">{f"{mp:+.0f}% @ {t.get(chr(39)+chr(39)) or t.get("mfe_prem_t") or ""}" if mp is not None else "—"}</span></div>'
                f'<div class="dfull"><span class="dk">사이징별 계약</span><span class="dv">{ct or "—"}</span></div>'
                f'</div>')
-        rows += (f'<tr class="crow" data-i="L{i}"><td>{t["date"][5:]}</td>'
+        _rc = '<br><span class="rs">소급</span>' if t.get("recon") else ""
+        rows += (f'<tr class="crow" data-i="L{i}"><td>{t["date"][5:]}{_rc}</td>'
                  f'<td>C{t["strike"]:.0f}</td>'
                  f'<td class="{c}">{t["pnl_pct"]:+.0f}%</td>'
                  f'<td class="pos">{f"{mp:+.0f}%" if mp is not None else "—"}</td>'
@@ -1112,6 +1128,19 @@ def render(log, st):
                  f'<tr class="drow" id="dL{i}"><td colspan="6">{det}</td></tr>')
     if not rows:
         rows = '<tr><td colspan="6" class="rs">NO OPERATIONS — 3층 통과 시 자동 개시</td></tr>'
+    # 앱이 오전에 못 깨어난 날의 3층 판정(소급) — 왜 들어갔고 왜 안 들어갔는지
+    _l3v = log.get("l3_recon") or {}
+    l3days = ""
+    for _d in sorted(_l3v, reverse=True)[:30]:
+        _v = _l3v[_d]
+        _vp = f'{_v["vix_pct"]:.0f}%' if _v.get("vix_pct") is not None else "—"
+        _pp = f'{_v["pm_pos"]:.2f}' if _v.get("pm_pos") is not None else "—"
+        _cl = "pos" if str(_v.get("res", "")).startswith("진입") else "rs"
+        l3days += (f'<div class="mrow"><span class="md">{_d[5:]}</span>'
+                   f'<span class="mg">L1 {_vp} · L2 {_pp}</span>'
+                   f'<span class="mr {_cl}">{_v.get("res", "")}</span></div>')
+    l3days_html = (f'<div class="panel"><div class="ph">일자별 3층 판정 · 소급 (앱이 오전에 못 깬 날)</div>{l3days}</div>'
+                   if l3days else "")
 
     # ── 갭 트랙 패널 ──
     gs = log.get("gap")
@@ -1195,7 +1224,8 @@ def render(log, st):
                    f'<div class="dfull"><span class="dk">사이징별 계약</span><span class="dv">{ct or "—"}</span></div>'
                    f'</div>')
             _sb = (f'<br><span class="rs">{t["strat"]}</span>' if t.get("strat") else "")
-            rows += (f'<tr class="crow" data-i="{rid}"><td>{t["date"][5:]}</td><td>{_a}{_sb}</td>'
+            _rc = '<br><span class="rs">소급</span>' if t.get("recon") else ""
+            rows += (f'<tr class="crow" data-i="{rid}"><td>{t["date"][5:]}{_rc}</td><td>{_a}{_sb}</td>'
                      f'<td>{t["gap"]:+.2f}%</td><td>{t["cover"]:.2f}</td>'
                      f'<td class="{c}">{t.get("pnl_pct",0):+.0f}%</td>'
                      f'<td class="rs">{t["res"]}</td><td class="rs">▾</td></tr>'
@@ -1561,6 +1591,7 @@ tr:last-child td{{border-bottom:none}}
 <div class="panel"><div class="ph">원장 · 행을 누르면 상세</div>
 <table class="ltab"><tr><th>DATE</th><th>계약</th><th>P/L</th><th>MFE</th><th>EXIT</th><th></th></tr>{rows}</table>
 </div>
+{l3days_html}
 <div class="brief">
 <b>3-LAYER · ITM</b><br>
 L1 VIX9D/VIX3M 백분위 ≥50 · L2 프리마켓 위치 &gt;0.5 · L3 VWAP −1σ 터치<br>
