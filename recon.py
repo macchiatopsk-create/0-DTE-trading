@@ -277,6 +277,57 @@ def recon_l3(px, d, iv):
     return None
 
 
+# ───────────────────────── 실시간 거래의 추정 손익 채우기 ─────────────────────────
+def _spot(px, d, hm):
+    """5분봉에서 d일 hm 시각의 기초가격 (봉 안에서는 시가→종가 선형)."""
+    g = px[px.index.date == d]
+    m = int(hm[:2]) * 60 + int(hm[3:5])
+    best = None
+    for ts, o, c in zip(g.index, g["Open"], g["Close"]):
+        sm = ts.hour * 60 + ts.minute
+        if sm <= m:
+            best = (sm, float(o), float(c))
+        else:
+            break
+    if best is None:
+        return None
+    frac = min(max((m - best[0]) / 5.0, 0.0), 1.0)
+    return best[1] + (best[2] - best[1]) * frac
+
+
+def fill_rt(log, px, iv_of):
+    """야후 옵션 호가는 10~15분 지연이라, 실시간으로 찍힌 거래에도 '실시간 기초가 모델' 손익을 붙인다.
+    앱이 진입·청산한 바로 그 시각의 기초가격으로 계산 (앱의 rt_premium과 같은 식). 이미 있으면 건드리지 않는다."""
+    n = 0
+
+    def one(t, side, t_in, t_out, tp1_time=None):
+        nonlocal n
+        if t.get("recon") or t.get("pnl_rt") is not None or not t_in or not t_out:
+            return
+        d = dt.date.fromisoformat(t["date"])
+        s0, s1 = _spot(px, d, t_in), _spot(px, d, t_out)
+        if s0 is None or s1 is None:
+            return
+        fl, K, iv = ("c" if side == "call" else "p"), float(t["strike"]), iv_of(d)
+        p0 = round(bsm(fl, s0, K, _tau(t_in), iv), 2)
+        p1 = round(bsm(fl, s1, K, _tau(t_out), iv), 2)
+        if tp1_time and _spot(px, d, tp1_time) is not None:
+            p1 = round(0.5 * bsm(fl, _spot(px, d, tp1_time), K, _tau(tp1_time), iv) + 0.5 * p1, 2)
+        if p0 <= 0.05:
+            return
+        pct = max((p1 / p0 - 1) * 100 - SPREAD, -100.0)
+        t.update(spot_rt=round(s0, 2), premium_rt=p0, exit_premium_rt=p1, pnl_rt=round(pct, 1),
+                 per_contract_rt=round(p0 * pct, 2), rt_src="recon")
+        n += 1
+    for tr in list(log.get("gap_tracks", {}).values()) + [log.get("mom_track", {}), log.get("comb", {})]:
+        for t in tr.get("trades", []):
+            one(t, t.get("opt_side") or ("put" if t.get("sgn", 1) > 0 else "call"), t.get("at"), t.get("exit_at"))
+    for t in log.get("trades", []):
+        if str(t.get("version", "")).startswith("itm"):
+            one(t, "call", t.get("entry_time"), t.get("exit_time"), t.get("tp1_time") if t.get("tp1_prem") else None)
+    return n
+
+
 # ───────────────────────── 데이터 ─────────────────────────
 def load_market():
     px = yf.download("QQQ", period="60d", interval="5m", auto_adjust=False, progress=False, prepost=False)
@@ -488,6 +539,10 @@ def main(market=None, now=None):
                     rep.append(f"  {d} 3층 L1 {vp:.0f}% · L2 {pp:.2f} → CALL {p3['strike']:.0f} @${p3['premium']:.2f} "
                                f"{p3['entry_time']} · {p3['reason']} {p3['exit_time']} · {p3['pnl_pct']:+.1f}%")
             l3v[dstr] = v
+
+    n_rt = fill_rt(log, px, lambda d: ivm.get(d) or (vopen.get(d, 16.0) * 1.15 / 100))
+    if n_rt:
+        rep.append(f"실시간 거래 {n_rt}건에 '실시간 기초가 모델' 손익 추가")
 
     # ── 북을 날짜순으로 다시 계산 (소급 거래가 과거에 끼어들어도 잔고·계약수가 시간순으로 맞게) ──
     for tr in list(tracks.values()) + [mtr]:

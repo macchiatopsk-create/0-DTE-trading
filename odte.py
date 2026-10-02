@@ -68,6 +68,15 @@ GAP_ENTRIES = {"now": "즉시 진입", "vwap": "VWAP 중간선 대기"}
 GAP_TF_TIME = {"5m": "09:35", "15m": "09:45", "1h": "10:30"}
 GAP_CAPITAL = 3000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
 
+# ── 옵션 호가 지연 → 실시간 추정 손익 ──
+# 야후 옵션 호가는 실시간이 아니다 (2026-10-02 확인: 기록된 프리미엄이 그 시각 내재가치보다 낮거나,
+# 10~15분 전 기초가격과 맞아떨어짐). 지연 호가로 찍힌 손익은 "10~15분 전 경로"의 손익이라
+# 트레일 청산처럼 직전에 가격이 꺾인 경우 크게 틀린다 (10/2 모멘텀: 기록 +34%, 실제 추정 -4~-10%).
+# 그래서 실시간 기초가격으로 계산한 모델가(BSM, IV=VXN 시가)를 같이 기록한다 — recon(소급)과 같은 계산.
+# (지연 호가에서 IV를 역산하는 방식은 시차·봉 보간 오차가 그대로 실려서 쓰지 않는다.)
+RT_SPREAD = 2.2                   # 왕복 스프레드 마찰 (%) — recon과 동일
+VIX_OPEN_LAST = None              # vix_open_chg()가 채움 (IV 기준값 예비)
+
 # ── 모멘텀 트랙 (VIX확인 스킵데이) — orbvix 백테스트 스펙 그대로 ──
 # 커버<0.40(못 메움) + VIX 개장변화가 갭 방향 확인(갭업&VIX↓/갭다운&VIX↑)
 # → 갭 "방향"으로 진입 (갭필과 반대). 74일 백테스트 PF 3.08/상위2제외 1.90(A모드),
@@ -204,6 +213,8 @@ def vix_open_chg():
                 return None            # 오늘 VIX 시가 미도착 — 다음 실행에서 재시도
         except Exception:
             pass
+        global VIX_OPEN_LAST
+        VIX_OPEN_LAST = float(h["Open"].iloc[-1])
         return round((float(h["Open"].iloc[-1]) / float(h["Close"].iloc[-2]) - 1) * 100, 2)
     except Exception as e:
         print(f"  VIX 개장변화 조회 실패: {type(e).__name__}: {e}")
@@ -395,6 +406,61 @@ def gap_fill_since(df, today, at_hm, sgn, target):
     except Exception as e:
         print(f"  갭필 판정 실패: {type(e).__name__}: {e}")
     return False, None, None
+
+
+def _bsm(fl, S, K, tau, iv, r=0.043):
+    if tau <= 0 or iv <= 0:
+        return max(0.0, (S - K) if fl == "c" else (K - S))
+    from statistics import NormalDist
+    nd = NormalDist()
+    d1 = (math.log(S / K) + (r + iv * iv / 2) * tau) / (iv * math.sqrt(tau))
+    d2 = d1 - iv * math.sqrt(tau)
+    if fl == "c":
+        return S * nd.cdf(d1) - K * math.exp(-r * tau) * nd.cdf(d2)
+    return K * math.exp(-r * tau) * nd.cdf(-d2) - S * nd.cdf(-d1)
+
+
+def _tau_years(t, lag_min=0):
+    h = t.hour + t.minute / 60 + t.second / 3600 - lag_min / 60
+    return max(16.0 - h, 0.02) / 24 / 365
+
+
+def base_iv_today(log, dstr):
+    """QQQ 0DTE 기준 IV: VXN 시가(하루 1회 조회·캐시). 실패하면 VIX 시가×1.15, 그것도 없으면 20%."""
+    c = log.get("iv_base")
+    if c and c.get("d") == dstr and c.get("v"):
+        return c["v"]
+    v = None
+    try:
+        h = yf.Ticker("^VXN").history(period="5d")[["Open"]].dropna()
+        if len(h) and h.index[-1].date() == dt.datetime.now(NY).date():
+            v = round(float(h["Open"].iloc[-1]) / 100, 4)
+    except Exception as e:
+        print(f"  VXN 조회 실패: {type(e).__name__}: {e}")
+    if v:
+        log["iv_base"] = dict(d=dstr, v=v, src="VXN")
+        return v
+    lvl = (log.get("vixchg") or {}).get("lvl") if (log.get("vixchg") or {}).get("d") == dstr else None
+    return round((lvl or 17.4) * 1.15 / 100, 4)             # 캐시하지 않음 — 다음 실행에서 VXN 재시도
+
+
+def rt_premium(side, strike, now, spot_now, base_iv):
+    """실시간 기초가격으로 계산한 모델 프리미엄 (야후 호가가 10~15분 지연이라 따로 계산). 실패하면 None."""
+    try:
+        return round(_bsm("c" if side == "call" else "p", float(spot_now), float(strike),
+                          _tau_years(now), base_iv), 2)
+    except Exception as e:
+        print(f"  실시간 프리미엄 추정 실패: {type(e).__name__}: {e}")
+        return None
+
+
+def _rt_fields(open_rec, exit_rt):
+    """청산 기록에 붙일 실시간 추정 손익 (스프레드 마찰 반영 — recon과 같은 계산)."""
+    p0 = open_rec.get("premium_rt")
+    if not p0 or exit_rt is None:
+        return {}
+    pct = max((exit_rt / p0 - 1) * 100 - RT_SPREAD, -100.0)
+    return dict(exit_premium_rt=exit_rt, pnl_rt=round(pct, 1), per_contract_rt=round(p0 * pct, 2))
 
 
 def premarket_pos():
@@ -602,7 +668,8 @@ def step():
     else:
         vchg = vix_open_chg()
         if vchg is not None:
-            log["vixchg"] = dict(d=dstr, v=vchg)
+            log["vixchg"] = dict(d=dstr, v=vchg, lvl=VIX_OPEN_LAST)
+    base_iv = base_iv_today(log, dstr) if is_today else 0.20
     if gsig and gsig.get("state") in ("ACTIVE", "WAIT", "LOW_COVER") and gsig.get("tfs"):
         tracks = log.setdefault("gap_tracks", {})
         for tf in GAP_TFS:
@@ -672,6 +739,8 @@ def step():
                             at=(GAP_TF_TIME[tf] if late else now.strftime("%H:%M")),
                             found_at=now.strftime("%H:%M"),
                             opt_side=oside, strike=gopt["strike"], premium=prem, contracts=ent,
+                            spot_rt=gsig["cur"],
+                            premium_rt=rt_premium(oside, gopt["strike"], now, gsig["cur"], base_iv),
                             prem_src=("소급" if late else "실시간"),
                             band_px=None, band_t=None, mfe=0.0, mfe_t=None,
                             mfe_prem=-99.0, mfe_prem_t=None, filled=False, fill_t=None, res=None)
@@ -728,6 +797,7 @@ def step():
                     rec = dict(gopen); rec.update(res=res, exit=round(cur, 2),
                         exit_at=now.strftime("%H:%M"), exit_premium=ex,
                         pnl_pct=pct, per_contract=per, ux=round(ux, 3))
+                    rec.update(_rt_fields(gopen, rt_premium(gopen["opt_side"], gopen["strike"], now, cur, base_iv)))
                     if gopen.get("comb") is not None:
                         comb_settle(comb_state(log), rec, per, "갭필")
                     tr["trades"].append(rec); tr["open"] = None
@@ -794,6 +864,8 @@ def step():
                                 room=None, at=now.strftime("%H:%M"),
                                 found_at=now.strftime("%H:%M"), opt_side=oside,
                                 strike=mopt["strike"], premium=mopt["premium"],
+                                spot_rt=ep,
+                                premium_rt=rt_premium(oside, mopt["strike"], now, ep, base_iv),
                                 contracts=ent, prem_src="실시간",
                                 or_stop=(gsig["orl"] if sgn > 0 else gsig["orh"]),
                                 ext=ep, mfe=0.0, mfe_t=None,
@@ -858,6 +930,7 @@ def step():
                     rec = dict(mo); rec.update(res=res, exit=round(cur, 2),
                         exit_at=now.strftime("%H:%M"), exit_premium=ex,
                         pnl_pct=pct, per_contract=per, ux=round(ux, 3))
+                    rec.update(_rt_fields(mo, rt_premium(mo["opt_side"], mo["strike"], now, cur, base_iv)))
                     if mo.get("comb") is not None:
                         comb_settle(comb_state(log), rec, per, "모멘텀")
                     mtr["trades"].append(rec); mtr["open"] = None
@@ -918,6 +991,7 @@ def step():
         # TP1: VWAP 도달 -> 가치 50% 청산 기록 (1계약 mock)
         if not open_pos.get("tp1_prem") and px >= w and cur_prem and cur_prem > 0:
             open_pos["tp1_prem"] = cur_prem
+            open_pos["tp1_prem_rt"] = rt_premium("call", open_pos["strike"], now, px, base_iv)
             open_pos["tp1_time"] = now.strftime("%H:%M")
             log["open"] = open_pos
             print(f"  TP1 도달(VWAP {w:.2f}) · 프리미엄 ${cur_prem} 에서 50% 가치 청산 기록")
@@ -950,6 +1024,11 @@ def step():
             tr.update(exit_time=now.strftime("%H:%M"), exit_px=round(px, 2),
                       exit_premium=exit_prem, eff_exit=eff_exit,
                       pnl_pct=round(pnl_pct, 1), pnl_usd=pnl_usd, reason=reason)
+            _ex_rt = rt_premium("call", open_pos["strike"], now, px, base_iv)
+            _t1r = open_pos.get("tp1_prem_rt")
+            if _ex_rt and t1 and _t1r:
+                _ex_rt = round(0.5 * _t1r + 0.5 * _ex_rt, 2)
+            tr.update(_rt_fields(open_pos, _ex_rt))
             log.setdefault("trades", []).append(tr)
             log["open"] = None
             print(f"  청산: {reason} 유효단가 {open_pos['premium']}→{eff_exit} ({pnl_pct:+.1f}% / ${pnl_usd:+.2f})")
@@ -1002,6 +1081,8 @@ def step():
                                contracts=_ent,
                                mfe_prem=-99.0, mfe_prem_t=None, strike=opt["strike"],
                                premium=opt["premium"], iv=opt["iv"], symbol=opt["symbol"],
+                               spot_rt=round(st["px"], 2),
+                               premium_rt=rt_premium("call", opt["strike"], now, st["px"], base_iv),
                                entry_time=now.strftime("%H:%M"), entry_px=round(st["px"], 2),
                                score=st["score"], gap=round(st["gap"], 2), rsi=round(st["rsi"], 1),
                                stop_px=round(st.get("day_lo", st["px"]) * 0.9995, 2),
@@ -1116,13 +1197,15 @@ def render(log, st):
                f'<div><span class="dk">TP1</span><span class="dv">{("$"+str(t.get("tp1_prem"))+" @ "+str(t.get("tp1_time",""))) if t.get("tp1_prem") else "미달성"}</span></div>'
                f'<div><span class="dk">손절가(기초)</span><span class="dv">{t.get("stop_px","-")}</span></div>'
                f'<div><span class="dk">옵션 손익</span><span class="dv {c}">{t["pnl_pct"]:+.1f}% (${t.get("pnl_usd",0):+.0f}/계약)</span></div>'
+               + (f'<div class="dfull"><span class="dk">실시간 추정</span><span class="dv">${t["premium_rt"]}→${t["exit_premium_rt"]} · {t["pnl_rt"]:+.1f}% (실시간 기초가 모델)</span></div>' if t.get("pnl_rt") is not None else "") +
                f'<div><span class="dk">최고 지점</span><span class="dv pos">{f"{mp:+.0f}% @ {t.get(chr(39)+chr(39)) or t.get("mfe_prem_t") or ""}" if mp is not None else "—"}</span></div>'
                f'<div class="dfull"><span class="dk">사이징별 계약</span><span class="dv">{ct or "—"}</span></div>'
                f'</div>')
         _rc = '<br><span class="rs">소급</span>' if t.get("recon") else ""
+        _rt = f'<br><span class="rs">추정 {t["pnl_rt"]:+.0f}%</span>' if t.get("pnl_rt") is not None else ""
         rows += (f'<tr class="crow" data-i="L{i}"><td>{t["date"][5:]}{_rc}</td>'
                  f'<td>C{t["strike"]:.0f}</td>'
-                 f'<td class="{c}">{t["pnl_pct"]:+.0f}%</td>'
+                 f'<td class="{c}">{t["pnl_pct"]:+.0f}%{_rt}</td>'
                  f'<td class="pos">{f"{mp:+.0f}%" if mp is not None else "—"}</td>'
                  f'<td class="rs">{t["reason"]}</td><td class="rs">▾</td></tr>'
                  f'<tr class="drow" id="dL{i}"><td colspan="6">{det}</td></tr>')
@@ -1219,15 +1302,17 @@ def render(log, st):
                    f'<div><span class="dk">계약</span><span class="dv">{_a} {t["strike"]:.0f}</span></div>'
                    f'<div><span class="dk">프리미엄</span><span class="dv">${t["premium"]}→${t.get("exit_premium","")}</span></div>'
                    f'<div><span class="dk">옵션 손익</span><span class="dv {c}">{t.get("pnl_pct",0):+.1f}% (${t.get("per_contract",0):+.0f}/계약)</span></div>'
+                   + (f'<div class="dfull"><span class="dk">실시간 추정</span><span class="dv">${t["premium_rt"]}→${t["exit_premium_rt"]} · {t["pnl_rt"]:+.1f}% (실시간 기초가 모델)</span></div>' if t.get("pnl_rt") is not None else "") +
                    f'<div><span class="dk">기초 손익</span><span class="dv">{t.get("ux",0):+.3f}%</span></div>'
                    f'<div class="dfull"><span class="dk">최고 지점</span><span class="dv pos">{mfe_str}</span></div>'
                    f'<div class="dfull"><span class="dk">사이징별 계약</span><span class="dv">{ct or "—"}</span></div>'
                    f'</div>')
             _sb = (f'<br><span class="rs">{t["strat"]}</span>' if t.get("strat") else "")
             _rc = '<br><span class="rs">소급</span>' if t.get("recon") else ""
+            _rt = f'<br><span class="rs">추정 {t["pnl_rt"]:+.0f}%</span>' if t.get("pnl_rt") is not None else ""
             rows += (f'<tr class="crow" data-i="{rid}"><td>{t["date"][5:]}{_rc}</td><td>{_a}{_sb}</td>'
                      f'<td>{t["gap"]:+.2f}%</td><td>{t["cover"]:.2f}</td>'
-                     f'<td class="{c}">{t.get("pnl_pct",0):+.0f}%</td>'
+                     f'<td class="{c}">{t.get("pnl_pct",0):+.0f}%{_rt}</td>'
                      f'<td class="rs">{t["res"]}</td><td class="rs">▾</td></tr>'
                      f'<tr class="drow" id="d{rid}"><td colspan="7">{det}</td></tr>')
         return rows or '<tr><td colspan="7" class="rs">NO OPERATIONS</td></tr>'
