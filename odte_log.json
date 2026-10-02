@@ -399,8 +399,8 @@
   },
   "2026-10-02": {
    "status": "WAIT_OPEN",
-   "bars": 4,
-   "at": "09:45"
+   "bars": 5,
+   "at": "09:50"
   }
  },
  "vix": {
@@ -425,12 +425,12 @@
   "sgn": 1,
   "prev_close": 742.04,
   "open": 751.31,
-  "entry": 752.22,
+  "entry": 752.02,
   "target": 742.04,
-  "room": 1.353,
-  "cover": -0.1,
+  "room": 1.327,
+  "cover": -0.08,
   "r50": 750.2,
-  "cur": 752.22,
+  "cur": 752.02,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -455,14 +455,14 @@
     "vw_room": 1.151
    },
    "1h": {
-    "cover": -0.1,
-    "entry": 752.22,
+    "cover": -0.08,
+    "entry": 752.02,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.353,
-    "vw_entry": 750.68,
-    "vw_room": 1.151
+    "room": 1.327,
+    "vw_entry": 750.82,
+    "vw_room": 1.169
    }
   },
   "band_px": 750.64,
@@ -3295,7 +3295,7 @@
    },
    "prem_src": "실시간",
    "or_stop": 749.1,
-   "ext": 752.22,
+   "ext": 752.469970703125,
    "mfe": 0.0,
    "mfe_t": null,
    "mfe_prem": 0.0,
@@ -3303,7 +3303,7 @@
    "filled": false,
    "fill_t": null,
    "res": null,
-   "trail_px": 749.96
+   "trail_px": 750.21
   },
   "trades": [
    {
