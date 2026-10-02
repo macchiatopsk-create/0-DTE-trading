@@ -77,7 +77,13 @@
     "50": 2,
     "60": 3,
     "70": 4
-   }
+   },
+   "spot_rt": 717.24,
+   "premium_rt": 5.26,
+   "exit_premium_rt": 5.24,
+   "pnl_rt": -2.6,
+   "per_contract_rt": -13.57,
+   "rt_src": "recon"
   },
   {
    "date": "2026-09-09",
@@ -113,7 +119,13 @@
    "eff_exit": 7.09,
    "pnl_pct": 13.6,
    "pnl_usd": 85.0,
-   "reason": "CUTOFF(14:30)"
+   "reason": "CUTOFF(14:30)",
+   "spot_rt": 714.54,
+   "premium_rt": 5.64,
+   "exit_premium_rt": 6.82,
+   "pnl_rt": 18.7,
+   "per_contract_rt": 105.59,
+   "rt_src": "recon"
   },
   {
    "date": "2026-09-11",
@@ -662,7 +674,13 @@
      "exit_premium": 3.28,
      "pnl_pct": -53.4,
      "per_contract": -376.0,
-     "ux": -0.4
+     "ux": -0.4,
+     "spot_rt": 712.73,
+     "premium_rt": 5.05,
+     "exit_premium_rt": 3.54,
+     "pnl_rt": -32.1,
+     "per_contract_rt": -162.11,
+     "rt_src": "recon"
     },
     {
      "date": "2026-08-21",
@@ -703,7 +721,13 @@
      "exit_premium": 6.77,
      "pnl_pct": 9.0,
      "per_contract": 56.0,
-     "ux": -0.013
+     "ux": -0.013,
+     "spot_rt": 711.88,
+     "premium_rt": 6.25,
+     "exit_premium_rt": 5.58,
+     "pnl_rt": -12.9,
+     "per_contract_rt": -80.75,
+     "rt_src": "recon"
     },
     {
      "date": "2026-08-26",
@@ -1146,7 +1170,13 @@
      "exit_premium": 3.96,
      "pnl_pct": -48.8,
      "per_contract": -377.0,
-     "ux": -0.268
+     "ux": -0.268,
+     "spot_rt": 712.73,
+     "premium_rt": 5.93,
+     "exit_premium_rt": 4.39,
+     "pnl_rt": -28.2,
+     "per_contract_rt": -167.05,
+     "rt_src": "recon"
     },
     {
      "date": "2026-08-21",
@@ -1642,7 +1672,13 @@
      "exit_premium": 2.4,
      "pnl_pct": -62.0,
      "per_contract": -391.0,
-     "ux": -0.423
+     "ux": -0.423,
+     "spot_rt": 712.73,
+     "premium_rt": 4.21,
+     "exit_premium_rt": 2.76,
+     "pnl_rt": -36.6,
+     "per_contract_rt": -154.26,
+     "rt_src": "recon"
     },
     {
      "date": "2026-08-21",
@@ -1683,7 +1719,13 @@
      "exit_premium": 6.39,
      "pnl_pct": 11.1,
      "per_contract": 64.0,
-     "ux": -0.114
+     "ux": -0.114,
+     "spot_rt": 711.88,
+     "premium_rt": 5.8,
+     "exit_premium_rt": 5.12,
+     "pnl_rt": -13.9,
+     "per_contract_rt": -80.76,
+     "rt_src": "recon"
     },
     {
      "date": "2026-09-29",
@@ -2058,7 +2100,13 @@
      "exit_premium": 3.28,
      "pnl_pct": -53.4,
      "per_contract": -376.0,
-     "ux": -0.282
+     "ux": -0.282,
+     "spot_rt": 712.73,
+     "premium_rt": 5.05,
+     "exit_premium_rt": 3.54,
+     "pnl_rt": -32.1,
+     "per_contract_rt": -162.11,
+     "rt_src": "recon"
     },
     {
      "date": "2026-08-21",
@@ -3319,7 +3367,13 @@
     "exit_premium": 3.27,
     "pnl_pct": -43.5,
     "per_contract": -252.0,
-    "ux": -0.298
+    "ux": -0.298,
+    "spot_rt": 712.36,
+    "premium_rt": 5.57,
+    "exit_premium_rt": 3.38,
+    "pnl_rt": -41.5,
+    "per_contract_rt": -231.25,
+    "rt_src": "recon"
    },
    {
     "date": "2026-08-27",
@@ -3868,7 +3922,13 @@
     "exit_premium": 7.9,
     "pnl_pct": 34.1,
     "per_contract": 201.0,
-    "ux": -0.032
+    "ux": -0.032,
+    "spot_rt": 752.02,
+    "premium_rt": 6.19,
+    "exit_premium_rt": 5.82,
+    "pnl_rt": -8.2,
+    "per_contract_rt": -50.62,
+    "rt_src": "recon"
    }
   ],
   "books": {
@@ -5010,7 +5070,13 @@
     "pnl_pct": -43.5,
     "per_contract": -252.0,
     "ux": -0.298,
-    "strat": "모멘텀"
+    "strat": "모멘텀",
+    "spot_rt": 712.36,
+    "premium_rt": 5.57,
+    "exit_premium_rt": 3.38,
+    "pnl_rt": -41.5,
+    "per_contract_rt": -231.25,
+    "rt_src": "recon"
    },
    {
     "date": "2026-08-27",
@@ -5619,7 +5685,13 @@
     "pnl_pct": 34.1,
     "per_contract": 201.0,
     "ux": -0.032,
-    "strat": "모멘텀"
+    "strat": "모멘텀",
+    "spot_rt": 752.02,
+    "premium_rt": 6.19,
+    "exit_premium_rt": 5.82,
+    "pnl_rt": -8.2,
+    "per_contract_rt": -50.62,
+    "rt_src": "recon"
    }
   ],
   "open_by": null,
