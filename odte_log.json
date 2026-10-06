@@ -438,12 +438,12 @@
   "2026-10-06": {
    "status": "NO TRADE · VIX게이트 (백분위 29% < 50)",
    "score": 4,
-   "rsi": 60.3,
+   "rsi": 64.4,
    "direction": 1,
    "gap": 0.58,
-   "px": 761.69,
-   "vwap": 760.76,
-   "at": "10:50",
+   "px": 762.1,
+   "vwap": 760.8,
+   "at": "10:55",
    "vix_pct": 29.1,
    "vix_state": "DEAD",
    "pm_pos": 0.893
@@ -476,7 +476,7 @@
   "room": 0.53,
   "cover": 0.08,
   "r50": 759.82,
-  "cur": 761.69,
+  "cur": 762.1,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -571,7 +571,7 @@
    },
    {
     "d": "2025-07-03",
-    "dist": 1.78,
+    "dist": 1.77,
     "gap": 0.43,
     "ret": 0.55,
     "lo": 0.0,
@@ -3381,15 +3381,15 @@
    },
    "prem_src": "실시간(모델가)",
    "or_stop": 759.59,
-   "ext": 762.0900268554688,
-   "mfe": 0.196,
-   "mfe_t": "10:10",
-   "mfe_prem": 22.7,
-   "mfe_prem_t": "10:10",
+   "ext": 762.1900024414062,
+   "mfe": 0.212,
+   "mfe_t": "10:55",
+   "mfe_prem": 24.2,
+   "mfe_prem_t": "10:55",
    "filled": false,
    "fill_t": null,
    "res": null,
-   "trail_px": 759.8
+   "trail_px": 759.9
   },
   "trades": [
    {
