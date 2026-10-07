@@ -6,8 +6,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-  pages: write
-  id-token: write
+  actions: write
 concurrency:
   group: odte-recon                # odte 연쇄가 장중 내내 odte 그룹을 잡고 있어 같은 그룹이면 recon이 영영 못 돈다.
   cancel-in-progress: false        # 대신 아래 가드로 장중(원장을 odte가 쓰는 시간)에는 실행하지 않는다.
@@ -29,6 +28,8 @@ jobs:
           fi
       - uses: actions/checkout@v4
         if: steps.guard.outputs.ok == 'true'
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         if: steps.guard.outputs.ok == 'true'
         with:
@@ -54,25 +55,14 @@ jobs:
             echo "retry $i"; sleep 5
           done
           exit 0
-      - name: pages
+      - name: pages 발사 (화면 배포는 pages.yml)
         if: steps.guard.outputs.ok == 'true'
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p _site
-          cp index.html manifest.webmanifest sw.js icon-192.png icon-512.png _site/ 2>/dev/null || true
-          if [ -d hq ]; then python hq/build.py _site; fi
-          ls -la _site
-      - uses: actions/upload-pages-artifact@v3
-        if: steps.guard.outputs.ok == 'true'
-        with:
-          path: _site
-  deploy:
-    needs: run
-    if: needs.run.outputs.ok == 'true'
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow pages.yml --status waiting --json databaseId -q '.[].databaseId' 2>/dev/null); do
+            echo "대기에 걸린 배포 $id 취소"; gh run cancel "$id" -R "$GITHUB_REPOSITORY" || true
+          done
+          gh workflow run pages.yml -R "$GITHUB_REPOSITORY" --ref main || echo "::warning::pages 발사 실패"

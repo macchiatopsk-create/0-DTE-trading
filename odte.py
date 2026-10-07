@@ -473,6 +473,197 @@ def settle_prices(pos, quote_now, now, spot_now, base_iv, side=None, tp1=None):
     return ex, pct, round((ex - p0) * 100, 2), q
 
 
+# ───────────────────────── 놓친 폴링 따라잡기 ─────────────────────────
+# 앱이 멈췄다가 다시 깨어났을 때(2026-10-06: 배포 잡이 걸려 26시간 정지, 포지션이 열린 채 다음 날로 넘어감)
+# 열려 있던 포지션을 '지금 가격'으로 청산하면 안 된다. 놓친 5분 폴링을 그날 봉으로 재생해서
+# 규칙상 청산됐어야 할 시각·가격으로 처리한다 (recon과 같은 5분 폴링 규칙: 폴링가 = 봉 마감가, 옵션가 = 모델가).
+CATCH_TAG = "·청산소급"
+
+
+def _iv_for(log, dstr, now):
+    if dstr == str(now.date()):
+        return base_iv_today(log, dstr)
+    c = log.get("iv_base") or {}
+    if c.get("d") == dstr and c.get("v"):
+        return c["v"]
+    vc = log.get("vixchg") or {}
+    if vc.get("d") == dstr and vc.get("lvl"):
+        return round(vc["lvl"] * 1.15 / 100, 4)
+    return 0.20
+
+
+def _missed_polls(g, d, start, last_poll, now):
+    """d일 5분봉 중 '봉 마감 시각 = 앱이 놓친 폴링 시각'인 것들 [(시각, 봉 마감가)] — 시간순.
+    정상 가동 중에는 비어 있다 (직전 폴링 +150초 이후 ~ 지금 -240초 이전에 끝난 봉만 놓친 것으로 본다)."""
+    lo = start if (last_poll is None or last_poll < start) else last_poll
+    lo = lo + dt.timedelta(seconds=150)
+    hi = (now - dt.timedelta(seconds=240)) if d == now.date() \
+        else dt.datetime(d.year, d.month, d.day, 16, 0, tzinfo=NY)
+    out = []
+    day = g[(g.index.date == d) & (g.index.time >= dt.time(9, 30)) & (g.index.time < dt.time(16, 0))]
+    for ts, c in zip(day.index, day["Close"]):
+        T = ts.to_pydatetime() + dt.timedelta(minutes=5)
+        if lo < T <= hi:
+            out.append((T, float(c)))
+    return out
+
+
+def _replay_poll(log, kind, tr, pos, g, d, T, cur, iv):
+    """놓친 폴링 한 번을 재생. 청산되면 True."""
+    hm = T.strftime("%H:%M")
+    upto = g[g.index < T]                                    # T까지 끝난 봉만
+    if kind == "l3":
+        st, _, _ = session_state(upto)
+        if st is None:
+            return False
+        px, w, s_ = st["px"], st["vwap"], st["sd"]
+        cm = rt_premium("call", pos["strike"], T, px, iv)
+        _mfe = (px / pos["entry_px"] - 1) * 100
+        if _mfe > pos.get("mfe", -99):
+            pos["mfe"], pos["mfe_t"] = round(_mfe, 3), hm
+        if cm and cm > 0:
+            _pm = (cm / pos["premium"] - 1) * 100
+            if _pm > pos.get("mfe_prem", -99):
+                pos["mfe_prem"], pos["mfe_prem_t"] = round(_pm, 1), hm
+            if not pos.get("tp1_prem") and px >= w:
+                pos["tp1_prem"], pos["tp1_time"] = cm, hm
+        reason = None
+        if px <= pos.get("stop_px", 0):
+            reason = "STOP(당일저점)" if not pos.get("tp1_prem") else "STOP_AFTER_TP1"
+        elif pos.get("tp1_prem") and s_ > 1e-9 and px >= w + s_:
+            reason = "RUNNER(+1σ)"
+        elif T.time() >= CUTOFF:
+            reason = f"CUTOFF({CUTOFF.strftime('%H:%M')})"
+        if not reason:
+            return False
+        reason += CATCH_TAG
+        eff, pct, usd, _qf = settle_prices(dict(pos, basis="rt"), None, T, px, iv, side="call",
+                                           tp1=pos.get("tp1_prem"))
+        _books = log.setdefault("l3_books", {})
+        for _k, _nc in (pos.get("contracts") or {}).items():
+            if _nc < 1:
+                continue
+            _bk = _books.setdefault(_k, dict(cap=CAPITAL_START, trades=[]))
+            _u = round((eff - pos["premium"]) * 100 * _nc, 2)
+            _bk["cap"] = round(_bk["cap"] + _u, 2)
+            _bk["trades"].append(dict(d=pos["date"], nc=_nc, usd=_u, pct=pct, res=reason))
+        rec = dict(pos)
+        rec.update(exit_time=hm, exit_px=round(px, 2), exit_premium=cm, eff_exit=eff,
+                   pnl_pct=pct, pnl_usd=usd, reason=reason, catchup=True)
+        rec.update(_qf)
+        log.setdefault("trades", []).append(rec)
+        log["open"] = None
+        print(f"  [3층] 따라잡기 청산 {pos['date']} {hm} {reason} {pct:+.1f}%")
+        return True
+
+    sgn = pos["sgn"]
+    long_ = pos.get("opt_side") == "call"
+    adv = ((cur - pos["entry"]) if long_ else (pos["entry"] - cur)) / pos["entry"] * 100
+    if adv > pos.get("mfe", 0.0):
+        pos["mfe"], pos["mfe_t"] = round(adv, 3), hm
+    _m = rt_premium(pos["opt_side"], pos["strike"], T, cur, iv)
+    if _m and _m > 0:
+        _p = (_m / pos["premium"] - 1) * 100
+        if _p > pos.get("mfe_prem", -99):
+            pos["mfe_prem"], pos["mfe_prem_t"] = round(_p, 1), hm
+    res = None
+    if kind == "mom":
+        et = dt.time(int(pos["at"][:2]), int(pos["at"][3:5]))
+        rt2 = upto[(upto.index.date == d) & (upto.index.time >= et)]
+        if len(rt2):
+            bx = float(rt2["High"].max()) if sgn > 0 else float(rt2["Low"].min())
+            pos["ext"] = max(pos["ext"], bx) if sgn > 0 else min(pos["ext"], bx)
+        tpx = pos["ext"] * (1 - MOM_TRAIL / 100) if sgn > 0 else pos["ext"] * (1 + MOM_TRAIL / 100)
+        pos["trail_px"] = round(tpx, 2)
+        if (cur <= pos["or_stop"]) if sgn > 0 else (cur >= pos["or_stop"]):
+            res = "STOP(OR)"
+        elif (cur <= tpx) if sgn > 0 else (cur >= tpx):
+            res = "TRAIL"
+        strat = "모멘텀"
+    else:
+        _gf, _gtrail, _gft = gap_fill_since(upto, d, pos["at"], sgn, pos["target"])
+        if not pos["filled"] and _gf:
+            pos["filled"], pos["fill_t"] = True, _gft
+        if not pos["filled"] and T.time() >= GAP_TIMECUT:
+            res = "TIMECUT"
+        elif pos["filled"] and _gtrail and ((cur >= _gtrail) if sgn > 0 else (cur <= _gtrail)):
+            res = "TRAIL"
+        strat = "갭필"
+    if res is None and T.time() >= GAP_CUT:
+        res = "CUT"
+    if res is None and T.time() >= dt.time(15, 55):
+        res = "EOD"
+    if not res:
+        return False
+    res += CATCH_TAG
+    ex, pct, per, _qf = settle_prices(dict(pos, basis="rt"), None, T, cur, iv)
+    for k, nc in pos["contracts"].items():
+        bk = tr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+        if nc < 1:
+            bk["trades"].append(dict(d=pos["date"], nc=0, usd=0.0, pct=0.0, res="SKIP_FUND"))
+            continue
+        usd = round(per * nc, 2)
+        bk["cap"] = round(bk["cap"] + usd, 2)
+        bk["trades"].append(dict(d=pos["date"], nc=nc, usd=usd, pct=pct, res=res))
+    rec = dict(pos)
+    rec.update(res=res, exit=round(cur, 2), exit_at=hm, exit_premium=ex, pnl_pct=pct,
+               per_contract=per, ux=round(adv, 3), catchup=True)
+    rec.update(_qf)
+    if pos.get("comb") is not None:
+        comb_settle(comb_state(log), rec, per, strat)
+    tr["trades"].append(rec)
+    tr["open"] = None
+    print(f"  [{strat}] 따라잡기 청산 {pos['date']} {hm} {res} {pct:+.1f}% 기초 {adv:+.3f}%")
+    return True
+
+
+def catch_up(log, df, now):
+    """열린 포지션마다 놓친 폴링을 재생. 반환: 따라잡기로 청산한 건수. (df=None이면 필요할 때만 조회)"""
+    plist = []
+    for tk, tr in (log.get("gap_tracks") or {}).items():
+        p = tr.get("open")
+        if p and p.get("res") is None:
+            plist.append(("gap", tk, tr, p))
+    mtr = log.get("mom_track") or {}
+    if mtr.get("open") and mtr["open"].get("res") is None:
+        plist.append(("mom", "모멘텀", mtr, mtr["open"]))
+    if log.get("open"):
+        plist.append(("l3", "3층", None, log["open"]))
+    if not plist:
+        return 0
+    lp = None
+    try:
+        lp = dt.datetime.fromisoformat(log["last_poll"])
+    except Exception:
+        pass
+    if df is None:
+        df = intraday()
+    long_df, n = None, 0
+    for kind, key, tr, pos in plist:
+        try:
+            d = dt.date.fromisoformat(pos["date"])
+            g = df
+            have = sorted({x for x in g.index.date if x <= d})
+            if d not in have or (kind == "l3" and len(have) < 2):   # 3일치 밖 (3층은 전일 봉도 필요)
+                if long_df is None:
+                    long_df = intraday("60d")
+                g = long_df
+            hm = pos.get("found_at") or pos.get("at") or pos.get("entry_time")
+            start = dt.datetime(d.year, d.month, d.day, int(hm[:2]), int(hm[3:5]), tzinfo=NY)
+            polls = _missed_polls(g, d, start, lp, now)
+            if not polls:
+                continue
+            iv = _iv_for(log, pos["date"], now)
+            print(f"  따라잡기 {key}: {pos['date']} 놓친 폴링 {len(polls)}회 ({polls[0][0].strftime('%H:%M')}~{polls[-1][0].strftime('%H:%M')})")
+            for T, cur in polls:
+                if _replay_poll(log, kind, tr, pos, g, d, T, cur, iv):
+                    n += 1
+                    break
+        except Exception as e:
+            print(f"  따라잡기 실패({key}): {type(e).__name__}: {e}")
+    return n
+
+
 def premarket_pos():
     """프리마켓(04:00~09:30) 레인지 내 09:30 시가 위치. v9 검증: >0.5 롱만 엣지."""
     try:
@@ -501,8 +692,8 @@ def premarket_pos():
         return None
 
 
-def intraday():
-    df = yf.Ticker(TICKER).history(period="3d", interval="5m")
+def intraday(period="3d"):
+    df = yf.Ticker(TICKER).history(period=period, interval="5m")
     if df is None or df.empty:
         raise ValueError("5분봉 없음")
     df = df[["Open", "High", "Low", "Close", "Volume"]].dropna()
@@ -660,8 +851,14 @@ def step():
     now = dt.datetime.now(NY)
     log = load_log()
     df = intraday()
+    try:                                 # 앱이 멈췄던 구간에 났어야 할 청산을 먼저 처리 (오늘 가격으로 어제 포지션을 닫지 않게)
+        catch_up(log, df, now)
+    except Exception as e:
+        print(f"  따라잡기 실패: {type(e).__name__}: {e}")
+    log["last_poll"] = now.isoformat(timespec="seconds")
     st, today, nbars = session_state(df)
     dstr = str(today)
+    nstr = str(now.date())               # 포지션 관리는 '오늘 연 포지션'만 (지난 날 포지션은 따라잡기가 그날 봉으로 정산)
     is_today = (today == now.date())     # 개장 전에는 마지막 봉이 어제 것 → 신규 진입 판정 금지
     gsig = gap_signal(df, st)
     log["gap"] = gsig
@@ -759,7 +956,7 @@ def step():
 
             # ── 관리·청산 ──
             gopen = tr["open"]
-            if gopen and gopen.get("res") is None:
+            if gopen and gopen.get("res") is None and gopen.get("date") == nstr:
                 sgn = gopen["sgn"]; cur = gsig["cur"]
                 # MFE는 전역(시가 기준)이 아니라 이 트랙의 진입 이후로만 측정
                 _adv = ((gopen["entry"] - cur) / gopen["entry"] * 100) if sgn > 0 \
@@ -886,7 +1083,7 @@ def step():
                                   f"{oside.upper()} {mopt['strike']:.0f} @${mopt['premium']}")
             # ── 관리·청산 ──
             mo = mtr.get("open")
-            if mo and mo.get("res") is None:
+            if mo and mo.get("res") is None and mo.get("date") == nstr:
                 s2 = mo["sgn"]; cur = gsig["cur"]
                 _adv = ((cur - mo["entry"]) / mo["entry"] * 100) if s2 > 0 \
                        else ((mo["entry"] - cur) / mo["entry"] * 100)
@@ -975,7 +1172,7 @@ def step():
           f"편차={st['dev']:+.2f}σ 방향={st['direction']}")
 
     # ── 1) 보유 중이면 청산 체크 ──
-    if open_pos and open_pos.get("date") == dstr:
+    if open_pos and open_pos.get("date") == dstr and is_today:
         side = open_pos["side"]; reason = None
         # 현재 프리미엄 조회 후 손익 기준으로 청산 판단
         cur_prem = None
