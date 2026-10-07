@@ -475,8 +475,8 @@
   "target": 759.61,
   "room": 0.692,
   "cover": 0.09,
-  "r50": 755.89,
-  "cur": 757.9,
+  "r50": 756.04,
+  "cur": 757.93,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -514,13 +514,13 @@
   "band_px": 753.3,
   "band_t": "09:35",
   "band_room": 0.838,
-  "mfe": 0.535,
+  "mfe": 0.574,
   "mfe_t": "15:55",
-  "mfe_px": 757.9
+  "mfe_px": 758.2
  },
  "macro": {
   "date": "2026-10-07",
-  "n_hist": 500,
+  "n_hist": 499,
   "n_feat": 17,
   "extremes": [
    {
@@ -529,14 +529,14 @@
     "pct": 98
    },
    {
-    "name": "TLT",
-    "chg": -1.07,
-    "pct": 2
-   },
-   {
     "name": "10Y",
     "chg": 1.37,
     "pct": 98
+   },
+   {
+    "name": "TLT",
+    "chg": -1.07,
+    "pct": 2
    },
    {
     "name": "HY",
@@ -648,7 +648,7 @@
   "base_rng": 1.438,
   "lo_avg": -0.644,
   "hi_avg": 0.645,
-  "base_up": 53.0
+  "base_up": 52.9
  },
  "gap_skip": {
   "date": "2026-08-19",
