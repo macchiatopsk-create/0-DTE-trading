@@ -17,8 +17,6 @@ on:
 permissions:
   contents: write
   actions: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: odte
@@ -43,6 +41,8 @@ jobs:
           echo "NY $(TZ=America/New_York date '+%a %H:%M:%S') → $M"
       - uses: actions/checkout@v4
         if: steps.mode.outputs.mode == 'live'
+        with:
+          ref: main      # 대기열에 있다가 늦게 시작한 실행이 '발사 시점의 옛 커밋'으로 돌아 최신 원장을 덮어쓰지 않게 (2026-10-07)
       - uses: actions/setup-python@v5
         if: steps.mode.outputs.mode == 'live'
         with:
@@ -65,19 +65,21 @@ jobs:
           git commit -m "odte $(date -u +%F_%H%M)" || echo "변동 없음"
           git pull --rebase -X theirs || (git rebase --abort 2>/dev/null; true)
           git push || echo "푸시 스킵"
-      - name: pages
+      # 화면 배포는 별도 워크플로(pages.yml)로 뺐다. 2026-10-06 11:05 ET에 이 워크플로 안의 deploy 잡이
+      # github-pages 환경 대기에 걸려 odte 그룹을 26시간 붙잡았고, 그동안 앱이 통째로 멈췄다.
+      - name: pages 발사 (실패해도 앱 실행에는 영향 없음)
         if: steps.mode.outputs.mode == 'live'
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p _site
-          cp index.html manifest.webmanifest sw.js icon-192.png icon-512.png _site/ 2>/dev/null || true
-          if [ -d hq ]; then python hq/build.py _site; fi
-          ls -la _site
-      - uses: actions/upload-pages-artifact@v3
-        if: steps.mode.outputs.mode == 'live'
-        with:
-          path: _site
+          for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow pages.yml --status waiting --json databaseId -q '.[].databaseId' 2>/dev/null); do
+            echo "대기에 걸린 배포 $id 취소"; gh run cancel "$id" -R "$GITHUB_REPOSITORY" || true
+          done
+          gh workflow run pages.yml -R "$GITHUB_REPOSITORY" --ref main || echo "::warning::pages 발사 실패"
 
-  # 연쇄: 다음 실행을 스스로 예약한다. 화면 배포(deploy)와 병렬 — 예전에는 연쇄 대기(240초) 뒤에 배포돼 화면이 4분 늦었다.
+  # 연쇄: 다음 실행을 스스로 예약한다.
   chain:
     needs: run
     if: always()
@@ -113,14 +115,3 @@ jobs:
           done
           echo "::warning::self-chain 재발사 실패 — 다음 예약 틱이 살릴 때까지 공백"
 
-  deploy:
-    needs: run
-    if: needs.run.outputs.mode == 'live'
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4

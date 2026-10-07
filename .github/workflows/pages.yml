@@ -1,0 +1,40 @@
+name: pages
+# 화면(GitHub Pages) 배포 전용. 앱 실행(odte)·소급(recon)이 끝나면 여기를 발사한다.
+# 분리한 이유: 2026-10-06에 배포 잡이 github-pages 환경 대기에 걸려 odte 그룹을 26시간 붙잡았고 앱 전체가 멈췄다.
+# 이제 배포가 걸려도 앱은 계속 돌고, 다음 배포가 걸린 배포를 밀어낸다.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: site
+        run: |
+          mkdir -p _site
+          cp index.html manifest.webmanifest sw.js icon-192.png icon-512.png _site/ 2>/dev/null || true
+          if [ -d hq ]; then python3 hq/build.py _site; fi
+          ls -la _site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

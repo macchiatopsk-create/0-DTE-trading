@@ -428,6 +428,14 @@ def main(market=None, now=None):
     l3v = log.setdefault("l3_recon", {})
     added = 0
 
+    # 장이 끝났는데 열려 있는 포지션 = 앱이 장중에 멈춘 것. 놓친 폴링을 그날 봉으로 재생해 규칙대로 닫는다.
+    try:
+        n_cu = A.catch_up(log, None, now.replace(tzinfo=A.NY))
+        if n_cu:
+            rep.append(f"미청산 포지션 {n_cu}건을 그날 봉으로 사후 청산 ('{A.CATCH_TAG}' 표시)")
+    except Exception as e:
+        rep.append(f"미청산 포지션 정산 실패: {type(e).__name__}: {e}")
+
     for d in days:
         dstr = str(d)
         g = px[px.index.date == d]
