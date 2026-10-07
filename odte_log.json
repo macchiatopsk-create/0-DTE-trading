@@ -4010,6 +4010,50 @@
     "ux": -0.017,
     "exit_premium_q": null,
     "exit_note": "10/6 11:05 이후 앱 정지 → 10/6 실제 가격(5분 폴링 규칙)으로 사후 청산"
+   },
+   {
+    "date": "2026-10-07",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": null,
+    "dir": "숏",
+    "sgn": -1,
+    "gap": -0.762,
+    "cover": -0.17,
+    "vchg": 1.33,
+    "entry": 752.89,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "put",
+    "strike": 759.0,
+    "premium": 6.25,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2161,
+    "or_stop": 754.82,
+    "ext": 752.89,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 754.08,
+    "exit_at": "10:20",
+    "exit_premium": 5.0,
+    "pnl_pct": -20.0,
+    "per_contract": -125.0,
+    "ux": -0.158,
+    "contracts": {
+     "30": 0,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    }
    }
   ],
   "books": {
@@ -4116,11 +4160,19 @@
       "usd": 0.0,
       "pct": 0.0,
       "res": "SKIP_FUND"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 0,
+      "usd": 0.0,
+      "pct": 0.0,
+      "res": "SKIP_FUND",
+      "recon": true
      }
     ]
    },
    "40": {
-    "cap": 1645.0,
+    "cap": 1520.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -4222,11 +4274,19 @@
       "usd": -32.0,
       "pct": -4.9,
       "res": "TRAIL·청산소급"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -20.0,
+      "res": "TRAIL·소급",
+      "recon": true
      }
     ]
    },
    "50": {
-    "cap": 1418.0,
+    "cap": 1293.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -4328,11 +4388,19 @@
       "usd": -32.0,
       "pct": -4.9,
       "res": "TRAIL·청산소급"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -20.0,
+      "res": "TRAIL·소급",
+      "recon": true
      }
     ]
    },
    "60": {
-    "cap": 1082.0,
+    "cap": 957.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -4434,11 +4502,19 @@
       "usd": 0.0,
       "pct": 0.0,
       "res": "SKIP_FUND"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -20.0,
+      "res": "TRAIL·소급",
+      "recon": true
      }
     ]
    },
    "70": {
-    "cap": 1050.0,
+    "cap": 925.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -4540,6 +4616,14 @@
       "usd": -32.0,
       "pct": -4.9,
       "res": "TRAIL·청산소급"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -20.0,
+      "res": "TRAIL·소급",
+      "recon": true
      }
     ]
    }
@@ -4562,7 +4646,7 @@
    "2026-10-01": true,
    "2026-10-02": true,
    "2026-10-06": true,
-   "2026-10-07": "late"
+   "2026-10-07": true
   },
   "skips": [
    {
@@ -4592,14 +4676,6 @@
     "gap": 0.914,
     "vchg": 1.01,
     "cover": -0.43
-   },
-   {
-    "d": "2026-10-07",
-    "reason": "늦은 발견",
-    "gap": -0.756,
-    "vchg": 1.33,
-    "cover": -0.17,
-    "at": "13:25"
    }
   ]
  },
@@ -4722,11 +4798,19 @@
       "usd": 0.0,
       "pct": 0.0,
       "res": "SKIP_FUND"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 0,
+      "usd": 0.0,
+      "pct": 0.0,
+      "res": "SKIP_FUND",
+      "recon": true
      }
     ]
    },
    "40": {
-    "cap": 1579.0,
+    "cap": 1454.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -4836,11 +4920,19 @@
       "usd": 0.0,
       "pct": 0.0,
       "res": "SKIP_FUND"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -20.0,
+      "res": "TRAIL·소급",
+      "recon": true
      }
     ]
    },
    "50": {
-    "cap": 1320.0,
+    "cap": 1195.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -4950,6 +5042,14 @@
       "usd": -32.0,
       "pct": -4.9,
       "res": "TRAIL·청산소급"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -20.0,
+      "res": "TRAIL·소급",
+      "recon": true
      }
     ]
    },
@@ -5064,11 +5164,19 @@
       "usd": 0.0,
       "pct": 0.0,
       "res": "SKIP_FUND"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 0,
+      "usd": 0.0,
+      "pct": 0.0,
+      "res": "SKIP_FUND",
+      "recon": true
      }
     ]
    },
    "70": {
-    "cap": 952.0,
+    "cap": 827.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -5178,6 +5286,14 @@
       "usd": -32.0,
       "pct": -4.9,
       "res": "TRAIL·청산소급"
+     },
+     {
+      "d": "2026-10-07",
+      "nc": 1,
+      "usd": -125.0,
+      "pct": -20.0,
+      "res": "TRAIL·소급",
+      "recon": true
      }
     ]
    }
@@ -5908,6 +6024,51 @@
     "exit_premium_q": null,
     "strat": "모멘텀",
     "exit_note": "10/6 11:05 이후 앱 정지 → 10/6 실제 가격(5분 폴링 규칙)으로 사후 청산"
+   },
+   {
+    "date": "2026-10-07",
+    "tf": "mom",
+    "em": "vix",
+    "recon": true,
+    "comb": null,
+    "dir": "숏",
+    "sgn": -1,
+    "gap": -0.762,
+    "cover": -0.17,
+    "vchg": 1.33,
+    "entry": 752.89,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "recon",
+    "opt_side": "put",
+    "strike": 759.0,
+    "premium": 6.25,
+    "prem_src": "소급(모델가)",
+    "iv": 0.2161,
+    "or_stop": 754.82,
+    "ext": 752.89,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": -99.0,
+    "mfe_prem_t": null,
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL·소급",
+    "exit": 754.08,
+    "exit_at": "10:20",
+    "exit_premium": 5.0,
+    "pnl_pct": -20.0,
+    "per_contract": -125.0,
+    "ux": -0.158,
+    "contracts": {
+     "30": 0,
+     "40": 1,
+     "50": 1,
+     "60": 0,
+     "70": 1
+    },
+    "strat": "모멘텀"
    }
   ],
   "open_by": null,
@@ -6297,6 +6458,13 @@
    "pm_pos": 0.282,
    "gap": 0.37,
    "res": "NO-GO · L1 백분위 50% < 50",
+   "final": true
+  },
+  "2026-10-07": {
+   "vix_pct": 17.9,
+   "pm_pos": 0.102,
+   "gap": -0.76,
+   "res": "NO-GO · L1 백분위 18% < 50",
    "final": true
   }
  },
