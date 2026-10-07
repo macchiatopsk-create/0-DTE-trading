@@ -476,7 +476,7 @@
   "room": 0.692,
   "cover": 0.09,
   "r50": 755.77,
-  "cur": 756.87,
+  "cur": 757.27,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -507,8 +507,8 @@
     "ok": false,
     "over": false,
     "room": 0.692,
-    "vw_entry": 754.05,
-    "vw_room": 0.737
+    "vw_entry": 753.7,
+    "vw_room": 0.784
    }
   },
   "band_px": 753.3,
