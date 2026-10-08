@@ -450,13 +450,13 @@
   },
   "2026-10-08": {
    "status": "NO TRADE · VIX게이트 (백분위 11% < 50)",
-   "score": -2,
-   "rsi": 39.9,
+   "score": -1,
+   "rsi": 45.0,
    "direction": 0,
    "gap": -0.5,
-   "px": 755.08,
-   "vwap": 753.94,
-   "at": "10:20",
+   "px": 756.17,
+   "vwap": 754.04,
+   "at": "10:25",
    "vix_pct": 11.2,
    "vix_state": "DEAD",
    "pm_pos": 0.397
@@ -484,12 +484,12 @@
   "sgn": -1,
   "prev_close": 757.71,
   "open": 753.94,
-  "entry": 755.08,
+  "entry": 756.17,
   "target": 757.71,
-  "room": 0.348,
-  "cover": 0.3,
-  "r50": 754.54,
-  "cur": 755.08,
+  "room": 0.204,
+  "cover": 0.59,
+  "r50": 755.06,
+  "cur": 756.17,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -514,12 +514,12 @@
     "vw_room": 0.469
    },
    "1h": {
-    "cover": 0.3,
-    "entry": 755.08,
+    "cover": 0.59,
+    "entry": 756.17,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.348,
+    "room": 0.204,
     "vw_entry": null,
     "vw_room": null
    }
@@ -527,9 +527,9 @@
   "band_px": 754.23,
   "band_t": "09:35",
   "band_room": 0.461,
-  "mfe": 0.159,
-  "mfe_t": "10:15",
-  "mfe_px": 755.14
+  "mfe": 0.296,
+  "mfe_t": "10:25",
+  "mfe_px": 756.17
  },
  "macro": {
   "date": "2026-10-08",
@@ -6673,5 +6673,5 @@
   "v": 0.2117,
   "src": "VXN"
  },
- "last_poll": "2026-10-08T10:20:17-04:00"
+ "last_poll": "2026-10-08T10:25:16-04:00"
 }
