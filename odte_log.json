@@ -489,7 +489,7 @@
   "room": 0.103,
   "cover": 0.79,
   "r50": 755.56,
-  "cur": 747.8,
+  "cur": 747.39,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -520,8 +520,8 @@
     "ok": true,
     "over": false,
     "room": 0.103,
-    "vw_entry": 754.41,
-    "vw_room": 0.437
+    "vw_entry": 755.6,
+    "vw_room": 0.279
    }
   },
   "band_px": 754.23,
@@ -6839,5 +6839,5 @@
   "v": 0.2117,
   "src": "VXN"
  },
- "last_poll": "2026-10-08T13:00:17-04:00"
+ "last_poll": "2026-10-08T13:05:16-04:00"
 }
