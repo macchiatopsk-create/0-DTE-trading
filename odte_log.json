@@ -450,13 +450,13 @@
   },
   "2026-10-08": {
    "status": "NO TRADE · VIX게이트 (백분위 11% < 50)",
-   "score": -1,
-   "rsi": 42.6,
-   "direction": 0,
+   "score": -3,
+   "rsi": 58.3,
+   "direction": -1,
    "gap": -0.5,
-   "px": 755.99,
-   "vwap": 754.34,
-   "at": "10:40",
+   "px": 755.38,
+   "vwap": 755.6,
+   "at": "10:45",
    "vix_pct": 11.2,
    "vix_state": "DEAD",
    "pm_pos": 0.397
@@ -489,7 +489,7 @@
   "room": 0.103,
   "cover": 0.79,
   "r50": 755.56,
-  "cur": 755.99,
+  "cur": 755.38,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -520,8 +520,8 @@
     "ok": true,
     "over": false,
     "room": 0.103,
-    "vw_entry": null,
-    "vw_room": null
+    "vw_entry": 755.6,
+    "vw_room": 0.279
    }
   },
   "band_px": 754.23,
@@ -2773,7 +2773,45 @@
    ]
   },
   "1h|vwap": {
-   "open": null,
+   "open": {
+    "date": "2026-10-08",
+    "tf": "1h",
+    "em": "vwap",
+    "late": false,
+    "comb": null,
+    "dir": "롱",
+    "sgn": -1,
+    "gap": -0.497,
+    "cover": 0.79,
+    "entry": 755.6,
+    "target": 757.71,
+    "room": 0.279,
+    "at": "10:45",
+    "found_at": "10:45",
+    "opt_side": "call",
+    "strike": 750.0,
+    "premium": 5.55,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 2,
+     "60": 2,
+     "70": 3
+    },
+    "spot_rt": 755.38,
+    "premium_q": 7.05,
+    "basis": "rt",
+    "prem_src": "실시간(모델가)",
+    "band_px": 754.23,
+    "band_t": "09:35",
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": 0.0,
+    "mfe_prem_t": "10:45",
+    "filled": false,
+    "fill_t": null,
+    "res": null
+   },
    "trades": [
     {
      "date": "2026-09-09",
@@ -2975,7 +3013,8 @@
     "2026-09-18": true,
     "2026-09-24": true,
     "2026-09-25": true,
-    "2026-10-01": true
+    "2026-10-01": true,
+    "2026-10-08": true
    },
    "skips": [
     {
@@ -6712,5 +6751,5 @@
   "v": 0.2117,
   "src": "VXN"
  },
- "last_poll": "2026-10-08T10:40:16-04:00"
+ "last_poll": "2026-10-08T10:45:17-04:00"
 }
