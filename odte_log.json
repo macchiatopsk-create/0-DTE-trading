@@ -450,8 +450,8 @@
   },
   "2026-10-08": {
    "status": "WAIT_OPEN",
-   "bars": 1,
-   "at": "09:30"
+   "bars": 2,
+   "at": "09:35"
   }
  },
  "vix": {
@@ -461,67 +461,67 @@
   "asof": "2026-10-07"
  },
  "pm": {
-  "pos": 0.41,
+  "pos": 0.397,
   "pm_hi": 758.11,
   "pm_lo": 751.2,
   "ok": false
  },
  "gap": {
   "date": "2026-10-08",
-  "orh": 754.0,
-  "orl": 754.0,
+  "orh": 754.95,
+  "orl": 753.11,
   "state": "WAIT",
-  "gap": -0.49,
+  "gap": -0.497,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 757.71,
-  "open": 754.0,
-  "entry": 754.0,
+  "open": 753.94,
+  "entry": 754.56,
   "target": 757.71,
-  "room": 0.492,
-  "cover": 0.0,
-  "r50": 754.0,
-  "cur": 754.0,
+  "room": 0.417,
+  "cover": 0.16,
+  "r50": 754.45,
+  "cur": 754.56,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.0,
-    "entry": 754.0,
-    "ready": false,
+    "cover": 0.16,
+    "entry": 754.56,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.492,
-    "vw_entry": 754.0,
-    "vw_room": 0.492
+    "room": 0.417,
+    "vw_entry": null,
+    "vw_room": null
    },
    "15m": {
-    "cover": 0.0,
-    "entry": 754.0,
+    "cover": 0.16,
+    "entry": 754.56,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.492,
-    "vw_entry": 754.0,
-    "vw_room": 0.492
+    "room": 0.417,
+    "vw_entry": null,
+    "vw_room": null
    },
    "1h": {
-    "cover": 0.0,
-    "entry": 754.0,
+    "cover": 0.16,
+    "entry": 754.56,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.492,
-    "vw_entry": 754.0,
-    "vw_room": 0.492
+    "room": 0.417,
+    "vw_entry": null,
+    "vw_room": null
    }
   },
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.134,
+  "mfe_t": "09:30",
+  "mfe_px": 754.95
  },
  "macro": {
   "date": "2026-10-08",
@@ -6485,5 +6485,5 @@
   "v": 0.2161,
   "src": "VXN"
  },
- "last_poll": "2026-10-08T09:30:15-04:00"
+ "last_poll": "2026-10-08T09:35:16-04:00"
 }
