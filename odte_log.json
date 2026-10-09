@@ -463,8 +463,8 @@
   },
   "2026-10-09": {
    "status": "WAIT_OPEN",
-   "bars": 4,
-   "at": "09:45"
+   "bars": 5,
+   "at": "09:50"
   }
  },
  "vix": {
@@ -489,12 +489,12 @@
   "sgn": 1,
   "prev_close": 747.57,
   "open": 752.55,
-  "entry": 749.57,
+  "entry": 749.24,
   "target": 747.57,
-  "room": 0.267,
-  "cover": 0.6,
-  "r50": 750.79,
-  "cur": 749.57,
+  "room": 0.224,
+  "cover": 0.66,
+  "r50": 750.55,
+  "cur": 749.24,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -519,12 +519,12 @@
     "vw_room": 0.526
    },
    "1h": {
-    "cover": 0.6,
-    "entry": 749.57,
+    "cover": 0.66,
+    "entry": 749.24,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.267,
+    "room": 0.224,
     "vw_entry": null,
     "vw_room": null
    }
@@ -532,9 +532,9 @@
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.468,
-  "mfe_t": "09:40",
-  "mfe_px": 749.03
+  "mfe": 0.532,
+  "mfe_t": "09:45",
+  "mfe_px": 748.55
  },
  "macro": {
   "date": "2026-10-09",
@@ -1670,10 +1670,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.0,
-    "mfe_t": null,
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:45",
+    "mfe": 0.019,
+    "mfe_t": "09:50",
+    "mfe_prem": 7.3,
+    "mfe_prem_t": "09:50",
     "filled": false,
     "fill_t": null,
     "res": null
@@ -2137,10 +2137,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.259,
-    "mfe_t": "09:45",
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:45",
+    "mfe": 0.303,
+    "mfe_t": "09:50",
+    "mfe_prem": 4.2,
+    "mfe_prem_t": "09:50",
     "filled": false,
     "fill_t": null,
     "res": null
@@ -6925,9 +6925,9 @@
   "2026-10-09": "09:30"
  },
  "iv_base": {
-  "d": "2026-10-08",
-  "v": 0.2117,
+  "d": "2026-10-09",
+  "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-09T09:45:16-04:00"
+ "last_poll": "2026-10-09T09:50:16-04:00"
 }
