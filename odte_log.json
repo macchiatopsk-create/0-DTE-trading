@@ -463,13 +463,13 @@
   },
   "2026-10-09": {
    "status": "NO TRADE · VIX게이트 (백분위 15% < 50)",
-   "score": 2,
-   "rsi": 64.0,
-   "direction": 0,
+   "score": 4,
+   "rsi": 62.9,
+   "direction": 1,
    "gap": 0.67,
-   "px": 749.95,
-   "vwap": 750.57,
-   "at": "10:30",
+   "px": 750.41,
+   "vwap": 749.73,
+   "at": "10:35",
    "vix_pct": 14.7,
    "vix_state": "DEAD",
    "pm_pos": 0.699
@@ -502,7 +502,7 @@
   "room": 0.32,
   "cover": 0.52,
   "r50": 750.46,
-  "cur": 749.95,
+  "cur": 750.41,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -533,13 +533,13 @@
     "ok": true,
     "over": false,
     "room": 0.32,
-    "vw_entry": null,
-    "vw_room": null
+    "vw_entry": 749.73,
+    "vw_room": 0.288
    }
   },
-  "band_px": null,
-  "band_t": null,
-  "band_room": null,
+  "band_px": 750.34,
+  "band_t": "10:30",
+  "band_room": 0.369,
   "mfe": 0.556,
   "mfe_t": "10:10",
   "mfe_px": 748.36
@@ -1676,8 +1676,8 @@
     "premium_q": 3.5,
     "basis": "rt",
     "prem_src": "실시간(모델가)",
-    "band_px": null,
-    "band_t": null,
+    "band_px": 750.34,
+    "band_t": "10:30",
     "mfe": 0.08,
     "mfe_t": "09:55",
     "mfe_prem": 14.9,
@@ -2143,8 +2143,8 @@
     "premium_q": 10.08,
     "basis": "rt",
     "prem_src": "실시간(모델가)",
-    "band_px": null,
-    "band_t": null,
+    "band_px": 750.34,
+    "band_t": "10:30",
     "mfe": 0.365,
     "mfe_t": "09:55",
     "mfe_prem": 9.5,
@@ -2568,8 +2568,8 @@
     "premium_q": 6.85,
     "basis": "rt",
     "prem_src": "실시간(모델가)",
-    "band_px": null,
-    "band_t": null,
+    "band_px": 750.34,
+    "band_t": "10:30",
     "mfe": 0.003,
     "mfe_t": "10:30",
     "mfe_prem": 0.0,
@@ -2953,7 +2953,45 @@
    ]
   },
   "1h|vwap": {
-   "open": null,
+   "open": {
+    "date": "2026-10-09",
+    "tf": "1h",
+    "em": "vwap",
+    "late": false,
+    "comb": null,
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.666,
+    "cover": 0.52,
+    "entry": 749.73,
+    "target": 747.57,
+    "room": 0.288,
+    "at": "10:35",
+    "found_at": "10:35",
+    "opt_side": "put",
+    "strike": 756.0,
+    "premium": 5.71,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 2,
+     "70": 2
+    },
+    "spot_rt": 750.41,
+    "premium_q": 6.48,
+    "basis": "rt",
+    "prem_src": "실시간(모델가)",
+    "band_px": 750.34,
+    "band_t": "10:30",
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": 0.0,
+    "mfe_prem_t": "10:35",
+    "filled": false,
+    "fill_t": null,
+    "res": null
+   },
    "trades": [
     {
      "date": "2026-09-09",
@@ -3238,7 +3276,8 @@
     "2026-09-24": true,
     "2026-09-25": true,
     "2026-10-01": true,
-    "2026-10-08": true
+    "2026-10-08": true,
+    "2026-10-09": true
    },
    "skips": [
     {
@@ -6976,5 +7015,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-09T10:30:16-04:00"
+ "last_poll": "2026-10-09T10:35:15-04:00"
 }
