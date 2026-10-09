@@ -464,12 +464,12 @@
   "2026-10-09": {
    "status": "NO TRADE · VIX게이트 (백분위 15% < 50)",
    "score": 2,
-   "rsi": 63.3,
+   "rsi": 64.0,
    "direction": 0,
    "gap": 0.67,
-   "px": 749.76,
-   "vwap": 750.59,
-   "at": "10:25",
+   "px": 749.95,
+   "vwap": 750.57,
+   "at": "10:30",
    "vix_pct": 14.7,
    "vix_state": "DEAD",
    "pm_pos": 0.699
@@ -491,18 +491,18 @@
   "date": "2026-10-09",
   "orh": 752.86,
   "orl": 751.31,
-  "state": "WAIT",
+  "state": "ACTIVE",
   "gap": 0.666,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 747.57,
   "open": 752.55,
-  "entry": 749.76,
+  "entry": 749.97,
   "target": 747.57,
-  "room": 0.291,
-  "cover": 0.56,
+  "room": 0.32,
+  "cover": 0.52,
   "r50": 750.46,
-  "cur": 749.76,
+  "cur": 749.95,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -527,12 +527,12 @@
     "vw_room": 0.526
    },
    "1h": {
-    "cover": 0.56,
-    "entry": 749.76,
-    "ready": false,
-    "ok": false,
+    "cover": 0.52,
+    "entry": 749.97,
+    "ready": true,
+    "ok": true,
     "over": false,
-    "room": 0.291,
+    "room": 0.32,
     "vw_entry": null,
     "vw_room": null
    }
@@ -2539,7 +2539,45 @@
    ]
   },
   "1h|now": {
-   "open": null,
+   "open": {
+    "date": "2026-10-09",
+    "tf": "1h",
+    "em": "now",
+    "late": false,
+    "comb": null,
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.666,
+    "cover": 0.52,
+    "entry": 749.97,
+    "target": 747.57,
+    "room": 0.32,
+    "at": "10:30",
+    "found_at": "10:30",
+    "opt_side": "put",
+    "strike": 756.0,
+    "premium": 6.14,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "spot_rt": 749.95,
+    "premium_q": 6.85,
+    "basis": "rt",
+    "prem_src": "실시간(모델가)",
+    "band_px": null,
+    "band_t": null,
+    "mfe": 0.003,
+    "mfe_t": "10:30",
+    "mfe_prem": 0.0,
+    "mfe_prem_t": "10:30",
+    "filled": false,
+    "fill_t": null,
+    "res": null
+   },
    "trades": [
     {
      "date": "2026-09-09",
@@ -2828,7 +2866,8 @@
     "2026-09-24": true,
     "2026-09-25": true,
     "2026-10-01": true,
-    "2026-10-08": true
+    "2026-10-08": true,
+    "2026-10-09": true
    },
    "skips": [
     {
@@ -6937,5 +6976,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-09T10:25:16-04:00"
+ "last_poll": "2026-10-09T10:30:16-04:00"
 }
