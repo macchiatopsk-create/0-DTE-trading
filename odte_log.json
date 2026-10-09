@@ -463,8 +463,8 @@
   },
   "2026-10-09": {
    "status": "WAIT_OPEN",
-   "bars": 1,
-   "at": "09:30"
+   "bars": 2,
+   "at": "09:35"
   }
  },
  "vix": {
@@ -474,67 +474,67 @@
   "asof": "2026-10-08"
  },
  "pm": {
-  "pos": 0.67,
+  "pos": 0.699,
   "pm_hi": 754.93,
   "pm_lo": 747.02,
   "ok": true
  },
  "gap": {
   "date": "2026-10-09",
-  "orh": 752.38,
-  "orl": 752.38,
+  "orh": 752.86,
+  "orl": 751.31,
   "state": "WAIT",
-  "gap": 0.643,
+  "gap": 0.666,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 747.57,
-  "open": 752.38,
-  "entry": 752.38,
+  "open": 752.55,
+  "entry": 751.69,
   "target": 747.57,
-  "room": 0.639,
-  "cover": 0.0,
-  "r50": 752.38,
-  "cur": 752.38,
+  "room": 0.548,
+  "cover": 0.17,
+  "r50": 751.93,
+  "cur": 751.69,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.0,
-    "entry": 752.38,
-    "ready": false,
+    "cover": 0.17,
+    "entry": 751.69,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.639,
-    "vw_entry": 752.38,
-    "vw_room": 0.639
+    "room": 0.548,
+    "vw_entry": null,
+    "vw_room": null
    },
    "15m": {
-    "cover": 0.0,
-    "entry": 752.38,
+    "cover": 0.17,
+    "entry": 751.69,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.639,
-    "vw_entry": 752.38,
-    "vw_room": 0.639
+    "room": 0.548,
+    "vw_entry": null,
+    "vw_room": null
    },
    "1h": {
-    "cover": 0.0,
-    "entry": 752.38,
+    "cover": 0.17,
+    "entry": 751.69,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.639,
-    "vw_entry": 752.38,
-    "vw_room": 0.639
+    "room": 0.548,
+    "vw_entry": null,
+    "vw_room": null
    }
   },
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.165,
+  "mfe_t": "09:30",
+  "mfe_px": 751.31
  },
  "macro": {
   "date": "2026-10-09",
@@ -6845,5 +6845,5 @@
   "v": 0.2117,
   "src": "VXN"
  },
- "last_poll": "2026-10-09T09:30:17-04:00"
+ "last_poll": "2026-10-09T09:35:16-04:00"
 }
