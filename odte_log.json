@@ -489,13 +489,13 @@
   },
   "2026-10-13": {
    "status": "NO TRADE · VIX게이트 (백분위 8% < 50)",
-   "score": -1,
-   "rsi": 42.7,
+   "score": -2,
+   "rsi": 38.6,
    "direction": 0,
    "gap": -0.87,
-   "px": 743.93,
-   "vwap": 741.66,
-   "at": "10:05",
+   "px": 743.64,
+   "vwap": 741.91,
+   "at": "10:10",
    "vix_pct": 8.0,
    "vix_state": "DEAD",
    "pm_pos": -0.005
@@ -523,12 +523,12 @@
   "sgn": -1,
   "prev_close": 746.02,
   "open": 739.53,
-  "entry": 743.93,
+  "entry": 743.64,
   "target": 746.02,
-  "room": 0.281,
-  "cover": 0.68,
+  "room": 0.32,
+  "cover": 0.63,
   "r50": 741.86,
-  "cur": 743.93,
+  "cur": 743.64,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -553,12 +553,12 @@
     "vw_room": null
    },
    "1h": {
-    "cover": 0.68,
-    "entry": 743.93,
+    "cover": 0.63,
+    "entry": 743.64,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.281,
+    "room": 0.32,
     "vw_entry": null,
     "vw_room": null
    }
@@ -7581,5 +7581,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-13T10:05:16-04:00"
+ "last_poll": "2026-10-13T10:10:16-04:00"
 }
