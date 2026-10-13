@@ -490,12 +490,12 @@
   "2026-10-13": {
    "status": "NO TRADE · VIX게이트 (백분위 8% < 50)",
    "score": -1,
-   "rsi": 42.0,
+   "rsi": 42.7,
    "direction": 0,
    "gap": -0.87,
-   "px": 743.68,
-   "vwap": 741.5,
-   "at": "10:00",
+   "px": 743.93,
+   "vwap": 741.66,
+   "at": "10:05",
    "vix_pct": 8.0,
    "vix_state": "DEAD",
    "pm_pos": -0.005
@@ -523,12 +523,12 @@
   "sgn": -1,
   "prev_close": 746.02,
   "open": 739.53,
-  "entry": 743.68,
+  "entry": 743.93,
   "target": 746.02,
-  "room": 0.315,
-  "cover": 0.64,
-  "r50": 741.75,
-  "cur": 743.68,
+  "room": 0.281,
+  "cover": 0.68,
+  "r50": 741.86,
+  "cur": 743.93,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -553,12 +553,12 @@
     "vw_room": null
    },
    "1h": {
-    "cover": 0.64,
-    "entry": 743.68,
+    "cover": 0.68,
+    "entry": 743.93,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.315,
+    "room": 0.281,
     "vw_entry": null,
     "vw_room": null
    }
@@ -566,9 +566,9 @@
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.6,
-  "mfe_t": "09:50",
-  "mfe_px": 743.97
+  "mfe": 0.632,
+  "mfe_t": "10:00",
+  "mfe_px": 744.2
  },
  "macro": {
   "date": "2026-10-13",
@@ -1247,10 +1247,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.443,
-    "mfe_t": "10:00",
-    "mfe_prem": 8.0,
-    "mfe_prem_t": "10:00",
+    "mfe": 0.477,
+    "mfe_t": "10:05",
+    "mfe_prem": 10.8,
+    "mfe_prem_t": "10:05",
     "filled": false,
     "fill_t": null,
     "res": null
@@ -1752,10 +1752,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.059,
-    "mfe_t": "10:00",
-    "mfe_prem": 3.9,
-    "mfe_prem_t": "10:00",
+    "mfe": 0.093,
+    "mfe_t": "10:05",
+    "mfe_prem": 7.6,
+    "mfe_prem_t": "10:05",
     "filled": false,
     "fill_t": null,
     "res": null
@@ -7581,5 +7581,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-13T10:00:16-04:00"
+ "last_poll": "2026-10-13T10:05:16-04:00"
 }
