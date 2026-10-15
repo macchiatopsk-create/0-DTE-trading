@@ -516,12 +516,12 @@
   "2026-10-15": {
    "status": "NO TRADE · 프리마켓 위치 0.14 <= 0.5 (롱 엣지 없음)",
    "score": -2,
-   "rsi": 33.6,
+   "rsi": 31.6,
    "direction": 0,
-   "gap": -1.42,
-   "px": 720.53,
-   "vwap": 719.42,
-   "at": "10:25",
+   "gap": -1.41,
+   "px": 719.81,
+   "vwap": 719.78,
+   "at": "10:30",
    "vix_pct": 51.4,
    "vix_state": "LIVE",
    "pm_pos": 0.135
@@ -543,18 +543,18 @@
   "date": "2026-10-15",
   "orh": 719.42,
   "orl": 717.01,
-  "state": "WAIT",
-  "gap": -1.42,
+  "state": "LOW_COVER",
+  "gap": -1.413,
   "dir": "롱",
   "sgn": -1,
-  "prev_close": 728.89,
+  "prev_close": 728.84,
   "open": 718.54,
-  "entry": 720.53,
-  "target": 728.89,
-  "room": 1.16,
-  "cover": 0.19,
+  "entry": 720.1,
+  "target": 728.84,
+  "room": 1.214,
+  "cover": 0.15,
   "r50": 719.99,
-  "cur": 720.53,
+  "cur": 719.81,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -564,9 +564,9 @@
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.169,
+    "room": 1.162,
     "vw_entry": 718.4,
-    "vw_room": 1.46
+    "vw_room": 1.453
    },
    "15m": {
     "cover": 0.18,
@@ -574,24 +574,24 @@
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.183,
-    "vw_entry": 718.69,
-    "vw_room": 1.419
+    "room": 1.176,
+    "vw_entry": 719.04,
+    "vw_room": 1.363
    },
    "1h": {
-    "cover": 0.19,
-    "entry": 720.53,
-    "ready": false,
+    "cover": 0.15,
+    "entry": 720.1,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.16,
-    "vw_entry": null,
-    "vw_room": null
+    "room": 1.214,
+    "vw_entry": 719.78,
+    "vw_room": 1.259
    }
   },
   "band_px": 717.86,
   "band_t": "09:35",
-  "band_room": 1.537,
+  "band_room": 1.53,
   "mfe": 0.405,
   "mfe_t": "10:10",
   "mfe_px": 721.45
@@ -5973,7 +5973,7 @@
   "d": "2026-10-15",
   "vchg": 4.03,
   "state": "GO",
-  "why": "확인 (갭 -1.42% · VIX +4.0%)"
+  "why": "확인 (갭 -1.41% · VIX +4.0%)"
  },
  "comb": {
   "books": {
@@ -8223,5 +8223,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-15T10:25:16-04:00"
+ "last_poll": "2026-10-15T10:30:17-04:00"
 }
