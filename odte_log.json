@@ -515,8 +515,8 @@
   },
   "2026-10-15": {
    "status": "WAIT_OPEN",
-   "bars": 3,
-   "at": "09:45"
+   "bars": 5,
+   "at": "09:50"
   }
  },
  "vix": {
@@ -541,12 +541,12 @@
   "sgn": -1,
   "prev_close": 728.84,
   "open": 718.54,
-  "entry": 720.37,
+  "entry": 718.77,
   "target": 728.84,
-  "room": 1.176,
-  "cover": 0.18,
-  "r50": 719.73,
-  "cur": 720.37,
+  "room": 1.401,
+  "cover": 0.02,
+  "r50": 719.85,
+  "cur": 718.77,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -567,26 +567,26 @@
     "ok": false,
     "over": false,
     "room": 1.176,
-    "vw_entry": null,
-    "vw_room": null
+    "vw_entry": 719.04,
+    "vw_room": 1.363
    },
    "1h": {
-    "cover": 0.18,
-    "entry": 720.37,
+    "cover": 0.02,
+    "entry": 718.77,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.176,
-    "vw_entry": null,
-    "vw_room": null
+    "room": 1.401,
+    "vw_entry": 719.04,
+    "vw_room": 1.363
    }
   },
   "band_px": 717.86,
   "band_t": "09:35",
   "band_room": 1.53,
-  "mfe": 0.333,
-  "mfe_t": "09:40",
-  "mfe_px": 720.93
+  "mfe": 0.363,
+  "mfe_t": "09:45",
+  "mfe_px": 721.15
  },
  "macro": {
   "date": "2026-10-15",
@@ -4385,15 +4385,15 @@
    },
    "prem_src": "실시간(모델가)",
    "or_stop": 719.42,
-   "ext": 720.37,
-   "mfe": 0.0,
-   "mfe_t": null,
-   "mfe_prem": 0.0,
-   "mfe_prem_t": "09:45",
+   "ext": 718.3699951171875,
+   "mfe": 0.222,
+   "mfe_t": "09:50",
+   "mfe_prem": 26.3,
+   "mfe_prem_t": "09:50",
    "filled": false,
    "fill_t": null,
    "res": null,
-   "trail_px": 722.53
+   "trail_px": 720.53
   },
   "trades": [
    {
@@ -8081,5 +8081,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-15T09:45:16-04:00"
+ "last_poll": "2026-10-15T09:50:16-04:00"
 }
