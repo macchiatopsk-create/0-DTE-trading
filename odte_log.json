@@ -516,12 +516,12 @@
   "2026-10-15": {
    "status": "NO TRADE · 프리마켓 위치 0.14 <= 0.5 (롱 엣지 없음)",
    "score": -2,
-   "rsi": 33.0,
+   "rsi": 33.2,
    "direction": 0,
    "gap": -1.42,
-   "px": 720.06,
-   "vwap": 718.47,
-   "at": "10:15",
+   "px": 720.53,
+   "vwap": 718.52,
+   "at": "10:20",
    "vix_pct": 51.4,
    "vix_state": "LIVE",
    "pm_pos": 0.135
@@ -549,12 +549,12 @@
   "sgn": -1,
   "prev_close": 728.89,
   "open": 718.54,
-  "entry": 720.06,
+  "entry": 720.53,
   "target": 728.89,
-  "room": 1.226,
-  "cover": 0.15,
+  "room": 1.16,
+  "cover": 0.19,
   "r50": 719.99,
-  "cur": 720.06,
+  "cur": 720.53,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -579,12 +579,12 @@
     "vw_room": 1.419
    },
    "1h": {
-    "cover": 0.15,
-    "entry": 720.06,
+    "cover": 0.19,
+    "entry": 720.53,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.226,
+    "room": 1.16,
     "vw_entry": null,
     "vw_room": null
    }
@@ -8223,5 +8223,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-15T10:15:16-04:00"
+ "last_poll": "2026-10-15T10:20:16-04:00"
 }
