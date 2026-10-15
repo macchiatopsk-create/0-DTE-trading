@@ -544,17 +544,17 @@
   "orh": 719.42,
   "orl": 717.01,
   "state": "LOW_COVER",
-  "gap": -1.413,
+  "gap": -1.42,
   "dir": "롱",
   "sgn": -1,
-  "prev_close": 728.84,
+  "prev_close": 728.89,
   "open": 718.54,
   "entry": 720.1,
-  "target": 728.84,
-  "room": 1.214,
+  "target": 728.89,
+  "room": 1.221,
   "cover": 0.15,
   "r50": 722.32,
-  "cur": 723.27,
+  "cur": 723.54,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -564,9 +564,9 @@
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.162,
+    "room": 1.169,
     "vw_entry": 718.4,
-    "vw_room": 1.453
+    "vw_room": 1.46
    },
    "15m": {
     "cover": 0.18,
@@ -574,9 +574,9 @@
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.176,
-    "vw_entry": 719.04,
-    "vw_room": 1.363
+    "room": 1.183,
+    "vw_entry": 718.69,
+    "vw_room": 1.419
    },
    "1h": {
     "cover": 0.15,
@@ -584,14 +584,14 @@
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.214,
-    "vw_entry": 719.78,
-    "vw_room": 1.259
+    "room": 1.221,
+    "vw_entry": 719.44,
+    "vw_room": 1.314
    }
   },
   "band_px": 717.86,
   "band_t": "09:35",
-  "band_room": 1.53,
+  "band_room": 1.537,
   "mfe": 1.052,
   "mfe_t": "11:15",
   "mfe_px": 726.1
@@ -5973,7 +5973,7 @@
   "d": "2026-10-15",
   "vchg": 4.03,
   "state": "GO",
-  "why": "확인 (갭 -1.41% · VIX +4.0%)"
+  "why": "확인 (갭 -1.42% · VIX +4.0%)"
  },
  "comb": {
   "books": {
@@ -8223,5 +8223,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-15T12:55:17-04:00"
+ "last_poll": "2026-10-15T13:00:16-04:00"
 }
