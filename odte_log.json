@@ -515,8 +515,8 @@
   },
   "2026-10-15": {
    "status": "WAIT_OPEN",
-   "bars": 5,
-   "at": "09:50"
+   "bars": 6,
+   "at": "09:55"
   }
  },
  "vix": {
@@ -536,17 +536,17 @@
   "orh": 719.42,
   "orl": 717.01,
   "state": "WAIT",
-  "gap": -1.413,
+  "gap": -1.42,
   "dir": "롱",
   "sgn": -1,
-  "prev_close": 728.84,
+  "prev_close": 728.89,
   "open": 718.54,
-  "entry": 718.77,
-  "target": 728.84,
-  "room": 1.401,
-  "cover": 0.02,
+  "entry": 715.71,
+  "target": 728.89,
+  "room": 1.842,
+  "cover": -0.27,
   "r50": 719.85,
-  "cur": 718.77,
+  "cur": 715.71,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -556,9 +556,9 @@
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.162,
+    "room": 1.169,
     "vw_entry": 718.4,
-    "vw_room": 1.453
+    "vw_room": 1.46
    },
    "15m": {
     "cover": 0.18,
@@ -566,24 +566,24 @@
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.176,
-    "vw_entry": 719.04,
-    "vw_room": 1.363
+    "room": 1.183,
+    "vw_entry": 718.69,
+    "vw_room": 1.419
    },
    "1h": {
-    "cover": 0.02,
-    "entry": 718.77,
+    "cover": -0.27,
+    "entry": 715.71,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.401,
-    "vw_entry": 719.04,
-    "vw_room": 1.363
+    "room": 1.842,
+    "vw_entry": 718.5,
+    "vw_room": 1.446
    }
   },
   "band_px": 717.86,
   "band_t": "09:35",
-  "band_room": 1.53,
+  "band_room": 1.537,
   "mfe": 0.363,
   "mfe_t": "09:45",
   "mfe_px": 721.15
@@ -4385,15 +4385,15 @@
    },
    "prem_src": "실시간(모델가)",
    "or_stop": 719.42,
-   "ext": 718.3699951171875,
-   "mfe": 0.222,
-   "mfe_t": "09:50",
-   "mfe_prem": 26.3,
-   "mfe_prem_t": "09:50",
+   "ext": 715.71,
+   "mfe": 0.647,
+   "mfe_t": "09:55",
+   "mfe_prem": 78.9,
+   "mfe_prem_t": "09:55",
    "filled": false,
    "fill_t": null,
    "res": null,
-   "trail_px": 720.53
+   "trail_px": 717.86
   },
   "trades": [
    {
@@ -5921,7 +5921,7 @@
   "d": "2026-10-15",
   "vchg": 4.03,
   "state": "GO",
-  "why": "확인 (갭 -1.41% · VIX +4.0%)"
+  "why": "확인 (갭 -1.42% · VIX +4.0%)"
  },
  "comb": {
   "books": {
@@ -8081,5 +8081,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-15T09:50:16-04:00"
+ "last_poll": "2026-10-15T09:55:16-04:00"
 }
