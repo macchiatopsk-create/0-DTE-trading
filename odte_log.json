@@ -515,8 +515,8 @@
   },
   "2026-10-15": {
    "status": "WAIT_OPEN",
-   "bars": 1,
-   "at": "09:30"
+   "bars": 2,
+   "at": "09:35"
   }
  },
  "vix": {
@@ -526,67 +526,67 @@
   "asof": "2026-10-14"
  },
  "pm": {
-  "pos": 0.141,
+  "pos": 0.135,
   "pm_hi": 728.4,
   "pm_lo": 717.0,
   "ok": false
  },
  "gap": {
   "date": "2026-10-15",
-  "orh": 718.61,
-  "orl": 718.61,
+  "orh": 719.42,
+  "orl": 717.01,
   "state": "WAIT",
-  "gap": -1.404,
+  "gap": -1.42,
   "dir": "롱",
   "sgn": -1,
-  "prev_close": 728.84,
-  "open": 718.61,
-  "entry": 718.61,
-  "target": 728.84,
-  "room": 1.424,
-  "cover": 0.0,
-  "r50": 718.61,
-  "cur": 718.61,
+  "prev_close": 728.89,
+  "open": 718.54,
+  "entry": 718.16,
+  "target": 728.89,
+  "room": 1.494,
+  "cover": -0.04,
+  "r50": 718.98,
+  "cur": 718.16,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.0,
-    "entry": 718.61,
-    "ready": false,
+    "cover": -0.04,
+    "entry": 718.16,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.424,
-    "vw_entry": 718.61,
-    "vw_room": 1.424
+    "room": 1.494,
+    "vw_entry": null,
+    "vw_room": null
    },
    "15m": {
-    "cover": 0.0,
-    "entry": 718.61,
+    "cover": -0.04,
+    "entry": 718.16,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.424,
-    "vw_entry": 718.61,
-    "vw_room": 1.424
+    "room": 1.494,
+    "vw_entry": null,
+    "vw_room": null
    },
    "1h": {
-    "cover": 0.0,
-    "entry": 718.61,
+    "cover": -0.04,
+    "entry": 718.16,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.424,
-    "vw_entry": 718.61,
-    "vw_room": 1.424
+    "room": 1.494,
+    "vw_entry": null,
+    "vw_room": null
    }
   },
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.122,
+  "mfe_t": "09:30",
+  "mfe_px": 719.42
  },
  "macro": {
   "date": "2026-10-15",
@@ -8035,5 +8035,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-15T09:30:16-04:00"
+ "last_poll": "2026-10-15T09:35:16-04:00"
 }
