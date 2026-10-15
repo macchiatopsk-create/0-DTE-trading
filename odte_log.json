@@ -516,7 +516,7 @@
   "2026-10-15": {
    "status": "WAIT_OPEN",
    "bars": 6,
-   "at": "09:55"
+   "at": "10:00"
   }
  },
  "vix": {
@@ -541,12 +541,12 @@
   "sgn": -1,
   "prev_close": 728.89,
   "open": 718.54,
-  "entry": 715.71,
+  "entry": 717.03,
   "target": 728.89,
-  "room": 1.842,
-  "cover": -0.27,
+  "room": 1.654,
+  "cover": -0.15,
   "r50": 719.85,
-  "cur": 715.71,
+  "cur": 717.03,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -571,14 +571,14 @@
     "vw_room": 1.419
    },
    "1h": {
-    "cover": -0.27,
-    "entry": 715.71,
+    "cover": -0.15,
+    "entry": 717.03,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.842,
-    "vw_entry": 718.5,
-    "vw_room": 1.446
+    "room": 1.654,
+    "vw_entry": 718.28,
+    "vw_room": 1.477
    }
   },
   "band_px": 717.86,
@@ -4385,7 +4385,7 @@
    },
    "prem_src": "실시간(모델가)",
    "or_stop": 719.42,
-   "ext": 715.71,
+   "ext": 715.4349975585938,
    "mfe": 0.647,
    "mfe_t": "09:55",
    "mfe_prem": 78.9,
@@ -4393,7 +4393,7 @@
    "filled": false,
    "fill_t": null,
    "res": null,
-   "trail_px": 717.86
+   "trail_px": 717.58
   },
   "trades": [
    {
@@ -8081,5 +8081,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-15T09:55:16-04:00"
+ "last_poll": "2026-10-15T10:00:16-04:00"
 }
