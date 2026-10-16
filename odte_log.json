@@ -567,7 +567,7 @@
   "room": 1.055,
   "cover": -1.97,
   "r50": 725.71,
-  "cur": 708.26,
+  "cur": 710.09,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -578,8 +578,8 @@
     "ok": false,
     "over": false,
     "room": 0.775,
-    "vw_entry": 724.22,
-    "vw_room": 0.527
+    "vw_entry": 724.42,
+    "vw_room": 0.5
    },
    "15m": {
     "cover": -0.83,
@@ -588,8 +588,8 @@
     "ok": false,
     "over": false,
     "room": 0.647,
-    "vw_entry": 723.81,
-    "vw_room": 0.584
+    "vw_entry": 724.11,
+    "vw_room": 0.543
    },
    "1h": {
     "cover": -1.97,
@@ -598,13 +598,13 @@
     "ok": false,
     "over": false,
     "room": 1.055,
-    "vw_entry": 721.5,
-    "vw_room": 0.906
+    "vw_entry": 723.01,
+    "vw_room": 0.696
    }
   },
-  "band_px": 723.4,
+  "band_px": 723.74,
   "band_t": "09:35",
-  "band_room": 0.641,
+  "band_room": 0.594,
   "mfe": 0.063,
   "mfe_t": "09:30",
   "mfe_px": 725.94
@@ -8245,5 +8245,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-16T15:10:16-04:00"
+ "last_poll": "2026-10-16T15:15:16-04:00"
 }
