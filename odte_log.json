@@ -1,5 +1,36 @@
 {
- "open": null,
+ "open": {
+  "date": "2026-10-19",
+  "side": "call",
+  "mfe": -99.0,
+  "mfe_t": null,
+  "contracts": {
+   "30": 1,
+   "40": 2,
+   "50": 2,
+   "60": 3,
+   "70": 3
+  },
+  "mfe_prem": -99.0,
+  "mfe_prem_t": null,
+  "strike": 712.0,
+  "premium": 5.94,
+  "premium_q": 7.63,
+  "basis": "rt",
+  "iv": 0.2842,
+  "symbol": "QQQ261019C00712000",
+  "spot_rt": 717.8,
+  "entry_time": "10:00",
+  "entry_px": 717.8,
+  "score": 2,
+  "gap": 1.36,
+  "rsi": 73.5,
+  "stop_px": 716.98,
+  "version": "itm-2.0",
+  "vix_pct": 91.2,
+  "vix_state": "LIVE",
+  "pm_pos": 0.929
+ },
  "trades": [
   {
    "date": "2026-08-12",
@@ -540,9 +571,17 @@
    "pm_pos": -0.014
   },
   "2026-10-19": {
-   "status": "WAIT_OPEN",
-   "bars": 6,
-   "at": "09:55"
+   "status": "진입 · BUY CALL 712 @ $5.94 (잔고 $3010)",
+   "score": 2,
+   "rsi": 73.5,
+   "direction": 0,
+   "gap": 1.36,
+   "px": 717.8,
+   "vwap": 719.11,
+   "at": "10:00",
+   "vix_pct": 91.2,
+   "vix_state": "LIVE",
+   "pm_pos": 0.929
   }
  },
  "vix": {
@@ -567,12 +606,12 @@
   "sgn": 1,
   "prev_close": 709.93,
   "open": 719.61,
-  "entry": 718.2,
+  "entry": 717.8,
   "target": 709.93,
-  "room": 1.151,
-  "cover": 0.15,
-  "r50": 718.89,
-  "cur": 718.2,
+  "room": 1.096,
+  "cover": 0.19,
+  "r50": 718.48,
+  "cur": 717.8,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -597,12 +636,12 @@
     "vw_room": 1.299
    },
    "1h": {
-    "cover": 0.15,
-    "entry": 718.2,
+    "cover": 0.19,
+    "entry": 717.8,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.151,
+    "room": 1.096,
     "vw_entry": null,
     "vw_room": null
    }
@@ -610,9 +649,9 @@
   "band_px": 719.41,
   "band_t": "09:35",
   "band_room": 1.318,
-  "mfe": 0.201,
-  "mfe_t": "09:35",
-  "mfe_px": 718.16
+  "mfe": 0.317,
+  "mfe_t": "09:55",
+  "mfe_px": 717.34
  },
  "macro": {
   "date": "2026-10-19",
@@ -8251,5 +8290,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-19T09:55:16-04:00"
+ "last_poll": "2026-10-19T10:00:16-04:00"
 }
