@@ -598,13 +598,13 @@
   },
   "2026-10-20": {
    "status": "NO TRADE · 프리마켓 위치 0.44 <= 0.5 (롱 엣지 없음)",
-   "score": -2,
-   "rsi": 38.3,
+   "score": -1,
+   "rsi": 43.8,
    "direction": 0,
    "gap": -0.44,
-   "px": 716.4,
-   "vwap": 713.81,
-   "at": "10:05",
+   "px": 718.26,
+   "vwap": 714.19,
+   "at": "10:10",
    "vix_pct": 83.7,
    "vix_state": "LIVE",
    "pm_pos": 0.441
@@ -632,14 +632,14 @@
   "sgn": -1,
   "prev_close": 718.32,
   "open": 715.19,
-  "entry": 716.4,
+  "entry": 718.26,
   "target": 718.32,
-  "room": 0.268,
-  "cover": 0.39,
-  "r50": 716.09,
-  "cur": 716.4,
-  "filled": false,
-  "trail": null,
+  "room": 0.008,
+  "cover": 0.98,
+  "r50": 716.88,
+  "cur": 718.26,
+  "filled": true,
+  "trail": 717.49,
   "tfs": {
    "5m": {
     "cover": -0.72,
@@ -662,12 +662,12 @@
     "vw_room": 0.685
    },
    "1h": {
-    "cover": 0.39,
-    "entry": 716.4,
+    "cover": 0.98,
+    "entry": 718.26,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.268,
+    "room": 0.008,
     "vw_entry": null,
     "vw_room": null
    }
@@ -675,9 +675,9 @@
   "band_px": 713.72,
   "band_t": "09:35",
   "band_room": 0.645,
-  "mfe": 0.252,
-  "mfe_t": "10:00",
-  "mfe_px": 716.99
+  "mfe": 0.473,
+  "mfe_t": "10:05",
+  "mfe_px": 718.57
  },
  "macro": {
   "date": "2026-10-20",
@@ -8360,5 +8360,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-20T10:05:16-04:00"
+ "last_poll": "2026-10-20T10:10:16-04:00"
 }
