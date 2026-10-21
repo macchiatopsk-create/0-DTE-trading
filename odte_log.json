@@ -612,7 +612,7 @@
   "2026-10-21": {
    "status": "WAIT_OPEN",
    "bars": 2,
-   "at": "09:35"
+   "at": "09:40"
   }
  },
  "vix": {
@@ -637,52 +637,52 @@
   "sgn": 1,
   "prev_close": 717.52,
   "open": 722.22,
-  "entry": 722.16,
+  "entry": 722.4,
   "target": 717.52,
-  "room": 0.643,
-  "cover": 0.01,
-  "r50": 721.63,
-  "cur": 722.16,
+  "room": 0.676,
+  "cover": -0.04,
+  "r50": 721.49,
+  "cur": 722.4,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.01,
-    "entry": 722.16,
+    "cover": -0.04,
+    "entry": 722.4,
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.643,
-    "vw_entry": 722.13,
-    "vw_room": 0.638
+    "room": 0.676,
+    "vw_entry": 722.1,
+    "vw_room": 0.634
    },
    "15m": {
-    "cover": 0.01,
-    "entry": 722.16,
+    "cover": -0.04,
+    "entry": 722.4,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.643,
-    "vw_entry": 722.13,
-    "vw_room": 0.638
+    "room": 0.676,
+    "vw_entry": 722.1,
+    "vw_room": 0.634
    },
    "1h": {
-    "cover": 0.01,
-    "entry": 722.16,
+    "cover": -0.04,
+    "entry": 722.4,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.643,
-    "vw_entry": 722.13,
-    "vw_room": 0.638
+    "room": 0.676,
+    "vw_entry": 722.1,
+    "vw_room": 0.634
    }
   },
-  "band_px": null,
-  "band_t": null,
-  "band_room": null,
-  "mfe": 0.163,
-  "mfe_t": "09:30",
-  "mfe_px": 721.04
+  "band_px": 722.18,
+  "band_t": "09:35",
+  "band_room": 0.645,
+  "mfe": 0.202,
+  "mfe_t": "09:35",
+  "mfe_px": 720.76
  },
  "macro": {
   "date": "2026-10-21",
@@ -8382,5 +8382,5 @@
   "v": 0.2104,
   "src": "VXN"
  },
- "last_poll": "2026-10-21T09:35:16-04:00"
+ "last_poll": "2026-10-21T09:40:16-04:00"
 }
