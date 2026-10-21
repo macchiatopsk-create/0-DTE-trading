@@ -1,5 +1,36 @@
 {
- "open": null,
+ "open": {
+  "date": "2026-10-21",
+  "side": "call",
+  "mfe": -99.0,
+  "mfe_t": null,
+  "contracts": {
+   "30": 1,
+   "40": 2,
+   "50": 2,
+   "60": 3,
+   "70": 3
+  },
+  "mfe_prem": -99.0,
+  "mfe_prem_t": null,
+  "strike": 715.0,
+  "premium": 6.42,
+  "premium_q": 7.22,
+  "basis": "rt",
+  "iv": 0.2212,
+  "symbol": "QQQ261021C00715000",
+  "spot_rt": 721.23,
+  "entry_time": "10:10",
+  "entry_px": 721.23,
+  "score": 2,
+  "gap": 0.66,
+  "rsi": 62.4,
+  "stop_px": 719.36,
+  "version": "itm-2.0",
+  "vix_pct": 73.7,
+  "vix_state": "LIVE",
+  "pm_pos": 0.776
+ },
  "trades": [
   {
    "date": "2026-08-12",
@@ -610,14 +641,14 @@
    "pm_pos": 0.441
   },
   "2026-10-21": {
-   "status": "WAIT · 3층 통과 (VIX 74% · PM 0.78) · VWAP -1σ 터치 대기 (현재 +0.58σ)",
-   "score": 4,
-   "rsi": 69.2,
-   "direction": 1,
+   "status": "진입 · BUY CALL 715 @ $6.42 (잔고 $3247)",
+   "score": 2,
+   "rsi": 62.4,
+   "direction": 0,
    "gap": 0.66,
-   "px": 722.25,
-   "vwap": 722.0,
-   "at": "10:05",
+   "px": 721.23,
+   "vwap": 721.98,
+   "at": "10:10",
    "vix_pct": 73.7,
    "vix_state": "LIVE",
    "pm_pos": 0.776
@@ -645,12 +676,12 @@
   "sgn": 1,
   "prev_close": 717.52,
   "open": 722.22,
-  "entry": 722.25,
+  "entry": 721.23,
   "target": 717.52,
-  "room": 0.655,
-  "cover": -0.01,
+  "room": 0.514,
+  "cover": 0.21,
   "r50": 720.97,
-  "cur": 722.25,
+  "cur": 721.23,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -675,14 +706,14 @@
     "vw_room": 0.604
    },
    "1h": {
-    "cover": -0.01,
-    "entry": 722.25,
+    "cover": 0.21,
+    "entry": 721.23,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.655,
-    "vw_entry": 722.0,
-    "vw_room": 0.62
+    "room": 0.514,
+    "vw_entry": null,
+    "vw_room": null
    }
   },
   "band_px": 722.18,
@@ -4469,52 +4500,7 @@
   "lvl": 17.25
  },
  "mom_track": {
-  "open": {
-   "date": "2026-10-21",
-   "tf": "mom",
-   "em": "vix",
-   "comb": {
-    "30": 1,
-    "40": 1,
-    "50": 1,
-    "60": 1,
-    "70": 1
-   },
-   "dir": "롱",
-   "sgn": 1,
-   "gap": 0.655,
-   "cover": 0.29,
-   "vchg": -0.35,
-   "entry": 720.57,
-   "target": "러너",
-   "room": null,
-   "at": "09:45",
-   "found_at": "09:45",
-   "opt_side": "call",
-   "strike": 715.0,
-   "premium": 5.71,
-   "premium_q": 6.09,
-   "basis": "rt",
-   "spot_rt": 720.57,
-   "contracts": {
-    "30": 1,
-    "40": 1,
-    "50": 1,
-    "60": 1,
-    "70": 1
-   },
-   "prem_src": "실시간(모델가)",
-   "or_stop": 721.04,
-   "ext": 723.5700073242188,
-   "mfe": 0.279,
-   "mfe_t": "10:00",
-   "mfe_prem": 34.9,
-   "mfe_prem_t": "10:00",
-   "filled": false,
-   "fill_t": null,
-   "res": null,
-   "trail_px": 721.4
-  },
+  "open": null,
   "trades": [
    {
     "date": "2026-08-25",
@@ -5385,11 +5371,65 @@
     "ux": 0.125,
     "exit_premium_q": 7.44,
     "pnl_q": -6.4
+   },
+   {
+    "date": "2026-10-21",
+    "tf": "mom",
+    "em": "vix",
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.655,
+    "cover": 0.29,
+    "vchg": -0.35,
+    "entry": 720.57,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "09:45",
+    "opt_side": "call",
+    "strike": 715.0,
+    "premium": 5.71,
+    "premium_q": 6.09,
+    "basis": "rt",
+    "spot_rt": 720.57,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "prem_src": "실시간(모델가)",
+    "or_stop": 721.04,
+    "ext": 723.5700073242188,
+    "mfe": 0.279,
+    "mfe_t": "10:00",
+    "mfe_prem": 34.9,
+    "mfe_prem_t": "10:00",
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL",
+    "trail_px": 721.4,
+    "exit": 721.23,
+    "exit_at": "10:10",
+    "exit_premium": 6.29,
+    "pnl_pct": 10.2,
+    "per_contract": 58.0,
+    "ux": 0.092,
+    "exit_premium_q": 6.84,
+    "pnl_q": 12.3
    }
   ],
   "books": {
    "30": {
-    "cap": 2029.0,
+    "cap": 2087.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -5520,11 +5560,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "40": {
-    "cap": 1625.0,
+    "cap": 1683.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -5655,11 +5702,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "50": {
-    "cap": 1398.0,
+    "cap": 1456.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -5790,11 +5844,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "60": {
-    "cap": 1028.0,
+    "cap": 1086.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -5925,11 +5986,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "70": {
-    "cap": 1030.0,
+    "cap": 1088.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6060,6 +6128,13 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    }
@@ -6152,7 +6227,7 @@
  "comb": {
   "books": {
    "30": {
-    "cap": 2025.0,
+    "cap": 2083.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6305,11 +6380,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "40": {
-    "cap": 1521.0,
+    "cap": 1579.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6462,11 +6544,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "50": {
-    "cap": 1262.0,
+    "cap": 1320.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6619,11 +6708,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "60": {
-    "cap": 1051.0,
+    "cap": 1109.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6776,11 +6872,18 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    },
    "70": {
-    "cap": 894.0,
+    "cap": 952.0,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6933,6 +7036,13 @@
       "usd": 71.0,
       "pct": 12.4,
       "res": "STOP(OR)"
+     },
+     {
+      "d": "2026-10-21",
+      "nc": 1,
+      "usd": 58.0,
+      "pct": 10.2,
+      "res": "TRAIL"
      }
     ]
    }
@@ -7981,9 +8091,64 @@
     "exit_premium_q": 7.44,
     "pnl_q": -6.4,
     "strat": "모멘텀"
+   },
+   {
+    "date": "2026-10-21",
+    "tf": "mom",
+    "em": "vix",
+    "comb": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.655,
+    "cover": 0.29,
+    "vchg": -0.35,
+    "entry": 720.57,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "09:45",
+    "opt_side": "call",
+    "strike": 715.0,
+    "premium": 5.71,
+    "premium_q": 6.09,
+    "basis": "rt",
+    "spot_rt": 720.57,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "prem_src": "실시간(모델가)",
+    "or_stop": 721.04,
+    "ext": 723.5700073242188,
+    "mfe": 0.279,
+    "mfe_t": "10:00",
+    "mfe_prem": 34.9,
+    "mfe_prem_t": "10:00",
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL",
+    "trail_px": 721.4,
+    "exit": 721.23,
+    "exit_at": "10:10",
+    "exit_premium": 6.29,
+    "pnl_pct": 10.2,
+    "per_contract": 58.0,
+    "ux": 0.092,
+    "exit_premium_q": 6.84,
+    "pnl_q": 12.3,
+    "strat": "모멘텀"
    }
   ],
-  "open_by": "모멘텀",
+  "open_by": null,
   "skips": []
  },
  "l3_books": {
@@ -8436,5 +8601,5 @@
   "v": 0.2445,
   "src": "VXN"
  },
- "last_poll": "2026-10-21T10:05:16-04:00"
+ "last_poll": "2026-10-21T10:10:15-04:00"
 }
