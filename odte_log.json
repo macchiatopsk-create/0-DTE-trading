@@ -2,8 +2,8 @@
  "open": {
   "date": "2026-10-21",
   "side": "call",
-  "mfe": -99.0,
-  "mfe_t": null,
+  "mfe": -0.067,
+  "mfe_t": "10:15",
   "contracts": {
    "30": 1,
    "40": 2,
@@ -11,8 +11,8 @@
    "60": 3,
    "70": 3
   },
-  "mfe_prem": -99.0,
-  "mfe_prem_t": null,
+  "mfe_prem": -6.9,
+  "mfe_prem_t": "10:15",
   "strike": 715.0,
   "premium": 6.42,
   "premium_q": 7.22,
@@ -676,12 +676,12 @@
   "sgn": 1,
   "prev_close": 717.52,
   "open": 722.22,
-  "entry": 721.23,
+  "entry": 720.75,
   "target": 717.52,
-  "room": 0.514,
-  "cover": 0.21,
+  "room": 0.448,
+  "cover": 0.31,
   "r50": 720.97,
-  "cur": 721.23,
+  "cur": 720.75,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -706,12 +706,12 @@
     "vw_room": 0.604
    },
    "1h": {
-    "cover": 0.21,
-    "entry": 721.23,
+    "cover": 0.31,
+    "entry": 720.75,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.514,
+    "room": 0.448,
     "vw_entry": null,
     "vw_room": null
    }
@@ -8601,5 +8601,5 @@
   "v": 0.2445,
   "src": "VXN"
  },
- "last_poll": "2026-10-21T10:10:15-04:00"
+ "last_poll": "2026-10-21T10:15:16-04:00"
 }
