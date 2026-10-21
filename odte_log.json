@@ -2,8 +2,8 @@
  "open": {
   "date": "2026-10-21",
   "side": "call",
-  "mfe": -0.003,
-  "mfe_t": "10:25",
+  "mfe": 0.072,
+  "mfe_t": "10:30",
   "contracts": {
    "30": 1,
    "40": 2,
@@ -11,8 +11,8 @@
    "60": 3,
    "70": 3
   },
-  "mfe_prem": -0.5,
-  "mfe_prem_t": "10:25",
+  "mfe_prem": 7.3,
+  "mfe_prem_t": "10:30",
   "strike": 715.0,
   "premium": 6.42,
   "premium_q": 7.22,
@@ -29,7 +29,10 @@
   "version": "itm-2.0",
   "vix_pct": 73.7,
   "vix_state": "LIVE",
-  "pm_pos": 0.776
+  "pm_pos": 0.776,
+  "tp1_prem": 6.89,
+  "tp1_prem_q": 6.38,
+  "tp1_time": "10:30"
  },
  "trades": [
   {
@@ -670,18 +673,18 @@
   "date": "2026-10-21",
   "orh": 723.07,
   "orl": 721.04,
-  "state": "WAIT",
+  "state": "LOW_COVER",
   "gap": 0.655,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 717.52,
   "open": 722.22,
-  "entry": 721.21,
+  "entry": 721.81,
   "target": 717.52,
-  "room": 0.512,
-  "cover": 0.21,
+  "room": 0.594,
+  "cover": 0.09,
   "r50": 720.97,
-  "cur": 721.21,
+  "cur": 721.75,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -706,14 +709,14 @@
     "vw_room": 0.604
    },
    "1h": {
-    "cover": 0.21,
-    "entry": 721.21,
-    "ready": false,
+    "cover": 0.09,
+    "entry": 721.81,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.512,
-    "vw_entry": null,
-    "vw_room": null
+    "room": 0.594,
+    "vw_entry": 721.6,
+    "vw_room": 0.565
    }
   },
   "band_px": 722.18,
@@ -8601,5 +8604,5 @@
   "v": 0.2445,
   "src": "VXN"
  },
- "last_poll": "2026-10-21T10:25:16-04:00"
+ "last_poll": "2026-10-21T10:30:15-04:00"
 }
