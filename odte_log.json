@@ -681,8 +681,8 @@
   },
   "2026-10-23": {
    "status": "WAIT_OPEN",
-   "bars": 4,
-   "at": "09:45"
+   "bars": 5,
+   "at": "09:50"
   }
  },
  "vix": {
@@ -707,14 +707,14 @@
   "sgn": -1,
   "prev_close": 704.59,
   "open": 702.1,
-  "entry": 704.09,
+  "entry": 704.17,
   "target": 704.59,
-  "room": 0.071,
-  "cover": 0.8,
-  "r50": 703.3,
-  "cur": 704.09,
-  "filled": false,
-  "trail": null,
+  "room": 0.06,
+  "cover": 0.83,
+  "r50": 703.52,
+  "cur": 704.17,
+  "filled": true,
+  "trail": 703.88,
   "tfs": {
    "5m": {
     "cover": 0.14,
@@ -737,12 +737,12 @@
     "vw_room": 0.266
    },
    "1h": {
-    "cover": 0.8,
-    "entry": 704.09,
+    "cover": 0.83,
+    "entry": 704.17,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.071,
+    "room": 0.06,
     "vw_entry": null,
     "vw_room": null
    }
@@ -750,9 +750,9 @@
   "band_px": 702.26,
   "band_t": "09:35",
   "band_room": 0.332,
-  "mfe": 0.341,
-  "mfe_t": "09:40",
-  "mfe_px": 704.5
+  "mfe": 0.404,
+  "mfe_t": "09:45",
+  "mfe_px": 704.94
  },
  "macro": {
   "date": "2026-10-23",
@@ -1982,10 +1982,10 @@
     "band_t": "09:35",
     "mfe": 0.0,
     "mfe_t": null,
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:45",
-    "filled": false,
-    "fill_t": null,
+    "mfe_prem": 6.4,
+    "mfe_prem_t": "09:50",
+    "filled": true,
+    "fill_t": "09:45",
     "res": null
    },
    "trades": [
@@ -2625,12 +2625,12 @@
     "prem_src": "실시간(모델가)",
     "band_px": 702.26,
     "band_t": "09:35",
-    "mfe": 0.195,
-    "mfe_t": "09:45",
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:45",
-    "filled": false,
-    "fill_t": null,
+    "mfe": 0.206,
+    "mfe_t": "09:50",
+    "mfe_prem": 3.3,
+    "mfe_prem_t": "09:50",
+    "filled": true,
+    "fill_t": "09:45",
     "res": null
    },
    "trades": [
@@ -8749,9 +8749,9 @@
   "2026-10-23": "09:30"
  },
  "iv_base": {
-  "d": "2026-10-22",
-  "v": 0.2605,
+  "d": "2026-10-23",
+  "v": 0.2888,
   "src": "VXN"
  },
- "last_poll": "2026-10-23T09:45:16-04:00"
+ "last_poll": "2026-10-23T09:50:16-04:00"
 }
