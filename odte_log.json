@@ -681,8 +681,8 @@
   },
   "2026-10-23": {
    "status": "WAIT_OPEN",
-   "bars": 1,
-   "at": "09:30"
+   "bars": 2,
+   "at": "09:35"
   }
  },
  "vix": {
@@ -692,67 +692,67 @@
   "asof": "2026-10-22"
  },
  "pm": {
-  "pos": 0.008,
+  "pos": 0.07,
   "pm_hi": 708.14,
   "pm_lo": 701.65,
   "ok": false
  },
  "gap": {
   "date": "2026-10-23",
-  "orh": 701.7,
-  "orl": 701.7,
+  "orh": 703.87,
+  "orl": 701.37,
   "state": "WAIT",
-  "gap": -0.41,
+  "gap": -0.353,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 704.59,
-  "open": 701.7,
-  "entry": 701.7,
+  "open": 702.1,
+  "entry": 701.93,
   "target": 704.59,
-  "room": 0.412,
-  "cover": 0.0,
-  "r50": 701.7,
-  "cur": 701.7,
+  "room": 0.379,
+  "cover": -0.07,
+  "r50": 702.99,
+  "cur": 701.93,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.0,
-    "entry": 701.7,
-    "ready": false,
+    "cover": -0.07,
+    "entry": 701.93,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.412,
-    "vw_entry": 701.7,
-    "vw_room": 0.412
+    "room": 0.379,
+    "vw_entry": 702.56,
+    "vw_room": 0.289
    },
    "15m": {
-    "cover": 0.0,
-    "entry": 701.7,
+    "cover": -0.07,
+    "entry": 701.93,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.412,
-    "vw_entry": 701.7,
-    "vw_room": 0.412
+    "room": 0.379,
+    "vw_entry": 702.56,
+    "vw_room": 0.289
    },
    "1h": {
-    "cover": 0.0,
-    "entry": 701.7,
+    "cover": -0.07,
+    "entry": 701.93,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.412,
-    "vw_entry": 701.7,
-    "vw_room": 0.412
+    "room": 0.379,
+    "vw_entry": 702.56,
+    "vw_room": 0.289
    }
   },
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.252,
+  "mfe_t": "09:30",
+  "mfe_px": 703.87
  },
  "macro": {
   "date": "2026-10-23",
@@ -8669,5 +8669,5 @@
   "v": 0.2605,
   "src": "VXN"
  },
- "last_poll": "2026-10-23T09:30:16-04:00"
+ "last_poll": "2026-10-23T09:35:16-04:00"
 }
