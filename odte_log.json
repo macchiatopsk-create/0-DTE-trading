@@ -1,36 +1,5 @@
 {
- "open": {
-  "date": "2026-10-26",
-  "side": "call",
-  "mfe": 0.103,
-  "mfe_t": "10:10",
-  "contracts": {
-   "30": 1,
-   "40": 2,
-   "50": 3,
-   "60": 4,
-   "70": 4
-  },
-  "mfe_prem": 10.7,
-  "mfe_prem_t": "10:10",
-  "strike": 701.0,
-  "premium": 5.91,
-  "premium_q": 7.27,
-  "basis": "rt",
-  "iv": 0.2749,
-  "symbol": "QQQ261026C00701000",
-  "spot_rt": 706.51,
-  "entry_time": "10:00",
-  "entry_px": 706.51,
-  "score": 1,
-  "gap": 0.38,
-  "rsi": 57.6,
-  "stop_px": 705.23,
-  "version": "itm-2.0",
-  "vix_pct": 82.9,
-  "vix_state": "LIVE",
-  "pm_pos": 0.625
- },
+ "open": null,
  "trades": [
   {
    "date": "2026-08-12",
@@ -365,6 +334,50 @@
    "reason": "RUNNER(+1σ)",
    "exit_premium_q": 6.56,
    "pnl_q": -9.1
+  },
+  {
+   "date": "2026-10-26",
+   "side": "call",
+   "mfe": 0.313,
+   "mfe_t": "10:15",
+   "contracts": {
+    "30": 1,
+    "40": 2,
+    "50": 3,
+    "60": 4,
+    "70": 4
+   },
+   "mfe_prem": 33.3,
+   "mfe_prem_t": "10:15",
+   "strike": 701.0,
+   "premium": 5.91,
+   "premium_q": 7.27,
+   "basis": "rt",
+   "iv": 0.2749,
+   "symbol": "QQQ261026C00701000",
+   "spot_rt": 706.51,
+   "entry_time": "10:00",
+   "entry_px": 706.51,
+   "score": 1,
+   "gap": 0.38,
+   "rsi": 57.6,
+   "stop_px": 705.23,
+   "version": "itm-2.0",
+   "vix_pct": 82.9,
+   "vix_state": "LIVE",
+   "pm_pos": 0.625,
+   "tp1_prem": 7.88,
+   "tp1_prem_q": 6.33,
+   "tp1_time": "10:15",
+   "exit_time": "10:15",
+   "exit_px": 708.72,
+   "exit_premium": 7.88,
+   "eff_exit": 7.75,
+   "pnl_pct": 31.1,
+   "pnl_usd": 184.0,
+   "reason": "RUNNER(+1σ)",
+   "exit_premium_q": 6.33,
+   "pnl_q": -12.9
   }
  ],
  "days": {
@@ -759,12 +772,12 @@
   "sgn": 1,
   "prev_close": 704.39,
   "open": 707.06,
-  "entry": 707.24,
+  "entry": 708.72,
   "target": 704.39,
-  "room": 0.403,
-  "cover": -0.07,
+  "room": 0.611,
+  "cover": -0.62,
   "r50": 706.32,
-  "cur": 707.24,
+  "cur": 708.72,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -789,14 +802,14 @@
     "vw_room": 0.424
    },
    "1h": {
-    "cover": -0.07,
-    "entry": 707.24,
+    "cover": -0.62,
+    "entry": 708.72,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.403,
-    "vw_entry": null,
-    "vw_room": null
+    "room": 0.611,
+    "vw_entry": 707.45,
+    "vw_room": 0.433
    }
   },
   "band_px": 708.01,
@@ -8521,7 +8534,7 @@
  },
  "l3_books": {
   "30": {
-   "cap": 3318.53,
+   "cap": 3502.53,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8574,11 +8587,18 @@
      "usd": 71.9,
      "pct": 11.2,
      "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-26",
+     "nc": 1,
+     "usd": 184.0,
+     "pct": 31.1,
+     "res": "RUNNER(+1σ)"
     }
    ]
   },
   "40": {
-   "cap": 3637.06,
+   "cap": 4005.06,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8630,12 +8650,19 @@
      "nc": 2,
      "usd": 143.8,
      "pct": 11.2,
+     "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-26",
+     "nc": 2,
+     "usd": 368.0,
+     "pct": 31.1,
      "res": "RUNNER(+1σ)"
     }
    ]
   },
   "50": {
-   "cap": 3637.06,
+   "cap": 4189.06,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8688,11 +8715,18 @@
      "usd": 143.8,
      "pct": 11.2,
      "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-26",
+     "nc": 3,
+     "usd": 552.0,
+     "pct": 31.1,
+     "res": "RUNNER(+1σ)"
     }
    ]
   },
   "60": {
-   "cap": 3955.59,
+   "cap": 4691.59,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8745,11 +8779,18 @@
      "usd": 215.7,
      "pct": 11.2,
      "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-26",
+     "nc": 4,
+     "usd": 736.0,
+     "pct": 31.1,
+     "res": "RUNNER(+1σ)"
     }
    ]
   },
   "70": {
-   "cap": 3863.52,
+   "cap": 4599.52,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8801,6 +8842,13 @@
      "nc": 3,
      "usd": 215.7,
      "pct": 11.2,
+     "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-26",
+     "nc": 4,
+     "usd": 736.0,
+     "pct": 31.1,
      "res": "RUNNER(+1σ)"
     }
    ]
@@ -9007,5 +9055,5 @@
   "v": 0.2823,
   "src": "VXN"
  },
- "last_poll": "2026-10-26T10:10:15-04:00"
+ "last_poll": "2026-10-26T10:15:15-04:00"
 }
