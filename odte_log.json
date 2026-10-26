@@ -772,12 +772,12 @@
   "sgn": 1,
   "prev_close": 704.39,
   "open": 707.06,
-  "entry": 708.72,
+  "entry": 710.28,
   "target": 704.39,
-  "room": 0.611,
-  "cover": -0.62,
+  "room": 0.829,
+  "cover": -1.2,
   "r50": 706.32,
-  "cur": 708.72,
+  "cur": 710.28,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -802,14 +802,14 @@
     "vw_room": 0.424
    },
    "1h": {
-    "cover": -0.62,
-    "entry": 708.72,
+    "cover": -1.2,
+    "entry": 710.28,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.611,
-    "vw_entry": 707.45,
-    "vw_room": 0.433
+    "room": 0.829,
+    "vw_entry": 707.93,
+    "vw_room": 0.5
    }
   },
   "band_px": 708.01,
@@ -9055,5 +9055,5 @@
   "v": 0.2823,
   "src": "VXN"
  },
- "last_poll": "2026-10-26T10:15:15-04:00"
+ "last_poll": "2026-10-26T10:20:16-04:00"
 }
