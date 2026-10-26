@@ -1,5 +1,36 @@
 {
- "open": null,
+ "open": {
+  "date": "2026-10-26",
+  "side": "call",
+  "mfe": -99.0,
+  "mfe_t": null,
+  "contracts": {
+   "30": 1,
+   "40": 2,
+   "50": 3,
+   "60": 4,
+   "70": 4
+  },
+  "mfe_prem": -99.0,
+  "mfe_prem_t": null,
+  "strike": 701.0,
+  "premium": 5.91,
+  "premium_q": 7.27,
+  "basis": "rt",
+  "iv": 0.2749,
+  "symbol": "QQQ261026C00701000",
+  "spot_rt": 706.51,
+  "entry_time": "10:00",
+  "entry_px": 706.51,
+  "score": 1,
+  "gap": 0.38,
+  "rsi": 57.6,
+  "stop_px": 705.23,
+  "version": "itm-2.0",
+  "vix_pct": 82.9,
+  "vix_state": "LIVE",
+  "pm_pos": 0.625
+ },
  "trades": [
   {
    "date": "2026-08-12",
@@ -693,9 +724,17 @@
    "pm_pos": 0.07
   },
   "2026-10-26": {
-   "status": "WAIT_OPEN",
-   "bars": 6,
-   "at": "09:55"
+   "status": "진입 · BUY CALL 701 @ $5.91 (잔고 $3319)",
+   "score": 1,
+   "rsi": 57.6,
+   "direction": 0,
+   "gap": 0.38,
+   "px": 706.51,
+   "vwap": 707.46,
+   "at": "10:00",
+   "vix_pct": 82.9,
+   "vix_state": "LIVE",
+   "pm_pos": 0.625
   }
  },
  "vix": {
@@ -720,12 +759,12 @@
   "sgn": 1,
   "prev_close": 704.39,
   "open": 707.06,
-  "entry": 708.26,
+  "entry": 706.51,
   "target": 704.39,
-  "room": 0.546,
-  "cover": -0.45,
+  "room": 0.3,
+  "cover": 0.21,
   "r50": 706.32,
-  "cur": 708.26,
+  "cur": 706.51,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -750,14 +789,14 @@
     "vw_room": 0.424
    },
    "1h": {
-    "cover": -0.45,
-    "entry": 708.26,
+    "cover": 0.21,
+    "entry": 706.51,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.546,
-    "vw_entry": 707.48,
-    "vw_room": 0.437
+    "room": 0.3,
+    "vw_entry": null,
+    "vw_room": null
    }
   },
   "band_px": 708.01,
@@ -8968,5 +9007,5 @@
   "v": 0.2823,
   "src": "VXN"
  },
- "last_poll": "2026-10-26T09:55:15-04:00"
+ "last_poll": "2026-10-26T10:00:15-04:00"
 }
