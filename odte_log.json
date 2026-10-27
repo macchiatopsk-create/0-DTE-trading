@@ -29,7 +29,10 @@
   "version": "itm-2.0",
   "vix_pct": 81.3,
   "vix_state": "LIVE",
-  "pm_pos": 0.811
+  "pm_pos": 0.811,
+  "tp1_prem": 5.22,
+  "tp1_prem_q": 5.15,
+  "tp1_time": "10:25"
  },
  "trades": [
   {
@@ -816,12 +819,12 @@
   "sgn": 1,
   "prev_close": 712.12,
   "open": 715.1,
-  "entry": 714.09,
+  "entry": 714.85,
   "target": 712.12,
-  "room": 0.276,
-  "cover": 0.34,
+  "room": 0.382,
+  "cover": 0.08,
   "r50": 714.34,
-  "cur": 714.09,
+  "cur": 714.85,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -846,14 +849,14 @@
     "vw_room": 0.617
    },
    "1h": {
-    "cover": 0.34,
-    "entry": 714.09,
+    "cover": 0.08,
+    "entry": 714.85,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.276,
-    "vw_entry": null,
-    "vw_room": null
+    "room": 0.382,
+    "vw_entry": 714.63,
+    "vw_room": 0.351
    }
   },
   "band_px": 716.78,
@@ -9108,5 +9111,5 @@
   "v": 0.2571,
   "src": "VXN"
  },
- "last_poll": "2026-10-27T10:20:17-04:00"
+ "last_poll": "2026-10-27T10:25:16-04:00"
 }
