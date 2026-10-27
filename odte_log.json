@@ -751,8 +751,8 @@
   },
   "2026-10-27": {
    "status": "WAIT_OPEN",
-   "bars": 1,
-   "at": "09:30"
+   "bars": 2,
+   "at": "09:35"
   }
  },
  "vix": {
@@ -762,67 +762,67 @@
   "asof": "2026-10-26"
  },
  "pm": {
-  "pos": 0.834,
+  "pos": 0.811,
   "pm_hi": 716.6,
   "pm_lo": 708.65,
   "ok": true
  },
  "gap": {
   "date": "2026-10-27",
-  "orh": 715.28,
-  "orl": 715.28,
+  "orh": 716.77,
+  "orl": 714.61,
   "state": "WAIT",
-  "gap": 0.444,
+  "gap": 0.418,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 712.12,
-  "open": 715.28,
-  "entry": 715.28,
+  "open": 715.1,
+  "entry": 716.56,
   "target": 712.12,
-  "room": 0.442,
-  "cover": 0.0,
-  "r50": 715.28,
-  "cur": 715.28,
+  "room": 0.62,
+  "cover": -0.49,
+  "r50": 714.85,
+  "cur": 716.56,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.0,
-    "entry": 715.28,
-    "ready": false,
+    "cover": -0.49,
+    "entry": 716.56,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.442,
-    "vw_entry": 715.28,
-    "vw_room": 0.442
+    "room": 0.62,
+    "vw_entry": 716.02,
+    "vw_room": 0.545
    },
    "15m": {
-    "cover": 0.0,
-    "entry": 715.28,
+    "cover": -0.49,
+    "entry": 716.56,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.442,
-    "vw_entry": 715.28,
-    "vw_room": 0.442
+    "room": 0.62,
+    "vw_entry": 716.02,
+    "vw_room": 0.545
    },
    "1h": {
-    "cover": 0.0,
-    "entry": 715.28,
+    "cover": -0.49,
+    "entry": 716.56,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.442,
-    "vw_entry": 715.28,
-    "vw_room": 0.442
+    "room": 0.62,
+    "vw_entry": 716.02,
+    "vw_room": 0.545
    }
   },
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.068,
+  "mfe_t": "09:30",
+  "mfe_px": 714.61
  },
  "macro": {
   "date": "2026-10-27",
@@ -9061,5 +9061,5 @@
   "v": 0.2823,
   "src": "VXN"
  },
- "last_poll": "2026-10-27T09:30:15-04:00"
+ "last_poll": "2026-10-27T09:35:17-04:00"
 }
