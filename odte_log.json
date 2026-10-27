@@ -1,39 +1,5 @@
 {
- "open": {
-  "date": "2026-10-27",
-  "side": "call",
-  "mfe": -0.032,
-  "mfe_t": "10:05",
-  "contracts": {
-   "30": 1,
-   "40": 2,
-   "50": 3,
-   "60": 5,
-   "70": 5
-  },
-  "mfe_prem": -3.7,
-  "mfe_prem_t": "10:05",
-  "strike": 710.0,
-  "premium": 5.61,
-  "premium_q": 7.59,
-  "basis": "rt",
-  "iv": 0.2953,
-  "symbol": "QQQ261027C00710000",
-  "spot_rt": 715.26,
-  "entry_time": "10:00",
-  "entry_px": 715.26,
-  "score": 1,
-  "gap": 0.42,
-  "rsi": 58.4,
-  "stop_px": 713.92,
-  "version": "itm-2.0",
-  "vix_pct": 81.3,
-  "vix_state": "LIVE",
-  "pm_pos": 0.811,
-  "tp1_prem": 5.22,
-  "tp1_prem_q": 5.15,
-  "tp1_time": "10:25"
- },
+ "open": null,
  "trades": [
   {
    "date": "2026-08-12",
@@ -412,6 +378,50 @@
    "reason": "RUNNER(+1σ)",
    "exit_premium_q": 6.33,
    "pnl_q": -12.9
+  },
+  {
+   "date": "2026-10-27",
+   "side": "call",
+   "mfe": 0.145,
+   "mfe_t": "10:30",
+   "contracts": {
+    "30": 1,
+    "40": 2,
+    "50": 3,
+    "60": 5,
+    "70": 5
+   },
+   "mfe_prem": 15.9,
+   "mfe_prem_t": "10:30",
+   "strike": 710.0,
+   "premium": 5.61,
+   "premium_q": 7.59,
+   "basis": "rt",
+   "iv": 0.2953,
+   "symbol": "QQQ261027C00710000",
+   "spot_rt": 715.26,
+   "entry_time": "10:00",
+   "entry_px": 715.26,
+   "score": 1,
+   "gap": 0.42,
+   "rsi": 58.4,
+   "stop_px": 713.92,
+   "version": "itm-2.0",
+   "vix_pct": 81.3,
+   "vix_state": "LIVE",
+   "pm_pos": 0.811,
+   "tp1_prem": 5.22,
+   "tp1_prem_q": 5.15,
+   "tp1_time": "10:25",
+   "exit_time": "10:30",
+   "exit_px": 716.3,
+   "exit_premium": 6.5,
+   "eff_exit": 5.74,
+   "pnl_pct": 2.3,
+   "pnl_usd": 13.0,
+   "reason": "RUNNER(+1σ)",
+   "exit_premium_q": 4.78,
+   "pnl_q": -37.0
   }
  ],
  "days": {
@@ -813,18 +823,18 @@
   "date": "2026-10-27",
   "orh": 716.77,
   "orl": 714.61,
-  "state": "WAIT",
+  "state": "LOW_COVER",
   "gap": 0.418,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 712.12,
   "open": 715.1,
-  "entry": 714.85,
+  "entry": 716.3,
   "target": 712.12,
-  "room": 0.382,
-  "cover": 0.08,
+  "room": 0.584,
+  "cover": -0.4,
   "r50": 714.34,
-  "cur": 714.85,
+  "cur": 716.3,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -835,8 +845,8 @@
     "ok": false,
     "over": false,
     "room": 0.804,
-    "vw_entry": 716.29,
-    "vw_room": 0.582
+    "vw_entry": 716.19,
+    "vw_room": 0.568
    },
    "15m": {
     "cover": -0.74,
@@ -845,23 +855,23 @@
     "ok": false,
     "over": false,
     "room": 0.721,
-    "vw_entry": 716.54,
-    "vw_room": 0.617
+    "vw_entry": 716.37,
+    "vw_room": 0.593
    },
    "1h": {
-    "cover": 0.08,
-    "entry": 714.85,
-    "ready": false,
+    "cover": -0.4,
+    "entry": 716.3,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.382,
-    "vw_entry": 714.63,
-    "vw_room": 0.351
+    "room": 0.584,
+    "vw_entry": 715.13,
+    "vw_room": 0.421
    }
   },
-  "band_px": 716.78,
+  "band_px": 716.58,
   "band_t": "09:35",
-  "band_room": 0.65,
+  "band_room": 0.622,
   "mfe": 0.211,
   "mfe_t": "10:15",
   "mfe_px": 713.59
@@ -8589,7 +8599,7 @@
  },
  "l3_books": {
   "30": {
-   "cap": 3502.33,
+   "cap": 3515.33,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8649,11 +8659,18 @@
      "usd": 183.8,
      "pct": 31.1,
      "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-27",
+     "nc": 1,
+     "usd": 13.0,
+     "pct": 2.3,
+     "res": "RUNNER(+1σ)"
     }
    ]
   },
   "40": {
-   "cap": 4004.66,
+   "cap": 4030.66,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8713,11 +8730,18 @@
      "usd": 367.6,
      "pct": 31.1,
      "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-27",
+     "nc": 2,
+     "usd": 26.0,
+     "pct": 2.3,
+     "res": "RUNNER(+1σ)"
     }
    ]
   },
   "50": {
-   "cap": 4188.46,
+   "cap": 4227.46,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8777,11 +8801,18 @@
      "usd": 551.4,
      "pct": 31.1,
      "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-27",
+     "nc": 3,
+     "usd": 39.0,
+     "pct": 2.3,
+     "res": "RUNNER(+1σ)"
     }
    ]
   },
   "60": {
-   "cap": 4690.79,
+   "cap": 4755.79,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8841,11 +8872,18 @@
      "usd": 735.2,
      "pct": 31.1,
      "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-27",
+     "nc": 5,
+     "usd": 65.0,
+     "pct": 2.3,
+     "res": "RUNNER(+1σ)"
     }
    ]
   },
   "70": {
-   "cap": 4598.72,
+   "cap": 4663.72,
    "trades": [
     {
      "d": "2026-08-18",
@@ -8904,6 +8942,13 @@
      "nc": 4,
      "usd": 735.2,
      "pct": 31.1,
+     "res": "RUNNER(+1σ)"
+    },
+    {
+     "d": "2026-10-27",
+     "nc": 5,
+     "usd": 65.0,
+     "pct": 2.3,
      "res": "RUNNER(+1σ)"
     }
    ]
@@ -9111,5 +9156,5 @@
   "v": 0.2571,
   "src": "VXN"
  },
- "last_poll": "2026-10-27T10:25:16-04:00"
+ "last_poll": "2026-10-27T10:30:15-04:00"
 }
