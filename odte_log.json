@@ -881,7 +881,7 @@
   "room": 0.122,
   "cover": 0.69,
   "r50": 722.21,
-  "cur": 722.03,
+  "cur": 721.35,
   "filled": true,
   "trail": 721.38,
   "tfs": {
@@ -3645,10 +3645,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": 724.14,
     "band_t": "09:35",
-    "mfe": 0.012,
-    "mfe_t": "10:35",
-    "mfe_prem": 0.8,
-    "mfe_prem_t": "10:35",
+    "mfe": 0.107,
+    "mfe_t": "10:40",
+    "mfe_prem": 11.0,
+    "mfe_prem_t": "10:40",
     "filled": false,
     "fill_t": null,
     "res": null
@@ -4241,10 +4241,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": 724.14,
     "band_t": "09:35",
-    "mfe": 0.0,
-    "mfe_t": null,
-    "mfe_prem": 0.8,
-    "mfe_prem_t": "10:35",
+    "mfe": 0.086,
+    "mfe_t": "10:40",
+    "mfe_prem": 11.0,
+    "mfe_prem_t": "10:40",
     "filled": false,
     "fill_t": null,
     "res": null
@@ -9543,5 +9543,5 @@
   "v": 0.2475,
   "src": "VXN"
  },
- "last_poll": "2026-10-28T10:35:16-04:00"
+ "last_poll": "2026-10-28T10:40:16-04:00"
 }
