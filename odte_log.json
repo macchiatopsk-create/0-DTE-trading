@@ -807,9 +807,17 @@
    "pm_pos": 0.811
   },
   "2026-10-28": {
-   "status": "WAIT_OPEN",
-   "bars": 6,
-   "at": "10:00"
+   "status": "WAIT · 3층 통과 (VIX 72% · PM 0.70) · VWAP -1σ 터치 대기 (현재 -0.24σ)",
+   "score": 1,
+   "rsi": 55.3,
+   "direction": 0,
+   "gap": 0.4,
+   "px": 722.65,
+   "vwap": 722.91,
+   "at": "10:05",
+   "vix_pct": 72.1,
+   "vix_state": "LIVE",
+   "pm_pos": 0.702
   }
  },
  "vix": {
@@ -834,12 +842,12 @@
   "sgn": 1,
   "prev_close": 721.24,
   "open": 724.12,
-  "entry": 722.49,
+  "entry": 722.65,
   "target": 721.24,
-  "room": 0.174,
-  "cover": 0.56,
+  "room": 0.195,
+  "cover": 0.51,
   "r50": 722.21,
-  "cur": 722.49,
+  "cur": 722.65,
   "filled": true,
   "trail": 721.38,
   "tfs": {
@@ -864,12 +872,12 @@
     "vw_room": null
    },
    "1h": {
-    "cover": 0.56,
-    "entry": 722.49,
+    "cover": 0.51,
+    "entry": 722.65,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.174,
+    "room": 0.195,
     "vw_entry": null,
     "vw_room": null
    }
@@ -9340,5 +9348,5 @@
   "v": 0.2475,
   "src": "VXN"
  },
- "last_poll": "2026-10-28T10:00:16-04:00"
+ "last_poll": "2026-10-28T10:05:16-04:00"
 }
