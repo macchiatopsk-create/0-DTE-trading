@@ -1,5 +1,36 @@
 {
- "open": null,
+ "open": {
+  "date": "2026-10-28",
+  "side": "call",
+  "mfe": -99.0,
+  "mfe_t": null,
+  "contracts": {
+   "30": 1,
+   "40": 2,
+   "50": 3,
+   "60": 4,
+   "70": 5
+  },
+  "mfe_prem": -99.0,
+  "mfe_prem_t": null,
+  "strike": 716.0,
+  "premium": 5.94,
+  "premium_q": 7.05,
+  "basis": "rt",
+  "iv": 0.2467,
+  "symbol": "QQQ261028C00716000",
+  "spot_rt": 721.68,
+  "entry_time": "10:10",
+  "entry_px": 721.68,
+  "score": 1,
+  "gap": 0.4,
+  "rsi": 47.3,
+  "stop_px": 719.94,
+  "version": "itm-2.0",
+  "vix_pct": 72.1,
+  "vix_state": "LIVE",
+  "pm_pos": 0.702
+ },
  "trades": [
   {
    "date": "2026-08-12",
@@ -807,14 +838,14 @@
    "pm_pos": 0.811
   },
   "2026-10-28": {
-   "status": "WAIT · 3층 통과 (VIX 72% · PM 0.70) · VWAP -1σ 터치 대기 (현재 -0.24σ)",
+   "status": "진입 · BUY CALL 716 @ $5.94 (잔고 $3516)",
    "score": 1,
-   "rsi": 55.3,
+   "rsi": 47.3,
    "direction": 0,
    "gap": 0.4,
-   "px": 722.65,
-   "vwap": 722.91,
-   "at": "10:05",
+   "px": 721.68,
+   "vwap": 722.65,
+   "at": "10:10",
    "vix_pct": 72.1,
    "vix_state": "LIVE",
    "pm_pos": 0.702
@@ -842,12 +873,12 @@
   "sgn": 1,
   "prev_close": 721.24,
   "open": 724.12,
-  "entry": 722.65,
+  "entry": 721.68,
   "target": 721.24,
-  "room": 0.195,
-  "cover": 0.51,
+  "room": 0.062,
+  "cover": 0.85,
   "r50": 722.21,
-  "cur": 722.65,
+  "cur": 721.68,
   "filled": true,
   "trail": 721.38,
   "tfs": {
@@ -868,16 +899,16 @@
     "ok": true,
     "over": false,
     "room": 0.234,
-    "vw_entry": null,
-    "vw_room": null
+    "vw_entry": 722.67,
+    "vw_room": 0.198
    },
    "1h": {
-    "cover": 0.51,
-    "entry": 722.65,
+    "cover": 0.85,
+    "entry": 721.68,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.195,
+    "room": 0.062,
     "vw_entry": null,
     "vw_room": null
    }
@@ -2862,7 +2893,45 @@
    ]
   },
   "15m|vwap": {
-   "open": null,
+   "open": {
+    "date": "2026-10-28",
+    "tf": "15m",
+    "em": "vwap",
+    "late": false,
+    "comb": null,
+    "dir": "숏",
+    "sgn": 1,
+    "gap": 0.399,
+    "cover": 0.41,
+    "entry": 722.67,
+    "target": 721.24,
+    "room": 0.198,
+    "at": "10:10",
+    "found_at": "10:10",
+    "opt_side": "put",
+    "strike": 728.0,
+    "premium": 6.48,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "spot_rt": 721.68,
+    "premium_q": 7.29,
+    "basis": "rt",
+    "prem_src": "실시간(모델가)",
+    "band_px": 724.14,
+    "band_t": "09:35",
+    "mfe": 0.137,
+    "mfe_t": "10:10",
+    "mfe_prem": 0.0,
+    "mfe_prem_t": "10:10",
+    "filled": false,
+    "fill_t": null,
+    "res": null
+   },
    "trades": [
     {
      "date": "2026-08-19",
@@ -3475,7 +3544,8 @@
     "2026-09-29": true,
     "2026-10-09": true,
     "2026-10-13": true,
-    "2026-10-23": true
+    "2026-10-23": true,
+    "2026-10-28": true
    },
    "skips": [
     {
@@ -9348,5 +9418,5 @@
   "v": 0.2475,
   "src": "VXN"
  },
- "last_poll": "2026-10-28T10:05:16-04:00"
+ "last_poll": "2026-10-28T10:10:17-04:00"
 }
