@@ -809,7 +809,7 @@
   "2026-10-28": {
    "status": "WAIT_OPEN",
    "bars": 6,
-   "at": "09:55"
+   "at": "10:00"
   }
  },
  "vix": {
@@ -834,12 +834,12 @@
   "sgn": 1,
   "prev_close": 721.24,
   "open": 724.12,
-  "entry": 721.63,
+  "entry": 722.49,
   "target": 721.24,
-  "room": 0.054,
-  "cover": 0.86,
+  "room": 0.174,
+  "cover": 0.56,
   "r50": 722.21,
-  "cur": 721.63,
+  "cur": 722.49,
   "filled": true,
   "trail": 721.38,
   "tfs": {
@@ -864,12 +864,12 @@
     "vw_room": null
    },
    "1h": {
-    "cover": 0.86,
-    "entry": 721.63,
+    "cover": 0.56,
+    "entry": 722.49,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.054,
+    "room": 0.174,
     "vw_entry": null,
     "vw_room": null
    }
@@ -9340,5 +9340,5 @@
   "v": 0.2475,
   "src": "VXN"
  },
- "last_poll": "2026-10-28T09:55:16-04:00"
+ "last_poll": "2026-10-28T10:00:16-04:00"
 }
