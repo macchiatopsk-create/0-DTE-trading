@@ -904,7 +904,7 @@
   "room": 1.375,
   "cover": -0.1,
   "r50": 717.32,
-  "cur": 714.69,
+  "cur": 714.85,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -935,8 +935,8 @@
     "ok": false,
     "over": false,
     "room": 1.375,
-    "vw_entry": 715.52,
-    "vw_room": 1.392
+    "vw_entry": 715.22,
+    "vw_room": 1.435
    }
   },
   "band_px": 712.98,
@@ -948,7 +948,7 @@
  },
  "macro": {
   "date": "2026-10-29",
-  "n_hist": 500,
+  "n_hist": 499,
   "n_feat": 17,
   "extremes": [
    {
@@ -1073,10 +1073,10 @@
    }
   ],
   "rng": 0.97,
-  "base_rng": 1.446,
+  "base_rng": 1.447,
   "lo_avg": -0.441,
   "hi_avg": 0.529,
-  "base_up": 52.6
+  "base_up": 52.7
  },
  "gap_skip": {
   "date": "2026-08-19",
@@ -9870,5 +9870,5 @@
   "v": 0.2466,
   "src": "VXN"
  },
- "last_poll": "2026-10-29T15:55:15-04:00"
+ "last_poll": "2026-10-29T16:00:15-04:00"
 }
