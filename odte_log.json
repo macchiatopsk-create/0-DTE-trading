@@ -930,7 +930,7 @@
   "room": 1.252,
   "cover": -0.84,
   "r50": 694.31,
-  "cur": 693.9,
+  "cur": 694.62,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -946,7 +946,7 @@
    },
    "15m": {
     "cover": 0.04,
-    "entry": 695.13,
+    "entry": 695.12,
     "ready": true,
     "ok": false,
     "over": false,
@@ -961,8 +961,8 @@
     "ok": false,
     "over": false,
     "room": 1.252,
-    "vw_entry": 696.35,
-    "vw_room": 0.831
+    "vw_entry": 696.84,
+    "vw_room": 0.901
    }
   },
   "band_px": 695.03,
@@ -10078,5 +10078,5 @@
   "v": 0.2772,
   "src": "VXN"
  },
- "last_poll": "2026-11-02T11:30:16-05:00"
+ "last_poll": "2026-11-02T11:35:16-05:00"
 }
