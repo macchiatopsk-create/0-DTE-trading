@@ -891,8 +891,8 @@
   },
   "2026-11-02": {
    "status": "WAIT_OPEN",
-   "bars": 1,
-   "at": "09:30"
+   "bars": 2,
+   "at": "09:35"
   }
  },
  "vix": {
@@ -902,67 +902,67 @@
   "asof": "2026-10-30"
  },
  "pm": {
-  "pos": 0.219,
+  "pos": 0.235,
   "pm_hi": 698.0,
   "pm_lo": 694.49,
   "ok": false
  },
  "gap": {
   "date": "2026-11-02",
-  "orh": 695.22,
-  "orl": 695.22,
+  "orh": 695.71,
+  "orl": 694.14,
   "state": "WAIT",
-  "gap": 0.675,
+  "gap": 0.689,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 690.56,
-  "open": 695.22,
-  "entry": 695.22,
+  "open": 695.32,
+  "entry": 695.0,
   "target": 690.56,
-  "room": 0.67,
-  "cover": 0.0,
-  "r50": 695.22,
-  "cur": 695.22,
+  "room": 0.639,
+  "cover": 0.07,
+  "r50": 694.73,
+  "cur": 695.0,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.0,
-    "entry": 695.22,
-    "ready": false,
+    "cover": 0.07,
+    "entry": 695.0,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.67,
-    "vw_entry": 695.22,
-    "vw_room": 0.67
+    "room": 0.639,
+    "vw_entry": 694.95,
+    "vw_room": 0.632
    },
    "15m": {
-    "cover": 0.0,
-    "entry": 695.22,
+    "cover": 0.07,
+    "entry": 695.0,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.67,
-    "vw_entry": 695.22,
-    "vw_room": 0.67
+    "room": 0.639,
+    "vw_entry": 694.95,
+    "vw_room": 0.632
    },
    "1h": {
-    "cover": 0.0,
-    "entry": 695.22,
+    "cover": 0.07,
+    "entry": 695.0,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.67,
-    "vw_entry": 695.22,
-    "vw_room": 0.67
+    "room": 0.639,
+    "vw_entry": 694.95,
+    "vw_room": 0.632
    }
   },
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.169,
+  "mfe_t": "09:30",
+  "mfe_px": 694.14
  },
  "macro": {
   "date": "2026-11-02",
@@ -1035,7 +1035,7 @@
    },
    {
     "d": "2026-07-28",
-    "dist": 2.25,
+    "dist": 2.26,
     "gap": -0.86,
     "ret": -0.11,
     "lo": -1.23,
@@ -9890,5 +9890,5 @@
   "v": 0.2728,
   "src": "VXN"
  },
- "last_poll": "2026-11-02T09:30:16-05:00"
+ "last_poll": "2026-11-02T09:35:16-05:00"
 }
