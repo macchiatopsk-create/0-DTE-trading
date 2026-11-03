@@ -65,6 +65,11 @@ GAP_SIZES = [0.30, 0.40, 0.50, 0.60, 0.70]   # 병렬 비교할 사이징
 GAP_TFS = {"5m": 1, "15m": 2, "1h": 11}      # 키: 이름, 값: 5분봉 인덱스(0-base)
 GAP_TF_LABEL = {"5m": "5분(09:35)", "15m": "15분(09:45)", "1h": "1시간(10:30)"}
 GAP_ENTRIES = {"now": "즉시 진입", "vwap": "VWAP 중간선 대기"}
+# 챔피언(15m|now)과 같은 진입·같은 계약, 청산만 다른 병렬 비교 트랙 (2026-11-02 추가).
+# 근거: 5분봉 8개월(2/24~10/30) QQQ 22건 PF 2.55 → 메운 순간 청산 4.37, SPY 5.72 → 11.10. 1분봉 4.7년: 1분 트레일 PF 4.27.
+GAP_EXTRA = {"take": "메운 순간 청산", "1m": "1분 확인 트레일"}
+GAP_EXTRA_BASE = "15m|now"
+FAST_CUT = dt.time(14, 6)          # 1분 확인 루프가 도는 마지막 시각 (14:00 최종 컷 + 여유)
 GAP_TF_TIME = {"5m": "09:35", "15m": "09:45", "1h": "10:30"}
 GAP_CAPITAL = 3000.0              # 갭 트랙 mock 자본 (사이징별 각각 독립 운용)
 
@@ -430,18 +435,33 @@ def base_iv_today(log, dstr):
     c = log.get("iv_base")
     if c and c.get("d") == dstr and c.get("v"):
         return c["v"]
-    v = None
-    try:
-        h = yf.Ticker("^VXN").history(period="5d")[["Open"]].dropna()
-        if len(h) and h.index[-1].date() == dt.datetime.now(NY).date():
-            v = round(float(h["Open"].iloc[-1]) / 100, 4)
+    v, src = None, "VXN"
+    today_ = dt.datetime.now(NY).date()
+    try:                                   # 1분봉 당일 첫 봉 시가 — 일봉은 개장 15~20분 뒤에야 당일로 떠서 09:45에 못 씀
+        m = yf.Ticker("^VXN").history(period="1d", interval="1m")[["Open"]].dropna()
+        if len(m) and m.index[0].date() == today_:
+            v, src = round(float(m["Open"].iloc[0]) / 100, 4), "VXN(1분 첫 봉)"
     except Exception as e:
-        print(f"  VXN 조회 실패: {type(e).__name__}: {e}")
+        print(f"  VXN 1분봉 조회 실패: {type(e).__name__}: {e}")
+    if not v:
+        try:
+            h = yf.Ticker("^VXN").history(period="5d")[["Open"]].dropna()
+            if len(h) and h.index[-1].date() == today_:
+                v = round(float(h["Open"].iloc[-1]) / 100, 4)
+            elif len(h):
+                print(f"  VXN 일봉 마지막 날짜 {h.index[-1].date()} ≠ 오늘 — 대체값 사용")
+        except Exception as e:
+            print(f"  VXN 조회 실패: {type(e).__name__}: {e}")
     if v:
-        log["iv_base"] = dict(d=dstr, v=v, src="VXN")
+        log["iv_base"] = dict(d=dstr, v=v, src=src)
         return v
     lvl = (log.get("vixchg") or {}).get("lvl") if (log.get("vixchg") or {}).get("d") == dstr else None
     return round((lvl or 17.4) * 1.15 / 100, 4)             # 캐시하지 않음 — 다음 실행에서 VXN 재시도
+
+
+def _piv(pos, fallback):
+    """포지션의 모델 IV — 진입 때 쓴 값을 끝까지 쓴다 (진입·청산 IV가 달라 손익이 부풀던 문제, 2026-11-02 수정)."""
+    return (pos or {}).get("iv_m") or fallback
 
 
 def rt_premium(side, strike, now, spot_now, base_iv):
@@ -584,7 +604,9 @@ def _replay_poll(log, kind, tr, pos, g, d, T, cur, iv):
         _gf, _gtrail, _gft = gap_fill_since(upto, d, pos["at"], sgn, pos["target"])
         if not pos["filled"] and _gf:
             pos["filled"], pos["fill_t"] = True, _gft
-        if not pos["filled"] and T.time() >= GAP_TIMECUT:
+        if kind == "gap_take" and pos["filled"]:
+            res = "TAKE"
+        elif not pos["filled"] and T.time() >= GAP_TIMECUT:
             res = "TIMECUT"
         elif pos["filled"] and _gtrail and ((cur >= _gtrail) if sgn > 0 else (cur <= _gtrail)):
             res = "TRAIL"
@@ -623,7 +645,7 @@ def catch_up(log, df, now):
     for tk, tr in (log.get("gap_tracks") or {}).items():
         p = tr.get("open")
         if p and p.get("res") is None:
-            plist.append(("gap", tk, tr, p))
+            plist.append(("gap_take" if tk.endswith("|take") else "gap", tk, tr, p))
     mtr = log.get("mom_track") or {}
     if mtr.get("open") and mtr["open"].get("res") is None:
         plist.append(("mom", "모멘텀", mtr, mtr["open"]))
@@ -653,7 +675,7 @@ def catch_up(log, df, now):
             polls = _missed_polls(g, d, start, lp, now)
             if not polls:
                 continue
-            iv = _iv_for(log, pos["date"], now)
+            iv = pos.get("iv_m") or _iv_for(log, pos["date"], now)
             print(f"  따라잡기 {key}: {pos['date']} 놓친 폴링 {len(polls)}회 ({polls[0][0].strftime('%H:%M')}~{polls[-1][0].strftime('%H:%M')})")
             for T, cur in polls:
                 if _replay_poll(log, kind, tr, pos, g, d, T, cur, iv):
@@ -662,6 +684,128 @@ def catch_up(log, df, now):
         except Exception as e:
             print(f"  따라잡기 실패({key}): {type(e).__name__}: {e}")
     return n
+
+
+# ───────────────────────── 병렬 비교 트랙 (15m|take, 15m|1m) ─────────────────────────
+# 진입·계약은 챔피언(15m|now)과 같고 청산만 다르다.
+#  15m|take: 갭을 메운 것이 보이는 폴링에서 바로 청산 (트레일 없음)
+#  15m|1m  : 1분봉으로 필·트레일 판정 — 워크플로가 포지션이 열린 동안 60초마다 --fast로 부른다
+def intraday_1m():
+    df = yf.Ticker(TICKER).history(period="1d", interval="1m")
+    if df is None or df.empty:
+        raise ValueError("1분봉 없음")
+    df = df[["Open", "High", "Low", "Close", "Volume"]].dropna()
+    try:
+        df.index = df.index.tz_convert(NY)
+    except Exception:
+        pass
+    return df[(df.index.time >= dt.time(9, 30)) & (df.index.time < dt.time(16, 0))]
+
+
+def _settle_extra(tr, tk, pos, res, cur, now, iv):
+    ex, pct, per, _qf = settle_prices(pos, None, now, cur, iv)
+    long_ = pos.get("opt_side") == "call"
+    ux = ((cur - pos["entry"]) if long_ else (pos["entry"] - cur)) / pos["entry"] * 100
+    for k, nc in pos["contracts"].items():
+        bk = tr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+        if nc < 1:
+            bk["trades"].append(dict(d=pos["date"], nc=0, usd=0.0, pct=0.0, res="SKIP_FUND"))
+            continue
+        usd = round(per * nc, 2)
+        bk["cap"] = round(bk["cap"] + usd, 2)
+        bk["trades"].append(dict(d=pos["date"], nc=nc, usd=usd, pct=pct, res=res))
+    rec = dict(pos)
+    rec.update(res=res, exit=round(cur, 2), exit_at=now.strftime("%H:%M"), exit_premium=ex,
+               pnl_pct=pct, per_contract=per, ux=round(ux, 3))
+    rec.update(_qf)
+    tr["trades"].append(rec)
+    tr["open"] = None
+    print(f"  [갭/{tk}] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
+
+
+def manage_extra(log, df, now, base_iv, gsig, nstr, df1m=None, only=None):
+    """병렬 트랙 관리. 반환: 청산 건수."""
+    tracks = log.get("gap_tracks") or {}
+    hm = now.strftime("%H:%M")
+    n = 0
+    for xem in GAP_EXTRA:
+        if only and xem != only:
+            continue
+        tk = f"15m|{xem}"
+        tr = tracks.get(tk) or {}
+        pos = tr.get("open")
+        if not pos or pos.get("res") is not None or pos.get("date") != nstr:
+            continue
+        if pos.get("found_at") == hm:
+            continue                                   # 진입 직후 같은 실행에서는 판정 보류
+        iv = _piv(pos, base_iv)
+        sgn = pos["sgn"]
+        d0 = dt.date.fromisoformat(pos["date"])
+        gtrail = None
+        if xem == "take":
+            if df is None:
+                continue
+            cur = (gsig or {}).get("cur") or float(df["Close"].iloc[-1])
+            gf, _, gft = gap_fill_since(df, d0, pos["at"], sgn, pos["target"])
+        else:
+            if df1m is None:
+                try:
+                    df1m = intraday_1m()
+                except Exception as e:
+                    print(f"  1분봉 조회 실패: {type(e).__name__}: {e}")
+                    continue
+            cur = float(df1m["Close"].iloc[-1])
+            gf, gtrail, gft = gap_fill_since(df1m, d0, pos["at"], sgn, pos["target"])
+        if not pos["filled"] and gf:
+            pos["filled"], pos["fill_t"] = True, gft
+        long_ = pos.get("opt_side") == "call"
+        adv = ((cur - pos["entry"]) if long_ else (pos["entry"] - cur)) / pos["entry"] * 100
+        if adv > pos.get("mfe", 0.0):
+            pos["mfe"], pos["mfe_t"] = round(adv, 3), hm
+        _m = rt_premium(pos["opt_side"], pos["strike"], now, cur, iv)
+        if _m and _m > 0 and (_m / pos["premium"] - 1) * 100 > pos.get("mfe_prem", -99):
+            pos["mfe_prem"], pos["mfe_prem_t"] = round((_m / pos["premium"] - 1) * 100, 1), hm
+        if xem == "1m" and pos["filled"]:
+            pos["trail_px"] = gtrail
+        res = None
+        if xem == "take" and pos["filled"]:
+            res = "TAKE"
+        elif xem == "1m" and pos["filled"] and gtrail and ((cur >= gtrail) if sgn > 0 else (cur <= gtrail)):
+            res = "TRAIL(1분)"
+        elif not pos["filled"] and now.time() >= GAP_TIMECUT:
+            res = "TIMECUT"
+        elif now.time() >= GAP_CUT:
+            res = "CUT"
+        if res is None and now.time() >= dt.time(15, 55):
+            res = "EOD"
+        if res:
+            _settle_extra(tr, tk, pos, res, cur, now, iv)
+            n += 1
+    return n
+
+
+def fast_has():
+    """1분 확인 루프를 계속 돌릴지: 오늘 연 15m|1m 포지션이 열려 있고 14:06 전."""
+    log = load_log()
+    now = dt.datetime.now(NY)
+    p = ((log.get("gap_tracks") or {}).get("15m|1m") or {}).get("open")
+    return bool(p and p.get("res") is None and p.get("date") == str(now.date()) and now.time() < FAST_CUT)
+
+
+def fast_main():
+    now = dt.datetime.now(NY)
+    log = load_log()
+    n = 0
+    try:
+        n = manage_extra(log, None, now, (log.get("iv_base") or {}).get("v") or 0.20, None,
+                         str(now.date()), only="1m")
+        save_log(log)
+        print(f"  1분 확인 {now.strftime('%H:%M:%S')} · 청산 {n}건")
+    except Exception as e:
+        print(f"  1분 확인 실패: {type(e).__name__}: {e}")
+    if n:
+        with open(OUT, "w", encoding="utf-8") as f:
+            f.write(render(log, None))
 
 
 def premarket_pos():
@@ -950,9 +1094,23 @@ def step():
                             spot_rt=gsig["cur"], premium_q=prem_q, basis="rt",
                             prem_src=("소급" if late else "실시간(모델가)"),
                             band_px=None, band_t=None, mfe=0.0, mfe_t=None,
-                            mfe_prem=-99.0, mfe_prem_t=None, filled=False, fill_t=None, res=None)
+                            mfe_prem=-99.0, mfe_prem_t=None, filled=False, fill_t=None, res=None,
+                            iv_m=base_iv, vchg=vchg)
                         print(f"  [갭/{tk}] 진입 커버{info['cover']:.2f} @{ep_use} "
                               f"{oside.upper()} {gopt['strike']:.0f} @${prem}")
+                        if tk == GAP_EXTRA_BASE:
+                            for xem in GAP_EXTRA:
+                                xk = f"15m|{xem}"
+                                xt = tracks.setdefault(xk, dict(open=None, trades=[], books={}, done={}))
+                                if xt.get("open") is None and xt["done"].get(dstr) is None:
+                                    xent = {}
+                                    for f in GAP_SIZES:
+                                        k = str(int(f * 100))
+                                        bk = xt["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
+                                        xent[k] = int((bk["cap"] * f) // cost)
+                                    xp = dict(tr["open"]); xp.update(em=xem, comb=None, contracts=xent)
+                                    xt["open"] = xp; xt["done"][dstr] = True
+                                    print(f"  [갭/{xk}] 챔피언과 같은 진입 복제")
 
             # ── 관리·청산 ──
             gopen = tr["open"]
@@ -969,7 +1127,7 @@ def step():
                 if not gopen["filled"] and _gf:
                     gopen["filled"] = True; gopen["fill_t"] = _gft
                 gcur = opt_premium(gopen["strike"], gopen["opt_side"], today_expiry(today))   # 지연 호가 — 참고용
-                _gm = (rt_premium(gopen["opt_side"], gopen["strike"], now, cur, base_iv)
+                _gm = (rt_premium(gopen["opt_side"], gopen["strike"], now, cur, _piv(gopen, base_iv))
                        if gopen.get("basis") == "rt" else gcur)
                 if _gm and _gm > 0:
                     _p = (_gm / gopen["premium"] - 1) * 100
@@ -988,7 +1146,7 @@ def step():
                 if res is None and not same_tick and now.time() >= dt.time(15, 55):
                     res = "EOD"
                 if res:
-                    ex, pct, per, _qf = settle_prices(gopen, gcur, now, cur, base_iv)
+                    ex, pct, per, _qf = settle_prices(gopen, gcur, now, cur, _piv(gopen, base_iv))
                     ux = ((gopen["entry"] - cur) / gopen["entry"] * 100) if sgn > 0 \
                          else ((cur - gopen["entry"]) / gopen["entry"] * 100)
                     for k, nc in gopen["contracts"].items():
@@ -1009,6 +1167,11 @@ def step():
                         comb_settle(comb_state(log), rec, per, "갭필")
                     tr["trades"].append(rec); tr["open"] = None
                     print(f"  [갭/{tk}] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
+
+    try:                                   # 병렬 비교 트랙 (15m|take · 15m|1m)
+        manage_extra(log, df, now, base_iv, gsig, nstr)
+    except Exception as e:
+        print(f"  병렬 트랙 관리 실패: {type(e).__name__}: {e}")
 
     # ── 모멘텀 트랙 (VIX확인 스킵데이 → 갭 방향) ──
     try:
@@ -1074,7 +1237,7 @@ def step():
                                 found_at=now.strftime("%H:%M"), opt_side=oside,
                                 strike=mopt["strike"], premium=_mp, premium_q=_mq, basis="rt",
                                 spot_rt=ep,
-                                contracts=ent, prem_src="실시간(모델가)",
+                                contracts=ent, prem_src="실시간(모델가)", iv_m=base_iv,
                                 or_stop=(gsig["orl"] if sgn > 0 else gsig["orh"]),
                                 ext=ep, mfe=0.0, mfe_t=None,
                                 mfe_prem=-99.0, mfe_prem_t=None,
@@ -1090,7 +1253,7 @@ def step():
                 if _adv > mo.get("mfe", 0.0):
                     mo["mfe"], mo["mfe_t"] = round(_adv, 3), now.strftime("%H:%M")
                 mcur = opt_premium(mo["strike"], mo["opt_side"], today_expiry(today))   # 지연 호가 — 참고용
-                _mm = (rt_premium(mo["opt_side"], mo["strike"], now, cur, base_iv)
+                _mm = (rt_premium(mo["opt_side"], mo["strike"], now, cur, _piv(mo, base_iv))
                        if mo.get("basis") == "rt" else mcur)
                 if _mm and _mm > 0:
                     _p = (_mm / mo["premium"] - 1) * 100
@@ -1123,7 +1286,7 @@ def step():
                 elif now.time() >= dt.time(15, 55):
                     res = "EOD"
                 if res:
-                    ex, pct, per, _qf = settle_prices(mo, mcur, now, cur, base_iv)
+                    ex, pct, per, _qf = settle_prices(mo, mcur, now, cur, _piv(mo, base_iv))
                     ux = ((cur - mo["entry"]) / mo["entry"] * 100) if s2 > 0 \
                          else ((mo["entry"] - cur) / mo["entry"] * 100)
                     for k, nc in mo["contracts"].items():
@@ -1193,7 +1356,7 @@ def step():
         if _mfe > open_pos.get("mfe", -99):
             open_pos["mfe"] = round(_mfe, 3); open_pos["mfe_t"] = now.strftime("%H:%M")
         _rt = open_pos.get("basis") == "rt"
-        _cm = rt_premium("call", open_pos["strike"], now, px, base_iv) if _rt else cur_prem   # 손익 기준 프리미엄
+        _cm = rt_premium("call", open_pos["strike"], now, px, _piv(open_pos, base_iv)) if _rt else cur_prem   # 손익 기준 프리미엄
         if _cm and _cm > 0:
             _pm = (_cm / open_pos["premium"] - 1) * 100
             if _pm > open_pos.get("mfe_prem", -99):
@@ -1219,7 +1382,7 @@ def step():
             if _rt:
                 # 실시간 기초가 모델 기준 (스프레드 반영 — recon과 같은 식). 야후 호가는 참고로만 남긴다.
                 exit_prem = _cm
-                eff_exit, pnl_pct, pnl_usd, _qf = settle_prices(open_pos, cur_prem, now, px, base_iv, side="call", tp1=t1)
+                eff_exit, pnl_pct, pnl_usd, _qf = settle_prices(open_pos, cur_prem, now, px, _piv(open_pos, base_iv), side="call", tp1=t1)
             else:
                 exit_prem = cur_prem
                 if exit_prem is None or exit_prem <= 0:
@@ -1301,7 +1464,7 @@ def step():
                                version=VERSION,
                                vix_pct=(vg["pct"] if vg else None),
                                vix_state=(vg["state"] if vg else None),
-                               pm_pos=(pmv["pos"] if pmv else None))
+                               pm_pos=(pmv["pos"] if pmv else None), iv_m=base_iv)
             status = f"진입 · BUY CALL {opt['strike']:.0f} @ ${_lp} (잔고 ${cap:.0f})"
             print(f"  {status}")
     log["days"][dstr] = dict(status=status, score=st["score"], rsi=round(st["rsi"], 1),
@@ -1531,16 +1694,19 @@ def render(log, st):
 
     subtabs = ""; subpanes = ""
     for j, tf in enumerate(GAP_TFS):
-        n_tf = sum(len(tracks.get(f"{tf}|{e}", {}).get("trades", [])) for e in GAP_ENTRIES)
+        ems = dict(GAP_ENTRIES)
+        if tf == "15m":
+            ems.update(GAP_EXTRA)
+        n_tf = sum(len(tracks.get(f"{tf}|{e}", {}).get("trades", [])) for e in ems)
         subtabs += (f'<button class="stab{" on" if j==0 else ""}" data-s="{tf}">'
                     f'{GAP_TF_LABEL[tf]}<br><span class="rs">{n_tf}건</span></button>')
         inner_t = ""; inner_p = ""
-        for m, em in enumerate(GAP_ENTRIES):
+        for m, em in enumerate(ems):
             tk = f"{tf}|{em}"
             tr = tracks.get(tk, {})
             nn = len(tr.get("trades", []))
             inner_t += (f'<button class="etab{" on" if m==0 else ""}" data-e="{tf}_{em}">'
-                        f'{GAP_ENTRIES[em]} <span class="rs">{nn}</span></button>')
+                        f'{ems[em]} <span class="rs">{nn}</span></button>')
             op = tr.get("open")
             oh = ""
             if op:
@@ -1549,7 +1715,7 @@ def render(log, st):
                       f'<span class="dim">@ ${op["premium"]}</span></div>'
                       f'<div class="meta">진입 {op["at"]} @ {op["entry"]} · 커버 {op["cover"]:.2f}'
                       f' · 타깃 {op["target"]}<br>'
-                      f'{"갭필 " + str(op["fill_t"]) + " · 트레일 추적" if op["filled"] else "갭필 대기 · 11:30 컷"}'
+                      f'{"갭필 " + str(op["fill_t"]) + " · 트레일 추적" if op["filled"] else ("갭필 대기 · 메우면 즉시 청산 · 11:30 컷" if em == "take" else "갭필 대기 · 11:30 컷")}'
                       f'</div></div>')
             inner_p += (f'<div class="epane{" on" if m==0 else ""}" id="e{tf}_{em}">{oh}'
                         f'<div class="panel"><div class="ph">사이징 · 각 ${GAP_CAPITAL:.0f}</div>'
@@ -2053,4 +2219,9 @@ def main():
     print(f"  생성: {OUT} · 누적 {len(log.get('trades', []))}건")
 
 if __name__ == "__main__":
-    main()
+    if "--has-fast" in sys.argv:
+        sys.exit(0 if fast_has() else 1)
+    elif "--fast" in sys.argv:
+        fast_main()
+    else:
+        main()

@@ -25,7 +25,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 300      # 1분 확인 루프가 최대 14:06까지 이 잡 안에서 돈다
     outputs:
       mode: ${{ steps.mode.outputs.mode }}
     steps:
@@ -78,6 +78,27 @@ jobs:
             echo "대기에 걸린 배포 $id 취소"; gh run cancel "$id" -R "$GITHUB_REPOSITORY" || true
           done
           gh workflow run pages.yml -R "$GITHUB_REPOSITORY" --ref main || echo "::warning::pages 발사 실패"
+      # 15m|1m(1분 확인 트레일) 포지션이 열려 있는 동안만: 60초마다 1분봉으로 판정하고, 5분 경계에는 전체 실행.
+      # 이 잡이 살아 있는 동안은 연쇄가 기다리므로 5분 판정(다른 트랙·3층)도 여기서 대신 돈다. 포지션이 닫히면 빠져나와 평소 연쇄로 돌아간다.
+      - name: 1분 확인 루프
+        if: steps.mode.outputs.mode == 'live'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          n=0
+          while python odte.py --has-fast; do
+            now=$(date +%s); s=$(( (now/60+1)*60 + 5 - now )); sleep "$s"
+            M=$(( 10#$(date +%M) % 5 ))
+            if [ "$M" -eq 0 ]; then sleep 10; python odte.py; else python odte.py --fast; fi
+            git add odte_log.json index.html 2>/dev/null
+            git commit -qm "odte $(date -u +%F_%H%M)$([ "$M" -ne 0 ] && echo ' 1m')" || true
+            git pull -q --rebase -X theirs || (git rebase --abort 2>/dev/null; true)
+            git push -q || echo "푸시 스킵"
+            if [ "$M" -eq 0 ]; then gh workflow run pages.yml -R "$GITHUB_REPOSITORY" --ref main || true; fi
+            n=$((n+1)); [ "$n" -gt 300 ] && break
+          done
+          echo "1분 루프 ${n}회"
 
   # 연쇄: 다음 실행을 스스로 예약한다.
   chain:
