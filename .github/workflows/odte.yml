@@ -26,6 +26,8 @@ jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 300      # 1분 확인 루프가 최대 14:06까지 이 잡 안에서 돈다
+    env:
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}   # 휴대폰 알림(ntfy) 토픽 — 저장소 시크릿. 없으면 알림만 안 감
     outputs:
       mode: ${{ steps.mode.outputs.mode }}
     steps:
