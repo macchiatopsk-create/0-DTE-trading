@@ -301,14 +301,15 @@ def macro_match():
         return None
 
 
-def gap_signal(df, st):
-    """당일 갭 신호. 09:30 시가 vs 전날 종가. 되돌림 진입 후보도 같이 계산."""
+def gap_signal(df, st, pcl=None):
+    """당일 갭 신호. 09:30 시가 vs 전날 종가. 되돌림 진입 후보도 같이 계산.
+    pcl: 전일 종가를 따로 줄 때(갭필 v2는 공식 일봉 종가). 없으면 전날 마지막 5분봉 종가 (챔피언 기존 방식)."""
     try:
         d = df.copy()
         days = sorted(set(d.index.date))
         if len(days) < 2: return dict(state="ERR", msg=f"거래일 {len(days)}일뿐")
         today, prev = days[-1], days[-2]
-        pcl = float(d[d.index.date == prev]["Close"].iloc[-1])
+        pcl = float(pcl) if pcl else float(d[d.index.date == prev]["Close"].iloc[-1])
         rt = d[(d.index.date == today) & (d.index.time >= dt.time(9, 30))
                & (d.index.time < dt.time(16, 0))]
         if len(rt) < 1: return dict(state="ERR", msg=f"{today} 정규장 봉 없음")
@@ -872,6 +873,28 @@ def v2_check(tk, g, df, vchg):
     return out
 
 
+def official_prev_close(log, tk, dstr):
+    """공식 전일 종가 (일봉, 배당 조정 없음). 5분봉 마지막 값은 종가 경매가 빠져 수십 센트씩 다를 수 있다
+    (2026-10-01 SPY: 5분봉 762.36 vs 공식 762.63 → 메움 판정 시각이 달라짐). 하루 한 번 조회·캐시."""
+    c = (log.get(V2_KEY) or {}).get("pc") or {}
+    if c.get("d") == dstr and c.get(tk):
+        return c[tk]
+    try:
+        h = yf.Ticker(tk).history(period="5d", interval="1d", auto_adjust=False)[["Close"]].dropna()
+        today_ = dt.date.fromisoformat(dstr)
+        h = h[[x.date() < today_ for x in h.index]]
+        if len(h):
+            v = round(float(h["Close"].iloc[-1]), 2)
+            st_ = v2_state(log).setdefault("pc", {})
+            if st_.get("d") != dstr:
+                st_.clear(); st_["d"] = dstr
+            st_[tk] = v
+            return v
+    except Exception as e:
+        print(f"  {tk} 공식 종가 조회 실패: {type(e).__name__}: {e}")
+    return None
+
+
 def v2_iv(tk, base_iv, log, dstr):
     if tk == "QQQ":
         return base_iv
@@ -1400,12 +1423,13 @@ def step():
         print(f"  병렬 트랙 관리 실패: {type(e).__name__}: {e}")
 
     try:                                   # 갭필 v2 (QQQ 우선 · SPY 보조)
-        dfs, gsigs = {"QQQ": df}, {"QQQ": gsig}
+        dfs, gsigs = {"QQQ": df}, {}
         try:
             dfs["SPY"] = intraday_t("SPY")
-            gsigs["SPY"] = gap_signal(dfs["SPY"], None)
         except Exception as e:
             print(f"  SPY 조회 실패: {type(e).__name__}: {e}")
+        for _tk, _df in dfs.items():
+            gsigs[_tk] = gap_signal(_df, None, pcl=official_prev_close(log, _tk, dstr) if is_today else None)
         v2_step(log, now, dstr, nstr, is_today, vchg, base_iv, dfs, gsigs)
     except Exception as e:
         import traceback; traceback.print_exc()

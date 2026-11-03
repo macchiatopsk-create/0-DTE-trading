@@ -41,6 +41,11 @@ class Ticker:
     def history(self, period="1d", interval="1d", **kw):
         if self.sym in B and interval == "5m":
             return frame(self.sym, period)
+        if self.sym in D["daily"] and interval == "1d":
+            today = NOW[0].date().isoformat()
+            ks = sorted(k for k in D["daily"][self.sym] if k <= today)[-5:]
+            rows = [(pd.Timestamp(k).tz_localize(NY), *D["daily"][self.sym][k]) for k in ks if k < today]
+            return pd.DataFrame(rows, columns=["t", "Open", "High", "Low", "Close"]).set_index("t")
         if self.sym == "^VIX" and interval == "1d":
             today = NOW[0].date().isoformat()
             ks = sorted(k for k in VX if k <= today)[-5:]
