@@ -28,55 +28,124 @@ def _money(x, sign=False):
 
 
 def book_rows(books, sizes, cap0):
-    """사용 비율별 북 요약 → [(k, cap, pl, n, wins, skips, mdd)]"""
+    """사용 비율별 북 요약 → dict 목록"""
     out = []
     for f in sizes:
         k = str(int(round(f * 100)))
         bk = (books or {}).get(k) or dict(cap=cap0, trades=[])
         tl = bk.get("trades", [])
         real = [x for x in tl if x.get("res") != "SKIP_FUND" and x.get("nc", 1) > 0]
-        sk = len(tl) - len(real)
-        c = cap0; peak = cap0; mdd = 0.0
-        for x in real:
-            c += x.get("usd", 0.0); peak = max(peak, c); mdd = max(mdd, (peak - c) / peak * 100)
-        wins = sum(1 for x in real if x.get("usd", 0) > 0)
-        out.append((k, bk.get("cap", cap0), bk.get("cap", cap0) - cap0, len(real), wins, sk, mdd))
+        c = cap0; peak = cap0; mdd = 0.0; lo = cap0; hist = []
+        for x in tl:
+            if x.get("res") != "SKIP_FUND" and x.get("nc", 1) > 0:
+                c += x.get("usd", 0.0); peak = max(peak, c); lo = min(lo, c)
+                mdd = max(mdd, (peak - c) / peak * 100)
+            hist.append(dict(x, bal=c))
+        cap = bk.get("cap", cap0)
+        out.append(dict(k=k, cap=cap, pl=cap - cap0, ret=(cap / cap0 - 1) * 100, n=len(real),
+                        w=sum(1 for x in real if x.get("usd", 0) > 0), sk=len(tl) - len(real), mdd=mdd,
+                        peak=peak, lo=lo, hist=hist,
+                        best=max([x.get("usd", 0) for x in real] + [0]), worst=min([x.get("usd", 0) for x in real] + [0])))
     return out
 
 
-def books_html(books, sizes, cap0, note=""):
+def _tbl(head, rows, cls=""):
+    th = "".join(f"<th>{h}</th>" for h in head)
+    tr = "".join("<tr>" + "".join(f"<td{(' class=' + chr(34) + c + chr(34)) if c else ''}>{v}</td>" for v, c in r) + "</tr>"
+                 for r in rows)
+    return f'<div class="tblw"><table class="tbl {cls}"><thead><tr>{th}</tr></thead><tbody>{tr}</tbody></table></div>'
+
+
+def contracts_table(contracts, per=None):
+    """비율별 계약 표. per = 계약당 손익($)이면 손익 열도 붙인다."""
+    rows = []
+    for a, b in sorted((contracts or {}).items(), key=lambda x: int(x[0])):
+        if per is None:
+            rows.append([(f"{a}%", ""), (f"{b}계약" if b else "못 삼", "" if b else "mut")])
+        else:
+            u = per * b if b else None
+            rows.append([(f"{a}%", ""), (f"{b}계약" if b else "못 삼", "" if b else "mut"),
+                         (_money(u, True) if u is not None else "—", _cls(u))])
+    if not rows:
+        return ""
+    return _tbl(["비율", "계약"] + (["손익"] if per is not None else []), rows, "mini")
+
+
+def contracts_hrow(contracts):
+    """보유 카드용 가로 표: 비율 → 계약 수."""
+    items = sorted((contracts or {}).items(), key=lambda x: int(x[0]))
+    if not items:
+        return ""
+    head = "".join(f"<th>{a}%</th>" for a, _ in items)
+    row = "".join(f'<td class="{"" if b else "mut"}">{b if b else "–"}</td>' for _, b in items)
+    return f'<div class="tblw"><table class="tbl hrow"><thead><tr>{head}</tr></thead><tbody><tr>{row}</tr></tbody></table></div>'
+
+
+def books_html(books, sizes, cap0, note="", trades=None, uid="b"):
     rows = book_rows(books, sizes, cap0)
-    mx = max([abs(r[2]) for r in rows] + [1])
+    mx = max([abs(r["pl"]) for r in rows] + [1])
+    bydate = {}
+    for t in trades or []:
+        bydate.setdefault(t.get("date"), t)
     h = ""
-    for k, cap, pl, n, w, sk, mdd in rows:
+    for i, r in enumerate(rows):
+        k, n, sk = r["k"], r["n"], r["sk"]
         if n == 0 and sk > 0:
             sub = f"계약값이 커서 못 삼 {sk}회"
         elif n == 0:
             sub = "아직 거래 없음"
         else:
-            sub = f"{n}건 · 승률 {w / n * 100:.0f}% · 낙폭 {mdd:.0f}%" + (f" · 못 삼 {sk}" if sk else "")
-        bw = abs(pl) / mx * 100
-        h += (f'<div class="brow"><div class="bpill">{k}%</div>'
-              f'<div class="bmid"><div class="bcap">${cap:,.0f}</div><div class="bsub">{sub}</div>'
-              f'<div class="bbar"><i class="{_cls(pl)}" style="width:{bw:.0f}%"></i></div></div>'
-              f'<div class="bpl {_cls(pl)}">{_money(pl, True)}</div></div>')
+            sub = f"{n}건 · 승률 {r['w'] / n * 100:.0f}% · 낙폭 {r['mdd']:.0f}%" + (f" · 못 삼 {sk}" if sk else "")
+        bw = abs(r["pl"]) / mx * 100
+        # 펼침: 요약 + 거래별 잔고 표
+        stats = [("시작", f"${cap0:,.0f}"), ("지금", f"${r['cap']:,.0f}"),
+                 ("총수익률", f'<b class="{_cls(r["ret"])}">{r["ret"]:+.1f}%</b>'), ("손익", _money(r["pl"], True)),
+                 ("승률", f"{r['w']}/{n}" if n else "—"), ("최대낙폭", f"{r['mdd']:.1f}%"),
+                 ("최고 잔고", f"${r['peak']:,.0f}"), ("최저 잔고", f"${r['lo']:,.0f}"),
+                 ("최고 거래", _money(r["best"], True)), ("최악 거래", _money(r["worst"], True)),
+                 ("한 번에 쓰는 돈", f"잔고의 {k}%"), ("못 산 날", f"{sk}회")]
+        sg = "".join(f'<div><span>{a}</span><b>{b}</b></div>' for a, b in stats)
+        hr = []
+        for x in reversed(r["hist"][-30:]):
+            t = bydate.get(x.get("d")) or {}
+            nm = (t.get("tk") or "QQQ") + (" " + ("P" if (t.get("opt_side") or t.get("side")) == "put" else "C") if t else "")
+            if x.get("res") == "SKIP_FUND" or not x.get("nc"):
+                hr.append([(x.get("d", "")[5:].replace("-", "/"), ""), (nm, ""), ("못 삼", "mut"), ("—", "mut"), (f"${x['bal']:,.0f}", "")])
+            else:
+                hr.append([(x.get("d", "")[5:].replace("-", "/"), ""), (nm, ""), (f"{x['nc']}", ""),
+                           (_money(x.get("usd"), True), _cls(x.get("usd"))), (f"${x['bal']:,.0f}", "")])
+        tb = _tbl(["날짜", "종목", "계약", "손익", "잔고"], hr) if hr else '<div class="empty">거래가 생기면 여기에 쌓입니다</div>'
+        h += (f'<div class="brow" data-t="{uid}{i}"><div class="bpill">{k}%</div>'
+              f'<div class="bmid"><div class="bcap">${r["cap"]:,.0f} <i class="{_cls(r["ret"])}">{r["ret"]:+.1f}%</i></div>'
+              f'<div class="bsub">{sub}</div>'
+              f'<div class="bbar"><i class="{_cls(r["pl"])}" style="width:{bw:.0f}%"></i></div></div>'
+              f'<div class="bpl {_cls(r["pl"])}">{_money(r["pl"], True)}</div><div class="arr">›</div></div>'
+              f'<div class="bdet" id="{uid}{i}"><div class="sgrid">{sg}</div>{tb}</div>')
     return (f'<div class="card"><div class="ch"><span>계좌 ${cap0:,.0f} · 사용 비율별</span>'
-            f'<span class="mut">{note}</span></div>{h}</div>')
+            f'<span class="mut">{note} · 누르면 상세</span></div>{h}</div>')
 
 
-def stat_tiles(trades):
+def stat_tiles(trades, books=None, sizes=None, cap0=None):
     tl = [t for t in trades if t.get("pnl_pct") is not None]
     n = len(tl)
     w = sum(1 for t in tl if t["pnl_pct"] > 0)
     tot = sum(t["pnl_pct"] for t in tl)
     worst = min([t["pnl_pct"] for t in tl] + [0])
     loss = sum(t["pnl_pct"] for t in tl if t["pnl_pct"] < 0)
-    return (f'<div class="tiles">'
-            f'<div class="tile"><b>{n}</b><span>거래</span></div>'
-            f'<div class="tile"><b>{(w / n * 100 if n else 0):.0f}%</b><span>승률</span></div>'
-            f'<div class="tile"><b class="{_cls(tot)}">{tot:+.0f}%</b><span>합계</span></div>'
-            f'<div class="tile"><b class="{_cls(worst)}">{worst:.0f}%</b><span>최악</span></div>'
-            f'</div><div class="mut sm">손실 난 거래 합계 {loss:.0f}%</div>')
+    avg = tot / n if n else 0
+    out = (f'<div class="tiles">'
+           f'<div class="tile"><b>{n}</b><span>거래</span></div>'
+           f'<div class="tile"><b>{(w / n * 100 if n else 0):.0f}%</b><span>승률</span></div>'
+           f'<div class="tile"><b class="{_cls(avg)}">{avg:+.1f}%</b><span>거래당 평균</span></div>'
+           f'<div class="tile"><b class="{_cls(worst)}">{worst:.0f}%</b><span>최악</span></div>'
+           f'</div>')
+    if books is not None and sizes:
+        rr = book_rows(books, sizes, cap0)
+        out += _tbl(["계좌 사용", "잔고", "총수익률", "손익"],
+                    [[(f"{r['k']}%", ""), (f"${r['cap']:,.0f}", ""), (f"{r['ret']:+.1f}%", _cls(r["ret"])),
+                      (_money(r["pl"], True), _cls(r["pl"]))] for r in rr], "ret")
+    out += f'<div class="mut sm">옵션 손익 % 합계 {tot:+.0f}% · 손실 난 거래 합계 {loss:.0f}%</div>'
+    return out
 
 
 RES_KO = {"TAKE": "메움 즉시 청산", "LIMIT": "전일 종가 지정가", "TIMECUT": "11:30 미필 정리",
@@ -123,9 +192,10 @@ def trade_list(trades, uid, limit=40, show_tk=True):
             det.append(("옵션 최고", f"{mp:+.0f}% @ {t.get('mfe_prem_t') or ''}"))
         if t.get("pnl_q") is not None:
             det.append(("야후 호가(지연)", f"{t['pnl_q']:+.1f}% — 참고"))
-        if ct:
-            det.append(("비율별 계약", ct))
         dh = "".join(f'<div><span>{a}</span><b>{b}</b></div>' for a, b in det)
+        if ct:
+            dh += f'<div class="full"><span>비율별 계약 · 손익</span>{contracts_table(t.get("contracts"), t.get("per_contract", t.get("pnl_usd")))}</div>'
+
         tag = '<em>소급</em>' if (t.get("recon") or t.get("catchup")) else ""
         h += (f'<div class="trow" data-t="{uid}{i}">'
               f'<div class="ico {"p" if put else "c"}">{"↘" if put else "↗"}</div>'
@@ -164,7 +234,9 @@ def _pos_card(p, A, title="보유 중"):
             f'<div class="pos-h"><div><div class="big">{tk} {p["strike"]:.0f}{"P" if put else "C"}</div>'
             f'<div class="mut">{p.get("at", "")} 진입 · ${p["premium"]} · 갭 {p.get("gap", 0):+.2f}%</div></div>'
             f'<div class="big {_cls(live)}">{_pc(live, 1) if live is not None else "—"}</div></div>'
-            f'{bar}<div class="mut sm">{fill}{(" · 계약 " + ct) if ct else ""}</div></div>')
+            f'{bar}<div class="mut sm">{fill}</div>'
+            + (f'<div class="sub">비율별 계약 수 <span class="mut">– 는 못 삼</span></div>{contracts_hrow(p.get("contracts"))}' if ct else "")
+            + '</div>')
 
 
 def _tick_tile(c, picked, today_done):
@@ -233,9 +305,9 @@ def gap_tab(log, A, now):
              '</div></details>')
     old = legacy_gap(log, A)
     return (today_html + pos_html
-            + books_html(tr.get("books"), A.V2_SIZES, A.V2_CAPITAL, "각 비율 독립")
-            + f'<div class="card"><div class="ch"><span>성과</span><span class="mut">11/4 시작 · 모델가</span></div>'
-            + stat_tiles(trades) + '</div>'
+            + books_html(tr.get("books"), A.V2_SIZES, A.V2_CAPITAL, "각 비율 독립", trades, "bv")
+            + f'<div class="card"><div class="ch"><span>성과</span><span class="mut">11/3 시작 · 모델가</span></div>'
+            + stat_tiles(trades, tr.get("books"), A.V2_SIZES, A.V2_CAPITAL) + '</div>'
             + f'<div class="card"><div class="ch"><span>거래 기록</span><span class="mut">누르면 상세</span></div>'
             + trade_list(trades, "v") + '</div>'
             + journal + rules + old)
@@ -267,7 +339,7 @@ def legacy_gap(log, A):
     cpos = ch.get("open")
     inner = ((_pos_card(cpos, A, "챔피언 보유 중") if (cpos and cpos.get("res") is None) else "")
              + f'<div class="sub">트랙 비교 <span class="mut">진입은 같고 청산·타이밍만 다름</span></div>{rows}'
-             + books_html(ch.get("books"), A.GAP_SIZES, A.GAP_CAPITAL, "챔피언")
+             + books_html(ch.get("books"), A.GAP_SIZES, A.GAP_CAPITAL, "챔피언", ch.get("trades"), "bo")
              + f'<div class="sub">챔피언 기록</div>' + trade_list(ch.get("trades", []), "o", show_tk=False))
     return (f'<details class="card fold old"><summary>이전 갭필 <span class="mut">챔피언 15분·트레일과 비교 트랙 '
             f'{sum(len((tracks.get(k) or {}).get("trades", [])) for k in order)}건</span></summary>{inner}</details>')
@@ -290,8 +362,8 @@ def mom_tab(log, A, now):
               f'<div class="big">QQQ {pos["strike"]:.0f}{"P" if pos.get("opt_side") == "put" else "C"}</div>'
               f'<div class="mut">{pos.get("at")} 진입 · ${pos["premium"]} · OR 손절 {pos.get("or_stop")} · 트레일 {pos.get("trail_px", "—")}</div></div>')
     tl = mtr.get("trades", [])
-    return (sig + ph + books_html(mtr.get("books"), A.GAP_SIZES, A.GAP_CAPITAL, "보관 트랙")
-            + f'<div class="card"><div class="ch"><span>성과</span></div>{stat_tiles(tl)}</div>'
+    return (sig + ph + books_html(mtr.get("books"), A.GAP_SIZES, A.GAP_CAPITAL, "보관 트랙", tl, "bm")
+            + f'<div class="card"><div class="ch"><span>성과</span></div>{stat_tiles(tl, mtr.get("books"), A.GAP_SIZES, A.GAP_CAPITAL)}</div>'
             + f'<div class="card"><div class="ch"><span>거래 기록</span><span class="mut">누르면 상세</span></div>'
             + trade_list(tl, "m", show_tk=False) + '</div>')
 
@@ -331,8 +403,8 @@ def l3_tab(log, A, st, now):
               f'<div class="big">QQQ {op["strike"]:.0f}C</div>'
               f'<div class="mut">{op.get("entry_time")} 진입 · ${op["premium"]} · 손절(기초) {op.get("stop_px", "—")}</div></div>')
     itm = [t for t in log.get("trades", []) if str(t.get("version", "")).startswith("itm")]
-    return (gate + ph + books_html(log.get("l3_books"), A.L3_SIZES, A.CAPITAL_START, "보관 트랙")
-            + f'<div class="card"><div class="ch"><span>성과</span></div>{stat_tiles(itm)}</div>'
+    return (gate + ph + books_html(log.get("l3_books"), A.L3_SIZES, A.CAPITAL_START, "보관 트랙", itm, "bl")
+            + f'<div class="card"><div class="ch"><span>성과</span></div>{stat_tiles(itm, log.get("l3_books"), A.L3_SIZES, A.CAPITAL_START)}</div>'
             + f'<div class="card"><div class="ch"><span>거래 기록</span><span class="mut">누르면 상세</span></div>'
             + trade_list(itm, "l", show_tk=False) + '</div>')
 
@@ -479,6 +551,22 @@ background:rgba(255,255,255,.6);border:1px solid var(--line);cursor:pointer;tran
 .gate b{flex:0 0 92px}.gate span{color:var(--mut)}
 .split{display:flex;height:10px;border-radius:99px;overflow:hidden;margin:4px 0}
 .split i.up{background:var(--up)}.split i.dn{background:var(--dn)}
+.brow{cursor:pointer}.brow .arr{margin-left:-4px}.brow.on .arr{transform:rotate(90deg)}
+.bcap i{font-style:normal;font-size:12.5px;font-weight:700;margin-left:6px}
+.bdet{display:none;padding:4px 0 14px}.bdet.on{display:block}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sgrid div{background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+.sgrid span{display:block;font-size:11px;color:var(--mut)}.sgrid b{font:600 13.5px/1.3 var(--num)}
+.tblw{overflow-x:auto;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.55);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{font-weight:600;font-size:11px;color:var(--mut);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);background:rgba(15,23,42,.025)}
+.tbl td{text-align:right;padding:7px 10px;border-top:1px solid var(--line);font-family:var(--num)}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl tr:first-child td{border-top:0}
+.tbl td.mut{color:var(--mut);font-family:inherit}
+.tbl.mini{font-size:12px}
+.tbl.hrow th,.tbl.hrow td{text-align:center;padding:8px 4px}.tbl.hrow td{font-weight:700;font-size:14px}.tbl.ret td{font-weight:600}
+.tdet .full{grid-column:1/-1}
 .foot{text-align:center;color:var(--mut);font-size:11.5px;margin-top:24px;line-height:1.7}
 """
 
@@ -489,7 +577,7 @@ JS = """
     try{localStorage.setItem('odte_tab',i)}catch(e){}}
   tabs.forEach(function(t,i){t.addEventListener('click',function(){show(i)})});
   try{var s=+localStorage.getItem('odte_tab');if(s>=0&&s<tabs.length)show(s)}catch(e){}
-  document.querySelectorAll('.trow').forEach(function(r){r.addEventListener('click',function(){
+  document.querySelectorAll('.trow,.brow').forEach(function(r){r.addEventListener('click',function(){
     var d=document.getElementById(r.getAttribute('data-t'));if(d){d.classList.toggle('on');r.classList.toggle('on')}})});
   setTimeout(function(){location.reload()},150000);
 })();
