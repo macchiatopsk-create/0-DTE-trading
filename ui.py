@@ -144,7 +144,14 @@ def stat_tiles(trades, books=None, sizes=None, cap0=None):
         out += _tbl(["계좌 사용", "잔고", "총수익률", "손익"],
                     [[(f"{r['k']}%", ""), (f"${r['cap']:,.0f}", ""), (f"{r['ret']:+.1f}%", _cls(r["ret"])),
                       (_money(r["pl"], True), _cls(r["pl"]))] for r in rr], "ret")
-    out += f'<div class="mut sm">옵션 손익 % 합계 {tot:+.0f}% · 손실 난 거래 합계 {loss:.0f}%</div>'
+    gain = sum(t["pnl_pct"] for t in tl if t["pnl_pct"] > 0)
+    pf = (gain / -loss) if loss < 0 else None
+    run_ = mx = 0
+    for t in tl:
+        run_ = run_ + 1 if t["pnl_pct"] < 0 else 0
+        mx = max(mx, run_)
+    out += (f'<div class="mut sm">옵션 손익 % 합계 {tot:+.0f}% · 손실 난 거래 합계 {loss:.0f}% · '
+            f'손익비(PF) {"—" if pf is None else f"{pf:.2f}"} · 최대 연속 손실 {mx}건</div>')
     return out
 
 
