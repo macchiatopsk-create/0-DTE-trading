@@ -37,7 +37,7 @@ jobs:
         with:
           python-version: "3.12"
       - if: steps.guard.outputs.ok == 'true'
-        run: pip install yfinance pandas
+        run: pip install yfinance pandas pandas_market_calendars
       - if: steps.guard.outputs.ok == 'true'
         run: python recon.py
       - name: persist

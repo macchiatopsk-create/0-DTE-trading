@@ -59,7 +59,43 @@ GAP_ENTRY_GRACE = 4               # '즉시 진입'은 기준 시각 + 이 분(�
 GAP_VIX_SKIP = 5.0                # 개장 VIX 변화 |x|>=5% 이면 스킵
 GAP_TRAIL = 0.15                  # 갭필 후 트레일링 스탑 (%)
 GAP_TIMECUT = dt.time(11, 30)     # 갭필 실패 시 강제청산 (핵심: 세타 방어)
-GAP_CUT = dt.time(14, 0)          # 최종 마감
+GAP_CUT = dt.time(14, 0)          # 최종 마감 (조기 폐장일은 폐장 30분 전으로 당김 — cut_time())
+# 조기 폐장일 (13:00 마감). pandas_market_calendars가 있으면 그걸 쓰고, 설치 실패 시에만 이 표를 쓴다.
+EARLY_CLOSE_FALLBACK = {"2026-11-27": dt.time(13, 0), "2026-12-24": dt.time(13, 0)}
+_CLOSE_CACHE = {}
+
+
+def session_close(d):
+    """그날 정규장 마감 시각 (ET). 조기 폐장일이면 13:00. 조회 실패 시 표 → 16:00."""
+    if hasattr(d, "hour") and hasattr(d, "date"):
+        d = d.date()
+    k = str(d)
+    if k in _CLOSE_CACHE:
+        return _CLOSE_CACHE[k]
+    t = EARLY_CLOSE_FALLBACK.get(k, dt.time(16, 0))
+    try:
+        import pandas_market_calendars as mcal
+        sch = mcal.get_calendar("XNYS").schedule(start_date=k, end_date=k)
+        if len(sch):
+            t = sch["market_close"].iloc[0].tz_convert(NY).time()
+    except Exception:
+        pass
+    _CLOSE_CACHE[k] = t
+    return t
+
+
+def _minus(t, minutes):
+    m = t.hour * 60 + t.minute - minutes
+    return dt.time(m // 60, m % 60)
+
+
+def cut_time(d):
+    """최종 마감 컷: 평소 14:00, 조기 폐장일은 폐장 30분 전 (13:00 폐장 → 12:30)."""
+    return min(GAP_CUT, _minus(session_close(d), 30))
+
+
+def eod_time(d):
+    return _minus(session_close(d), 5)
 GAP_SIZES = [0.30, 0.40, 0.50, 0.60, 0.70]   # 병렬 비교할 사이징
 # 커버 판정 기준선 3종 병렬 (봉 크기별 진입 타이밍 비교)
 GAP_TFS = {"5m": 1, "15m": 2, "1h": 11}      # 키: 이름, 값: 5분봉 인덱스(0-base)
@@ -464,7 +500,8 @@ def _bsm(fl, S, K, tau, iv, r=0.043):
 
 def _tau_years(t, lag_min=0):
     h = t.hour + t.minute / 60 + t.second / 3600 - lag_min / 60
-    return max(16.0 - h, 0.02) / 24 / 365
+    c = session_close(t) if hasattr(t, "date") else dt.time(16, 0)
+    return max(c.hour + c.minute / 60 - h, 0.02) / 24 / 365
 
 
 def base_iv_today(log, dstr):
@@ -648,9 +685,9 @@ def _replay_poll(log, kind, tr, pos, g, d, T, cur, iv):
         elif pos["filled"] and _gtrail and ((cur >= _gtrail) if sgn > 0 else (cur <= _gtrail)):
             res = "TRAIL"
         strat = "갭필"
-    if res is None and T.time() >= GAP_CUT:
+    if res is None and T.time() >= cut_time(T):
         res = "CUT"
-    if res is None and T.time() >= dt.time(15, 55):
+    if res is None and T.time() >= eod_time(T):
         res = "EOD"
     if not res:
         return False
@@ -816,9 +853,9 @@ def manage_extra(log, df, now, base_iv, gsig, nstr, df1m=None, only=None):
             res = "TRAIL(1분)"
         elif not pos["filled"] and now.time() >= GAP_TIMECUT:
             res = "TIMECUT"
-        elif now.time() >= GAP_CUT:
+        elif now.time() >= cut_time(now):
             res = "CUT"
-        if res is None and now.time() >= dt.time(15, 55):
+        if res is None and now.time() >= eod_time(now):
             res = "EOD"
         if res:
             _settle_extra(tr, tk, pos, res, cur, now, iv)
@@ -961,9 +998,10 @@ def v2_decide(pos, filled, cur, t):
         return "LIMIT", pos["target"]
     if t >= GAP_TIMECUT:
         return "TIMECUT", cur
-    if t >= GAP_CUT:
+    d = dt.date.fromisoformat(pos["date"])
+    if t >= cut_time(d):
         return "CUT", cur
-    if t >= dt.time(15, 55):
+    if t >= eod_time(d):
         return "EOD", cur
     return None, None
 
@@ -1422,9 +1460,9 @@ def step():
                     res = "TIMECUT"
                 elif gopen["filled"] and _gtrail and ((cur >= _gtrail) if sgn > 0 else (cur <= _gtrail)):
                     res = "TRAIL"
-                elif now.time() >= GAP_CUT:        # 갭필 후 트레일이 안 걸린 포지션도 14:00에 닫는다 (기존엔 이 분기에 못 왔음)
+                elif now.time() >= cut_time(now):  # 갭필 후 트레일이 안 걸린 포지션도 14:00(조기 폐장일은 폐장 30분 전)에 닫는다
                     res = "CUT"
-                if res is None and not same_tick and now.time() >= dt.time(15, 55):
+                if res is None and not same_tick and now.time() >= eod_time(now):
                     res = "EOD"
                 if res:
                     ex, pct, per, _qf = settle_prices(gopen, gcur, now, cur, _piv(gopen, base_iv))
@@ -1577,9 +1615,9 @@ def step():
                     res = "STOP(OR)"
                 elif (cur <= tpx) if s2 > 0 else (cur >= tpx):
                     res = "TRAIL"
-                elif now.time() >= GAP_CUT:
+                elif now.time() >= cut_time(now):
                     res = "CUT"
-                elif now.time() >= dt.time(15, 55):
+                elif now.time() >= eod_time(now):
                     res = "EOD"
                 if res:
                     ex, pct, per, _qf = settle_prices(mo, mcur, now, cur, _piv(mo, base_iv))

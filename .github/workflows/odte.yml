@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: "3.12"
       - if: steps.mode.outputs.mode == 'live'
-        run: pip install yfinance pandas
+        run: pip install yfinance pandas pandas_market_calendars
       - name: align (5분 경계 +15초에 맞춰 실행 — 09:45 판정을 09:45에)
         if: steps.mode.outputs.mode == 'live'
         run: |
