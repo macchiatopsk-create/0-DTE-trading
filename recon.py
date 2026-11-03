@@ -580,7 +580,7 @@ def main(market=None, now=None):
     for tr in list(tracks.values()) + [mtr]:
         tr["trades"].sort(key=lambda t: t.get("date", ""))
         tr["books"] = rebuild_books(tr["trades"], A.GAP_SIZES, A.GAP_CAPITAL)
-    if cb.get("open_by") is None:
+    if getattr(A, "COMB_ON", True) and cb.get("open_by") is None:
         have = {t.get("date") for t in cb["trades"]}
         for src, strat in ((tracks.get(A.COMB_FILL_KEY, {}), "갭필"), (mtr, "모멘텀")):
             for t in src.get("trades", []):

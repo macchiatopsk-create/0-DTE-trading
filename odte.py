@@ -94,6 +94,23 @@ MOM_ENTRY_LAST = dt.time(9, 50)   # 이후 발견 시 진입 포기 → recon.py
 # 커버≥0.40 → 갭필(15m|now 변형) / 커버<0.40+VIX확인 → 모멘텀 / 역행 → 관망.
 # 같은 $2,000 북에서 실제 잔고 기준으로 계약수 산정 — 합산표가 아니라 진짜 한 계좌.
 COMB_FILL_KEY = "15m|now"         # 통합에 편입되는 갭필 변형 (모멘텀과 같은 09:45 판정)
+COMB_ON = False                   # 2026-11-03 형님 결정: 통합 계좌 중단 (원장 log["comb"]은 보관만)
+
+# ── 갭필 v2 (병렬 비교 트랙, 2026-11-03 형님 결정) ─────────────────────
+# 진입 조건은 챔피언(15m|now)과 같다: 갭 0.2~1.5%, |VIX 개장변화|<5%, 09:45 커버 [0.40, 1.0), ITM 0.8% 0DTE.
+# 다른 점:
+#  - 하루 1건. QQQ가 조건에 맞으면 QQQ, 아니면 SPY.
+#  - 콜(갭다운)은 rv = 남은거리(09:45가→전일 종가) ÷ 전일 고저폭 < 0.20 일 때만.
+#  - 청산: 풋은 메운 것이 보이는 폴링에서 바로(TAKE), 콜은 전일 종가 지정가(LIMIT, 기초가=전일 종가로 계산).
+#    미필 11:30 TIMECUT, 14:00 CUT. 트레일 없음.
+#  - 북: $3,000 × 계좌 10~70% 사용 (각 북 독립).
+# 근거(로빈후드 5분봉 2/24~10/30, 보정 IV): 09:45 23건 +307% 손실합 -16 최악 -8 (지금 챔피언 QQQ 22건 +133% 손실합 -139).
+V2_KEY = "gap_v2"
+V2_TICKERS = ("QQQ", "SPY")
+V2_CALL_RV = 0.20
+V2_CAPITAL = 3000.0
+V2_SIZES = [0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70]
+V2_ITM = 0.008
 
 
 def comb_state(log):
@@ -651,8 +668,13 @@ def catch_up(log, df, now):
         plist.append(("mom", "모멘텀", mtr, mtr["open"]))
     if log.get("open"):
         plist.append(("l3", "3층", None, log["open"]))
+    nv2 = 0
+    try:
+        nv2 = v2_catch_up(log, now)
+    except Exception as e:
+        print(f"  따라잡기 실패(갭v2): {type(e).__name__}: {e}")
     if not plist:
-        return 0
+        return nv2
     lp = None
     try:
         lp = dt.datetime.fromisoformat(log["last_poll"])
@@ -683,7 +705,7 @@ def catch_up(log, df, now):
                     break
         except Exception as e:
             print(f"  따라잡기 실패({key}): {type(e).__name__}: {e}")
-    return n
+    return n + nv2
 
 
 # ───────────────────────── 병렬 비교 트랙 (15m|take, 15m|1m) ─────────────────────────
@@ -808,6 +830,206 @@ def fast_main():
             f.write(render(log, None))
 
 
+# ───────────────────────── 갭필 v2 (QQQ 우선 · SPY 보조, 병렬 비교) ─────────────────────────
+def v2_state(log):
+    return log.setdefault(V2_KEY, dict(open=None, trades=[], books={}, done={}, days={}))
+
+
+def prev_range(df):
+    """전일 정규장 고저폭 (rv 분모)."""
+    days = sorted(set(df.index.date))
+    if len(days) < 2:
+        return None
+    p = df[df.index.date == days[-2]]
+    return float(p["High"].max()) - float(p["Low"].min())
+
+
+def v2_check(tk, g, df, vchg):
+    """09:45 판정. 반환 dict(ok, wait, why, gap, cover, rv, side, entry, target)."""
+    out = dict(tk=tk, ok=False, wait=False, why="", gap=None, cover=None, rv=None)
+    if not g or g.get("state") == "ERR":
+        out.update(why="데이터 조회 실패", wait=True); return out
+    out["gap"] = g.get("gap")
+    if g.get("state") == "NO_GAP":
+        out["why"] = f"갭 {g['gap']:+.2f}% — 0.2~1.5% 밖"; return out
+    info = (g.get("tfs") or {}).get("15m") or {}
+    out.update(cover=info.get("cover"), entry=info.get("entry"), target=g.get("target"),
+               side=("put" if g["sgn"] > 0 else "call"))
+    pr = prev_range(df) if df is not None else None
+    if pr and info.get("entry"):
+        out["rv"] = round(abs(g["target"] - info["entry"]) / pr, 3)
+    if not info.get("ready"):
+        out.update(why="09:45 판정 대기", wait=True); return out
+    if info.get("over"):
+        out["why"] = "09:45 전에 이미 메움"; return out
+    if not info.get("ok"):
+        out["why"] = f"커버 {info['cover']:.2f} — 0.40 미만"; return out
+    if vchg is not None and abs(vchg) >= GAP_VIX_SKIP:
+        out["why"] = f"VIX 개장변화 {vchg:+.1f}% — 5% 이상"; return out
+    if out["side"] == "call" and (out["rv"] is None or out["rv"] >= V2_CALL_RV):
+        out["why"] = f"콜인데 rv {out['rv'] if out['rv'] is not None else '?'} — 0.20 이상"; return out
+    out.update(ok=True, why="조건 충족")
+    return out
+
+
+def v2_iv(tk, base_iv, log, dstr):
+    if tk == "QQQ":
+        return base_iv
+    vc = log.get("vixchg") or {}
+    if vc.get("d") == dstr and vc.get("lvl"):
+        return round(vc["lvl"] / 100, 4)                 # SPY: VIX 시가 × 1.0 (백테스트 스펙)
+    return round(base_iv / 1.15, 4)
+
+
+def v2_settle(tr, pos, res, px, when, iv, catchup=False):
+    ex, pct, per, _qf = settle_prices(dict(pos, basis="rt"), None, when, px, iv)
+    long_ = pos.get("opt_side") == "call"
+    ux = ((px - pos["entry"]) if long_ else (pos["entry"] - px)) / pos["entry"] * 100
+    for k, nc in pos["contracts"].items():
+        bk = tr["books"].setdefault(k, dict(cap=V2_CAPITAL, trades=[]))
+        if nc < 1:
+            bk["trades"].append(dict(d=pos["date"], nc=0, usd=0.0, pct=0.0, res="SKIP_FUND"))
+            continue
+        usd = round(per * nc, 2)
+        bk["cap"] = round(bk["cap"] + usd, 2)
+        bk["trades"].append(dict(d=pos["date"], nc=nc, usd=usd, pct=pct, res=res))
+    rec = dict(pos)
+    rec.update(res=res + (CATCH_TAG if catchup else ""), exit=round(px, 2), exit_at=when.strftime("%H:%M"),
+               exit_premium=ex, pnl_pct=pct, per_contract=per, ux=round(ux, 3))
+    if catchup:
+        rec["catchup"] = True
+    tr["trades"].append(rec)
+    tr["open"] = None
+    print(f"  [갭v2/{pos['tk']}] 청산 {rec['res']} {pct:+.1f}% 기초 {ux:+.3f}%")
+
+
+def v2_decide(pos, filled, cur, t):
+    """청산 판정. 반환 (res, 청산 기준 기초가) 또는 (None, None)."""
+    if filled:
+        if pos["opt_side"] == "put":
+            return "TAKE", cur
+        return "LIMIT", pos["target"]
+    if t >= GAP_TIMECUT:
+        return "TIMECUT", cur
+    if t >= GAP_CUT:
+        return "CUT", cur
+    if t >= dt.time(15, 55):
+        return "EOD", cur
+    return None, None
+
+
+def v2_step(log, now, dstr, nstr, is_today, vchg, base_iv, dfs, gsigs):
+    tr = v2_state(log)
+    hm = now.strftime("%H:%M")
+    # ── 판정·진입 (09:45 + 유예 4분 안에서만) ──
+    checks = {tk: v2_check(tk, gsigs.get(tk), dfs.get(tk), vchg) for tk in V2_TICKERS}
+    tr["live"] = dict(d=dstr, at=hm, checks=checks)
+    if is_today and tr["open"] is None and tr["done"].get(dstr) is None:
+        ref = dt.datetime.strptime(GAP_TF_TIME["15m"], "%H:%M")
+        late = (now.hour * 60 + now.minute) - (ref.hour * 60 + ref.minute) > GAP_ENTRY_GRACE
+        pick = None
+        for tk in V2_TICKERS:
+            c = checks[tk]
+            if c["wait"] and not late:
+                break                                   # 우선순위 종목이 아직 판정 전이면 기다린다
+            if c["ok"]:
+                pick = tk; break
+        decided = pick is not None or all(not checks[t]["wait"] for t in V2_TICKERS) or late
+        if decided:
+            day = dict(at=hm, pick=None, QQQ=checks["QQQ"], SPY=checks["SPY"])
+            if pick and late:
+                day["why"] = f"늦은 발견({hm}) — 진입 안 함"
+                pick = None
+            if pick:
+                c = checks[pick]; g = gsigs[pick]
+                side = c["side"]; ep = c["entry"]
+                iv = v2_iv(pick, base_iv, log, dstr)
+                opt = itm_opt(ep, today_expiry(now.date()), side, 1e9, sym=pick)
+                strike = opt["strike"] if opt else float(round(ep * (1 + V2_ITM if side == "put" else 1 - V2_ITM)))
+                prem = rt_premium(side, strike, now, g["cur"], iv) or (opt or {}).get("premium")
+                if prem and prem > 0:
+                    cost = prem * 100
+                    ent = {}
+                    for f in V2_SIZES:
+                        k = str(int(round(f * 100)))
+                        bk = tr["books"].setdefault(k, dict(cap=V2_CAPITAL, trades=[]))
+                        ent[k] = int((bk["cap"] * f) // cost)
+                    tr["open"] = dict(date=dstr, tk=pick, dir=g["dir"], sgn=g["sgn"], gap=g["gap"],
+                                      cover=c["cover"], rv=c["rv"], entry=ep, target=c["target"],
+                                      at=GAP_TF_TIME["15m"], found_at=hm, opt_side=side, strike=strike,
+                                      premium=prem, premium_q=(opt or {}).get("premium"), basis="rt",
+                                      spot_rt=g["cur"], iv_m=iv, contracts=ent,
+                                      exit_rule=("메우면 바로 청산" if side == "put" else "전일 종가 지정가"),
+                                      filled=False, fill_t=None, mfe=0.0, mfe_t=None,
+                                      mfe_prem=-99.0, mfe_prem_t=None, res=None)
+                    day["pick"] = pick
+                    print(f"  [갭v2] 진입 {pick} {side.upper()} {strike:.0f} @${prem} (커버 {c['cover']} rv {c['rv']})")
+                else:
+                    day["why"] = "옵션가 계산 실패"
+            tr["done"][dstr] = True
+            tr["days"][dstr] = day
+            for _k in sorted(tr["days"])[:-120]:
+                tr["days"].pop(_k, None)
+    # ── 관리·청산 ──
+    pos = tr.get("open")
+    if pos and pos.get("res") is None and pos.get("date") == nstr and pos.get("found_at") != hm:
+        tk = pos["tk"]; df = dfs.get(tk); g = gsigs.get(tk) or {}
+        if df is None:
+            return
+        cur = g.get("cur") or float(df["Close"].iloc[-1])
+        d0 = dt.date.fromisoformat(pos["date"])
+        gf, _, gft = gap_fill_since(df, d0, pos["at"], pos["sgn"], pos["target"])
+        if gf and not pos["filled"]:
+            pos["filled"], pos["fill_t"] = True, gft
+        long_ = pos["opt_side"] == "call"
+        adv = ((cur - pos["entry"]) if long_ else (pos["entry"] - cur)) / pos["entry"] * 100
+        if adv > pos.get("mfe", 0.0):
+            pos["mfe"], pos["mfe_t"] = round(adv, 3), hm
+        iv = _piv(pos, base_iv)
+        _m = rt_premium(pos["opt_side"], pos["strike"], now, cur, iv)
+        if _m and _m > 0:
+            pos["now_prem"], pos["now_spot"], pos["now_t"] = _m, round(cur, 2), hm
+            _p = (_m / pos["premium"] - 1) * 100
+            if _p > pos.get("mfe_prem", -99):
+                pos["mfe_prem"], pos["mfe_prem_t"] = round(_p, 1), hm
+        res, px = v2_decide(pos, pos["filled"], cur, now.time())
+        if res:
+            v2_settle(tr, pos, res, px, now, iv)
+
+
+def v2_catch_up(log, now):
+    """앱이 멈춘 동안 놓친 폴링을 그날 봉으로 재생해 v2 포지션을 규칙대로 닫는다."""
+    tr = log.get(V2_KEY) or {}
+    pos = tr.get("open")
+    if not pos or pos.get("res") is not None:
+        return 0
+    try:
+        lp = dt.datetime.fromisoformat(log["last_poll"])
+    except Exception:
+        lp = None
+    d = dt.date.fromisoformat(pos["date"])
+    g = intraday_t(pos["tk"])
+    if d not in set(g.index.date):
+        g = intraday_t(pos["tk"], "60d")
+    hm0 = pos.get("found_at") or pos["at"]
+    start = dt.datetime(d.year, d.month, d.day, int(hm0[:2]), int(hm0[3:5]), tzinfo=NY)
+    polls = _missed_polls(g, d, start, lp, now)
+    if not polls:
+        return 0
+    iv = pos.get("iv_m") or 0.20
+    print(f"  따라잡기 갭v2/{pos['tk']}: {pos['date']} 놓친 폴링 {len(polls)}회")
+    for T, cur in polls:
+        upto = g[g.index < T]
+        gf, _, gft = gap_fill_since(upto, d, pos["at"], pos["sgn"], pos["target"])
+        if gf and not pos["filled"]:
+            pos["filled"], pos["fill_t"] = True, gft
+        res, px = v2_decide(pos, pos["filled"], cur, T.time())
+        if res:
+            v2_settle(tr, pos, res, px, T, iv, catchup=True)
+            return 1
+    return 0
+
+
 def premarket_pos():
     """프리마켓(04:00~09:30) 레인지 내 09:30 시가 위치. v9 검증: >0.5 롱만 엣지."""
     try:
@@ -837,7 +1059,11 @@ def premarket_pos():
 
 
 def intraday(period="3d"):
-    df = yf.Ticker(TICKER).history(period=period, interval="5m")
+    return intraday_t(TICKER, period)
+
+
+def intraday_t(tk, period="3d"):
+    df = yf.Ticker(tk).history(period=period, interval="5m")
     if df is None or df.empty:
         raise ValueError("5분봉 없음")
     df = df[["Open", "High", "Low", "Close", "Volume"]].dropna()
@@ -898,10 +1124,10 @@ def session_state(df):
                 ts=day.index[-1].strftime("%H:%M")), today, len(day)
 
 # ───────────────────────── 옵션 ─────────────────────────
-def opt_premium(strike, side, expiry):
+def opt_premium(strike, side, expiry, tk=TICKER):
     """특정 스트라이크 현재 프리미엄(mid)."""
     try:
-        ch = yf.Ticker(TICKER).option_chain(expiry)
+        ch = yf.Ticker(tk).option_chain(expiry)
         df = ch.calls if side == "call" else ch.puts
         r = df[df["strike"] == strike]
         if r.empty: return None
@@ -912,10 +1138,10 @@ def opt_premium(strike, side, expiry):
         return None
 
 
-def itm_opt(spot, expiry, side="call", cap=None):
+def itm_opt(spot, expiry, side="call", cap=None, sym=TICKER):
     """델타 0.70~0.80 ITM 콜/풋. 콜은 스팟보다 낮은 스트라이크, 풋은 높은 스트라이크."""
     try:
-        tk = yf.Ticker(TICKER)
+        tk = yf.Ticker(sym)
         ch = tk.option_chain(expiry)
         df = ch.calls if side == "call" else ch.puts
         itm = df[df["strike"] < spot].copy() if side == "call" else df[df["strike"] > spot].copy()
@@ -1074,7 +1300,7 @@ def step():
                             bk = tr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
                             ent[k] = int((bk["cap"] * f) // cost)
                         cent = None
-                        if tk == COMB_FILL_KEY:
+                        if tk == COMB_FILL_KEY and COMB_ON:
                             cb = comb_state(log)
                             if cb.get("open_by") is None:
                                 cent = comb_contracts(cb, cost)
@@ -1173,6 +1399,18 @@ def step():
     except Exception as e:
         print(f"  병렬 트랙 관리 실패: {type(e).__name__}: {e}")
 
+    try:                                   # 갭필 v2 (QQQ 우선 · SPY 보조)
+        dfs, gsigs = {"QQQ": df}, {"QQQ": gsig}
+        try:
+            dfs["SPY"] = intraday_t("SPY")
+            gsigs["SPY"] = gap_signal(dfs["SPY"], None)
+        except Exception as e:
+            print(f"  SPY 조회 실패: {type(e).__name__}: {e}")
+        v2_step(log, now, dstr, nstr, is_today, vchg, base_iv, dfs, gsigs)
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print(f"  갭필 v2 실패: {type(e).__name__}: {e}")
+
     # ── 모멘텀 트랙 (VIX확인 스킵데이 → 갭 방향) ──
     try:
         msig = dict(d=dstr, vchg=vchg, state="OFF", why="")
@@ -1221,7 +1459,9 @@ def step():
                                 bk = mtr["books"].setdefault(k, dict(cap=GAP_CAPITAL, trades=[]))
                                 ent[k] = int((bk["cap"] * f) // cost)
                             cb = comb_state(log)
-                            if cb.get("open_by") is None:
+                            if not COMB_ON:
+                                cent = None
+                            elif cb.get("open_by") is None:
                                 cent = comb_contracts(cb, cost)
                                 cb["open_by"] = "모멘텀"
                             else:
@@ -1479,6 +1719,17 @@ def step():
 
 # ───────────────────────── 화면 ─────────────────────────
 def render(log, st):
+    """새 화면(ui.py, 2026-11-03 개편). 실패하면 예전 화면으로 되돌아간다."""
+    try:
+        import ui
+        return ui.render(log, st, sys.modules[__name__])
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print(f"  새 화면 실패 → 예전 화면: {type(e).__name__}: {e}")
+        return render_legacy(log, st)
+
+
+def render_legacy(log, st):
     vg = log.get("vix"); pmv = log.get("pm"); op = log.get("open")
     trades = log.get("trades", [])
     itm = [t for t in trades if str(t.get("version","")).startswith("itm")]
