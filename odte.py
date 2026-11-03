@@ -111,6 +111,25 @@ V2_CALL_RV = 0.20
 V2_CAPITAL = 3000.0
 V2_SIZES = [0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70]
 V2_ITM = 0.008
+PAGES_URL = "https://macchiatopsk-create.github.io/0-DTE-trading/"
+
+
+def notify(title, msg, tags=None, prio=4):
+    """휴대폰 알림 (ntfy.sh, 무료). 저장소 시크릿 NTFY_TOPIC이 없으면 아무것도 안 한다.
+    토픽 이름은 공개 레포에 쓰지 않는다 — 아는 사람은 누구나 구독할 수 있어서."""
+    topic = os.environ.get("NTFY_TOPIC", "").strip()
+    if not topic:
+        return
+    try:
+        import urllib.request
+        body = json.dumps(dict(topic=topic, title=title, message=msg, tags=tags or [],
+                               priority=prio, click=PAGES_URL), ensure_ascii=False).encode("utf-8")
+        req = urllib.request.Request("https://ntfy.sh/", data=body,
+                                     headers={"Content-Type": "application/json; charset=utf-8"})
+        urllib.request.urlopen(req, timeout=8).read()
+        print(f"  알림 전송: {title}")
+    except Exception as e:
+        print(f"  알림 실패: {type(e).__name__}: {e}")
 
 
 def comb_state(log):
@@ -924,6 +943,14 @@ def v2_settle(tr, pos, res, px, when, iv, catchup=False):
     tr["trades"].append(rec)
     tr["open"] = None
     print(f"  [갭v2/{pos['tk']}] 청산 {rec['res']} {pct:+.1f}% 기초 {ux:+.3f}%")
+    ko = {"TAKE": "메움 즉시 청산", "LIMIT": "전일 종가 지정가", "TIMECUT": "11:30 미필 정리",
+          "CUT": "14:00 마감", "EOD": "장 마감"}.get(res, res)
+    usd = " · ".join(f"{k}% {'+' if per * nc >= 0 else '-'}${abs(per * nc):,.0f}"
+                     for k, nc in sorted(pos["contracts"].items(), key=lambda x: int(x[0])) if nc)
+    notify(f"갭필 종료 {pos['tk']} {pos['strike']:.0f}{'P' if pos['opt_side'] == 'put' else 'C'} {pct:+.1f}%",
+           f"{ko} · {pos['at']}→{when.strftime('%H:%M')}" + (" (소급)" if catchup else "")
+           + (f"\n{usd}" if usd else ""),
+           ["white_check_mark" if pct > 0 else "x"])
 
 
 def v2_decide(pos, filled, cur, t):
@@ -987,6 +1014,11 @@ def v2_step(log, now, dstr, nstr, is_today, vchg, base_iv, dfs, gsigs):
                                       mfe_prem=-99.0, mfe_prem_t=None, res=None)
                     day["pick"] = pick
                     print(f"  [갭v2] 진입 {pick} {side.upper()} {strike:.0f} @${prem} (커버 {c['cover']} rv {c['rv']})")
+                    _ct = " · ".join(f"{k}% {v}" for k, v in sorted(ent.items(), key=lambda x: int(x[0])) if v)
+                    notify(f"갭필 진입 {pick} {strike:.0f}{'P' if side == 'put' else 'C'} @${prem:.2f}",
+                           f"갭 {g['gap']:+.2f}% · 커버 {c['cover']:.2f} · 목표 {c['target']}\n"
+                           f"{tr['open']['exit_rule']} · 못 메우면 11:30 정리"
+                           + (f"\n계약 {_ct}" if _ct else ""), ["rocket"], 5)
                 else:
                     day["why"] = "옵션가 계산 실패"
             tr["done"][dstr] = True

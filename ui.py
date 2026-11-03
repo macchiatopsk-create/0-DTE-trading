@@ -208,7 +208,7 @@ def trade_list(trades, uid, limit=40, show_tk=True):
     return h or '<div class="empty">아직 기록이 없습니다</div>'
 
 
-def _pos_card(p, A, title="보유 중"):
+def _pos_card(p, A, title='<span class="live"><i></i>LIVE</span> 거래 진행 중'):
     put = p.get("opt_side") == "put"
     tk = p.get("tk") or "QQQ"
     spot = p.get("now_spot") or p.get("spot_rt") or p.get("entry")
@@ -229,7 +229,7 @@ def _pos_card(p, A, title="보유 중"):
            f'<span>목표 {p["target"]}</span></div></div>') if prog is not None else ""
     ct = " · ".join(f"{a}% {b}" for a, b in sorted((p.get("contracts") or {}).items(),
                                                    key=lambda x: int(x[0])) if b)
-    return (f'<div class="card hero"><div class="ch"><span>{title}</span>'
+    return (f'<div class="card hero liveC"><div class="ch"><span>{title}</span>'
             f'<span class="chip">{E(rule)}</span></div>'
             f'<div class="pos-h"><div><div class="big">{tk} {p["strike"]:.0f}{"P" if put else "C"}</div>'
             f'<div class="mut">{p.get("at", "")} 진입 · ${p["premium"]} · 갭 {p.get("gap", 0):+.2f}%</div></div>'
@@ -237,6 +237,24 @@ def _pos_card(p, A, title="보유 중"):
             f'{bar}<div class="mut sm">{fill}</div>'
             + (f'<div class="sub">비율별 계약 수 <span class="mut">– 는 못 삼</span></div>{contracts_hrow(p.get("contracts"))}' if ct else "")
             + '</div>')
+
+
+def _done_card(t, A):
+    """오늘 거래가 끝났을 때 맨 위에 보이는 결과 카드."""
+    put = (t.get("opt_side") or "call") == "put"
+    pnl = t.get("pnl_pct") or 0
+    per = t.get("per_contract") or 0
+    items = sorted((t.get("contracts") or {}).items(), key=lambda x: int(x[0]))
+    head = "".join(f"<th>{a}%</th>" for a, _ in items)
+    row = "".join(f'<td class="{_cls(per * b) if b else "mut"}">{_money(per * b, True) if b else "–"}</td>' for _, b in items)
+    tbl = (f'<div class="sub">계좌 비율별 손익</div><div class="tblw"><table class="tbl hrow money"><thead><tr>{head}</tr></thead>'
+           f'<tbody><tr>{row}</tr></tbody></table></div>') if items else ""
+    return (f'<div class="card hero doneC {"win" if pnl > 0 else "loss"}"><div class="ch">'
+            f'<span><span class="donebadge">✓ 거래 종료</span></span><span class="chip">{E(_res_ko(t.get("res")))}</span></div>'
+            f'<div class="pos-h"><div><div class="big">{t.get("tk", "QQQ")} {t["strike"]:.0f}{"P" if put else "C"}</div>'
+            f'<div class="mut">{t.get("at", "")} 진입 → {t.get("exit_at", "")} 청산 · ${t.get("premium")} → ${t.get("exit_premium")}</div></div>'
+            f'<div class="big {_cls(pnl)}">{pnl:+.1f}%</div></div>{tbl}'
+            f'<div class="mut sm">오늘은 하루 1건 규칙이라 더 진입하지 않습니다 · 다음 판정은 다음 거래일 09:45</div></div>')
 
 
 def _tick_tile(c, picked, today_done):
@@ -282,6 +300,9 @@ def gap_tab(log, A, now):
         today_html = ('<div class="card"><div class="ch"><span>오늘 판정</span></div>'
                       '<div class="empty">장 전 · 09:45에 QQQ → SPY 순서로 판정합니다</div></div>')
     pos_html = _pos_card(pos, A) if (pos and pos.get("res") is None) else ""
+    done_t = next((t for t in reversed(trades) if t.get("date") == today), None)
+    if done_t and not pos_html:
+        pos_html = _done_card(done_t, A)
     # 일자별 판정 기록
     jr = ""
     for d in sorted(tr.get("days") or {}, reverse=True)[:30]:
@@ -304,7 +325,7 @@ def gap_tab(log, A, now):
              '<p class="mut">백테스트(로빈후드 5분봉 2/24~10/30, 보정 IV): 23건 +307% · 손실 합 -16 · 최악 -8</p>'
              '</div></details>')
     old = legacy_gap(log, A)
-    return (today_html + pos_html
+    return (pos_html + today_html
             + books_html(tr.get("books"), A.V2_SIZES, A.V2_CAPITAL, "각 비율 독립", trades, "bv")
             + f'<div class="card"><div class="ch"><span>성과</span><span class="mut">11/3 시작 · 모델가</span></div>'
             + stat_tiles(trades, tr.get("books"), A.V2_SIZES, A.V2_CAPITAL) + '</div>'
@@ -567,6 +588,18 @@ background:rgba(255,255,255,.6);border:1px solid var(--line);cursor:pointer;tran
 .tbl.mini{font-size:12px}
 .tbl.hrow th,.tbl.hrow td{text-align:center;padding:8px 4px}.tbl.hrow td{font-weight:700;font-size:14px}.tbl.ret td{font-weight:600}
 .tdet .full{grid-column:1/-1}
+.topr{display:flex;gap:8px;align-items:center}
+.bell{border:0;border-radius:999px;padding:7px 12px;font:600 12px/1 inherit;color:#fff;background:var(--ink);cursor:pointer}
+.live{display:inline-flex;align-items:center;gap:6px;margin-right:6px;padding:3px 9px 3px 7px;border-radius:999px;background:#e11d48;color:#fff;font:700 11px/1.2 var(--num);letter-spacing:.06em}
+.live i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+.liveC{box-shadow:0 0 0 4px rgba(225,29,72,.10),0 14px 40px rgba(225,29,72,.18)}
+.donebadge{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--ink);color:#fff;font-size:12px;font-weight:700}
+.doneC.win .donebadge{background:var(--up)}.doneC.loss .donebadge{background:var(--dn)}
+.tbl.money td{font-size:12.5px}
+.flash{animation:flash 1.2s ease-out 3}
+@keyframes flash{0%{transform:scale(1)}30%{transform:scale(1.02);box-shadow:0 0 0 8px rgba(129,140,248,.35)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.live i,.flash{animation:none}}
 .foot{text-align:center;color:var(--mut);font-size:11.5px;margin-top:24px;line-height:1.7}
 """
 
@@ -579,6 +612,19 @@ JS = """
   try{var s=+localStorage.getItem('odte_tab');if(s>=0&&s<tabs.length)show(s)}catch(e){}
   document.querySelectorAll('.trow,.brow').forEach(function(r){r.addEventListener('click',function(){
     var d=document.getElementById(r.getAttribute('data-t'));if(d){d.classList.toggle('on');r.classList.toggle('on')}})});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+  var b=document.body,sig=b.getAttribute('data-sig')||'',bell=document.getElementById('bell');
+  var canN=('Notification' in window);
+  if(canN&&Notification.permission==='default'&&bell){bell.hidden=false;bell.onclick=function(){
+    Notification.requestPermission().then(function(p){if(p!=='default')bell.hidden=true})}}
+  function pop(t,body){try{if(!canN||Notification.permission!=='granted')return;
+    var o={body:body,icon:'icon-192.png',badge:'icon-192.png',tag:sig};
+    if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(function(r){r.showNotification(t,o)}).catch(function(){new Notification(t,o)})}
+    else new Notification(t,o)}catch(e){}}
+  var last=null;try{last=localStorage.getItem('odte_sig')}catch(e){}
+  if(sig&&last!==null&&sig!==last){pop(b.getAttribute('data-nt'),b.getAttribute('data-nb'));
+    var c=document.querySelector('.liveC,.doneC');if(c)c.classList.add('flash')}
+  try{localStorage.setItem('odte_sig',sig)}catch(e){}
   setTimeout(function(){location.reload()},150000);
 })();
 """
@@ -613,6 +659,15 @@ def render(log, st, A):
     tb = "".join(f'<button class="tab{" on" if i == 0 else ""}">{n}</button>' for i, (n, _) in enumerate(tabs))
     pn = "".join(f'<section class="pane{" on" if i == 0 else ""}">{h}</section>' for i, (_, h) in enumerate(tabs))
     lp = log.get("last_poll", "")
+    sig = ntitle = nbody = ""
+    if pos and pos.get("res") is None and pos.get("date") == today:
+        sig = f'open|{today}|{pos.get("tk")}{pos.get("strike")}'
+        ntitle = f'갭필 진입 · {pos.get("tk", "QQQ")} {pos["strike"]:.0f}{"P" if pos.get("opt_side") == "put" else "C"}'
+        nbody = f'{pos.get("at", "")} 진입 · ${pos.get("premium")} · {pos.get("exit_rule", "")}'
+    elif done_today:
+        sig = f'done|{today}|{done_today.get("tk")}|{done_today.get("pnl_pct")}'
+        ntitle = f'갭필 종료 · {done_today.get("tk", "QQQ")} {done_today["pnl_pct"]:+.1f}%'
+        nbody = f'{_res_ko(done_today.get("res"))} · {done_today.get("at", "")}→{done_today.get("exit_at", "")}'
     return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>0DTE 갭필</title>
@@ -625,8 +680,8 @@ def render(log, st, A):
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><div class="wrap">
-<div class="top"><div class="brand"><i></i>0DTE · Gap Engine</div><div class="pill"><b>모의매매</b> · 실거래 아님</div></div>
+<style>{CSS}</style></head><body data-sig="{E(sig)}" data-nt="{E(ntitle)}" data-nb="{E(nbody)}"><div class="wrap">
+<div class="top"><div class="brand"><i></i>0DTE · Gap Engine</div><div class="topr"><button class="bell" id="bell" hidden>🔔 알림 켜기</button><div class="pill"><b>모의매매</b> · 실거래 아님</div></div></div>
 <div class="hero-top"><div class="orb {orb}"><span></span></div><div>
 <div class="when">{now.month}월 {now.day}일 {WD[now.weekday()]}요일 · {now.strftime('%H:%M')} ET</div><h1>{head_html}</h1></div></div>
 <nav class="tabs">{tb}</nav>
