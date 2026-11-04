@@ -917,8 +917,8 @@
   },
   "2026-11-04": {
    "status": "WAIT_OPEN",
-   "bars": 2,
-   "at": "09:35"
+   "bars": 3,
+   "at": "09:40"
   }
  },
  "vix": {
@@ -943,49 +943,49 @@
   "sgn": 1,
   "prev_close": 685.34,
   "open": 688.44,
-  "entry": 689.45,
+  "entry": 694.17,
   "target": 685.34,
-  "room": 0.596,
-  "cover": -0.33,
+  "room": 1.272,
+  "cover": -1.85,
   "r50": 688.17,
-  "cur": 689.45,
+  "cur": 694.17,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": -0.33,
-    "entry": 689.45,
+    "cover": -1.73,
+    "entry": 693.81,
     "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.596,
-    "vw_entry": 689.14,
-    "vw_room": 0.551
+    "room": 1.22,
+    "vw_entry": 689.62,
+    "vw_room": 0.621
    },
    "15m": {
-    "cover": -0.33,
-    "entry": 689.45,
+    "cover": -1.85,
+    "entry": 694.17,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.596,
-    "vw_entry": 689.14,
-    "vw_room": 0.551
+    "room": 1.272,
+    "vw_entry": 689.62,
+    "vw_room": 0.621
    },
    "1h": {
-    "cover": -0.33,
-    "entry": 689.45,
+    "cover": -1.85,
+    "entry": 694.17,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.596,
-    "vw_entry": 689.14,
-    "vw_room": 0.551
+    "room": 1.272,
+    "vw_entry": 689.62,
+    "vw_room": 0.621
    }
   },
-  "band_px": null,
-  "band_t": null,
-  "band_room": null,
+  "band_px": 690.66,
+  "band_t": "09:35",
+  "band_room": 0.77,
   "mfe": 0.078,
   "mfe_t": "09:30",
   "mfe_px": 687.9
@@ -10106,7 +10106,7 @@
   "v": 0.3035,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-04T09:35:16-05:00",
+ "last_poll": "2026-11-04T09:40:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10143,7 +10143,7 @@
   },
   "live": {
    "d": "2026-11-04",
-   "at": "09:35",
+   "at": "09:40",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
@@ -10151,9 +10151,9 @@
      "wait": true,
      "why": "09:45 판정 대기",
      "gap": 0.461,
-     "cover": -0.32,
-     "rv": 0.757,
-     "entry": 689.45,
+     "cover": -1.81,
+     "rv": 1.613,
+     "entry": 694.17,
      "target": 685.28,
      "side": "put"
     },
@@ -10163,9 +10163,9 @@
      "wait": true,
      "why": "09:45 판정 대기",
      "gap": 1.145,
-     "cover": -0.1,
-     "rv": 2.028,
-     "entry": 763.84,
+     "cover": -0.32,
+     "rv": 2.434,
+     "entry": 765.74,
      "target": 754.35,
      "side": "put"
     }
