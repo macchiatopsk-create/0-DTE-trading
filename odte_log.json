@@ -1,5 +1,37 @@
 {
- "open": null,
+ "open": {
+  "date": "2026-11-04",
+  "side": "call",
+  "mfe": -99.0,
+  "mfe_t": null,
+  "contracts": {
+   "30": 1,
+   "40": 2,
+   "50": 3,
+   "60": 4,
+   "70": 5
+  },
+  "mfe_prem": -99.0,
+  "mfe_prem_t": null,
+  "strike": 687.0,
+  "premium": 6.22,
+  "premium_q": 10.33,
+  "basis": "rt",
+  "iv": 0.4838,
+  "symbol": "QQQ261104C00687000",
+  "spot_rt": 693.0,
+  "entry_time": "10:50",
+  "entry_px": 693.0,
+  "score": 0,
+  "gap": 0.45,
+  "rsi": 36.5,
+  "stop_px": 687.56,
+  "version": "itm-2.0",
+  "vix_pct": 94.8,
+  "vix_state": "LIVE",
+  "pm_pos": 0.68,
+  "iv_m": 0.2752
+ },
  "trades": [
   {
    "date": "2026-08-12",
@@ -916,14 +948,14 @@
    "pm_pos": 0.563
   },
   "2026-11-04": {
-   "status": "WAIT · 3층 통과 (VIX 95% · PM 0.68) · VWAP -1σ 터치 대기 (현재 -0.70σ)",
-   "score": 1,
-   "rsi": 52.0,
+   "status": "진입 · BUY CALL 687 @ $6.22 (잔고 $3528)",
+   "score": 0,
+   "rsi": 36.5,
    "direction": 0,
    "gap": 0.45,
-   "px": 694.58,
-   "vwap": 696.58,
-   "at": "10:45",
+   "px": 693.0,
+   "vwap": 696.46,
+   "at": "10:50",
    "vix_pct": 94.8,
    "vix_state": "LIVE",
    "pm_pos": 0.68
@@ -956,7 +988,7 @@
   "room": 1.777,
   "cover": -3.0,
   "r50": 688.17,
-  "cur": 694.58,
+  "cur": 693.0,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -987,8 +1019,8 @@
     "ok": false,
     "over": false,
     "room": 1.777,
-    "vw_entry": 696.59,
-    "vw_room": 1.615
+    "vw_entry": 697.03,
+    "vw_room": 1.677
    }
   },
   "band_px": 690.66,
@@ -10114,7 +10146,7 @@
   "v": 0.2752,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-04T10:45:16-05:00",
+ "last_poll": "2026-11-04T10:50:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10180,7 +10212,7 @@
   },
   "live": {
    "d": "2026-11-04",
-   "at": "10:45",
+   "at": "10:50",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
