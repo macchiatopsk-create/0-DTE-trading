@@ -916,14 +916,14 @@
    "pm_pos": 0.563
   },
   "2026-11-04": {
-   "status": "WAIT · 3층 통과 (VIX 95% · PM 0.68) · VWAP -1σ 터치 대기 (현재 +0.16σ)",
+   "status": "WAIT · 3층 통과 (VIX 95% · PM 0.68) · VWAP -1σ 터치 대기 (현재 +0.22σ)",
    "score": 4,
-   "rsi": 73.8,
+   "rsi": 75.7,
    "direction": 1,
    "gap": 0.45,
-   "px": 697.39,
-   "vwap": 696.89,
-   "at": "10:25",
+   "px": 697.49,
+   "vwap": 697.03,
+   "at": "10:30",
    "vix_pct": 94.8,
    "vix_state": "LIVE",
    "pm_pos": 0.68
@@ -945,18 +945,18 @@
   "date": "2026-11-04",
   "orh": 691.43,
   "orl": 687.9,
-  "state": "WAIT",
+  "state": "LOW_COVER",
   "gap": 0.452,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 685.34,
   "open": 688.44,
-  "entry": 697.39,
+  "entry": 697.74,
   "target": 685.34,
-  "room": 1.727,
-  "cover": -2.89,
+  "room": 1.777,
+  "cover": -3.0,
   "r50": 688.17,
-  "cur": 697.39,
+  "cur": 697.49,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -981,14 +981,14 @@
     "vw_room": 0.775
    },
    "1h": {
-    "cover": -2.89,
-    "entry": 697.39,
-    "ready": false,
+    "cover": -3.0,
+    "entry": 697.74,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 1.727,
-    "vw_entry": 696.89,
-    "vw_room": 1.657
+    "room": 1.777,
+    "vw_entry": 697.03,
+    "vw_room": 1.677
    }
   },
   "band_px": 690.66,
@@ -10114,7 +10114,7 @@
   "v": 0.2752,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-04T10:25:16-05:00",
+ "last_poll": "2026-11-04T10:30:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10180,7 +10180,7 @@
   },
   "live": {
    "d": "2026-11-04",
-   "at": "10:25",
+   "at": "10:30",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
