@@ -280,19 +280,30 @@ def vix_gate():
 
 
 def vix_open_chg():
-    """당일 VIX 시가 vs 전일 종가 변화 (%). 실패 시 None."""
+    """당일 VIX 시가 vs 전일 종가 변화 (%). 실패 시 None.
+    시가는 1분봉 당일 첫 봉 시가를 먼저 쓴다 — 일봉은 개장 후 한참 뒤에야 당일 행이 생겨서
+    09:45에 못 쓰는 날이 있다 (2026-11-05: 10:40에야 도착 → 모멘텀 신호를 '늦은 발견'으로 놓침)."""
     try:
-        h = yf.Ticker("^VIX").history(period="5d")[["Open", "Close"]].dropna()
-        if len(h) < 2:
-            return None
-        try:
-            if h.index[-1].date() != dt.datetime.now(NY).date():
-                return None            # 오늘 VIX 시가 미도착 — 다음 실행에서 재시도
-        except Exception:
-            pass
         global VIX_OPEN_LAST
-        VIX_OPEN_LAST = float(h["Open"].iloc[-1])
-        return round((float(h["Open"].iloc[-1]) / float(h["Close"].iloc[-2]) - 1) * 100, 2)
+        today_ = dt.datetime.now(NY).date()
+        h = yf.Ticker("^VIX").history(period="5d")[["Open", "Close"]].dropna()
+        prev = h[[x.date() < today_ for x in h.index]]
+        if not len(prev):
+            return None
+        pc = float(prev["Close"].iloc[-1])
+        op = None
+        try:
+            m = yf.Ticker("^VIX").history(period="1d", interval="1m")[["Open"]].dropna()
+            if len(m) and m.index[0].date() == today_:
+                op = float(m["Open"].iloc[0])
+        except Exception as e:
+            print(f"  VIX 1분봉 조회 실패: {type(e).__name__}: {e}")
+        if op is None and len(h) and h.index[-1].date() == today_:
+            op = float(h["Open"].iloc[-1])
+        if op is None:
+            return None                # 오늘 VIX 시가 미도착 — 다음 실행에서 재시도
+        VIX_OPEN_LAST = op
+        return round((op / pc - 1) * 100, 2)
     except Exception as e:
         print(f"  VIX 개장변화 조회 실패: {type(e).__name__}: {e}")
         return None
@@ -1022,7 +1033,10 @@ def v2_step(log, now, dstr, nstr, is_today, vchg, base_iv, dfs, gsigs):
                 break                                   # 우선순위 종목이 아직 판정 전이면 기다린다
             if c["ok"]:
                 pick = tk; break
-        decided = pick is not None or all(not checks[t]["wait"] for t in V2_TICKERS) or late
+        # 09:45 전에는 확정하지 않는다 — 개장 직후 봉 값이 나중에 고쳐지는 일이 있다
+        # (2026-11-05: 09:35에 QQQ 갭 -1.55%로 '범위 밖' 확정, 실제 갭은 -1.28%)
+        at_ref = now.time() >= dt.datetime.strptime(GAP_TF_TIME["15m"], "%H:%M").time()
+        decided = (at_ref and (pick is not None or all(not checks[t]["wait"] for t in V2_TICKERS))) or late
         if decided:
             day = dict(at=hm, pick=None, QQQ=checks["QQQ"], SPY=checks["SPY"])
             if pick and late:
