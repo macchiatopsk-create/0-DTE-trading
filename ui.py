@@ -503,11 +503,16 @@ backdrop-filter:blur(6px)}
 h1{font-size:27px;line-height:1.18;font-weight:750;letter-spacing:-.025em}
 h1 em{font-style:normal;background:var(--acc);-webkit-background-clip:text;background-clip:text;color:transparent}
 .when{color:var(--mut);font:500 12.5px/1.4 var(--num);letter-spacing:.02em;margin-bottom:6px}
-.tabs{display:flex;gap:4px;padding:4px;margin:0 0 16px;border-radius:999px;background:var(--card);border:1px solid var(--edge);
+.tabs{position:relative;display:flex;gap:4px;padding:4px;margin:0 0 16px;border-radius:999px;background:var(--card);border:1px solid var(--edge);
 backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 6px 24px rgba(79,70,229,.08)}
-.tab{flex:1;padding:10px 6px;border-radius:999px;border:0;background:transparent;color:var(--mut);font:600 14px/1 inherit;cursor:pointer;transition:.2s}
-.tab.on{background:var(--ink);color:#fff;box-shadow:0 6px 18px rgba(11,16,32,.25)}
-.pane{display:none}.pane.on{display:block;animation:fade .25s ease}
+.tab{position:relative;z-index:1;flex:1;padding:10px 6px;border-radius:999px;border:0;background:transparent;color:var(--mut);font:600 14px/1 inherit;cursor:pointer;transition:color .25s}
+.tab.on{color:#fff}
+.tind{position:absolute;z-index:0;top:4px;bottom:4px;left:0;border-radius:999px;background:var(--ink);box-shadow:0 6px 18px rgba(11,16,32,.25);will-change:transform,width}
+.panes{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -16px;transition:height .3s ease}
+.panes::-webkit-scrollbar{display:none}
+.pane{flex:0 0 100%;min-width:0;padding:0 16px;scroll-snap-align:start;scroll-snap-stop:always;transition:opacity .25s}
+.panes.moving .pane{opacity:.92}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}}
 .card{background:var(--card);border:1px solid var(--edge);border-radius:24px;padding:16px;margin-bottom:12px;
 backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);box-shadow:0 10px 30px rgba(79,70,229,.07)}
@@ -613,10 +618,28 @@ background:rgba(255,255,255,.6);border:1px solid var(--line);cursor:pointer;tran
 JS = """
 (function(){
   var tabs=[].slice.call(document.querySelectorAll('.tab')),panes=[].slice.call(document.querySelectorAll('.pane'));
-  function show(i){tabs.forEach(function(t,k){t.classList.toggle('on',k===i)});panes.forEach(function(p,k){p.classList.toggle('on',k===i)});
+  var box=document.querySelector('.panes'),ind=document.querySelector('.tind'),cur=0,raf=0,tmr=0;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function place(f){  // f = 0..n-1 (소수점 = 스와이프 중간)
+    var a=Math.max(0,Math.min(tabs.length-1,Math.floor(f))),b=Math.min(tabs.length-1,a+1),t=f-a;
+    var A=tabs[a],B=tabs[b],x=A.offsetLeft+(B.offsetLeft-A.offsetLeft)*t,w=A.offsetWidth+(B.offsetWidth-A.offsetWidth)*t;
+    ind.style.width=w+'px';ind.style.transform='translateX('+x+'px)'}
+  function fit(i){if(panes[i])box.style.height=panes[i].offsetHeight+'px'}
+  function mark(i){cur=i;tabs.forEach(function(t,k){t.classList.toggle('on',k===i)});fit(i);
     try{localStorage.setItem('odte_tab',i)}catch(e){}}
-  tabs.forEach(function(t,i){t.addEventListener('click',function(){show(i)})});
-  try{var s=+localStorage.getItem('odte_tab');if(s>=0&&s<tabs.length)show(s)}catch(e){}
+  function go(i,smooth){box.scrollTo({left:i*box.clientWidth,behavior:(smooth&&!reduce)?'smooth':'auto'});mark(i);place(i)}
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){
+    if(i!==cur&&window.scrollY>box.offsetTop-80)window.scrollTo({top:Math.max(0,box.offsetTop-90),behavior:reduce?'auto':'smooth'});
+    go(i,true)})});
+  box.addEventListener('scroll',function(){
+    cancelAnimationFrame(raf);raf=requestAnimationFrame(function(){place(box.scrollLeft/box.clientWidth)});
+    box.classList.add('moving');clearTimeout(tmr);tmr=setTimeout(function(){box.classList.remove('moving');
+      var i=Math.round(box.scrollLeft/box.clientWidth);if(i!==cur)mark(i);else fit(i)},90)},{passive:true});
+  // 펼침·접힘으로 높이가 바뀌면 다시 맞춘다
+  if('ResizeObserver' in window){var ro=new ResizeObserver(function(){fit(cur)});panes.forEach(function(p){ro.observe(p)})}
+  window.addEventListener('resize',function(){go(cur,false)});
+  var s0=0;try{var s=+localStorage.getItem('odte_tab');if(s>=0&&s<tabs.length)s0=s}catch(e){}
+  go(s0,false);
   document.querySelectorAll('.trow,.brow').forEach(function(r){r.addEventListener('click',function(){
     var d=document.getElementById(r.getAttribute('data-t'));if(d){d.classList.toggle('on');r.classList.toggle('on')}})});
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
@@ -664,7 +687,7 @@ def render(log, st, A):
     tabs = [("갭필", gap_tab(log, A, now)), ("모멘텀", mom_tab(log, A, now)),
             ("3층", l3_tab(log, A, st, now)), ("매크로", macro_tab(log))]
     tb = "".join(f'<button class="tab{" on" if i == 0 else ""}">{n}</button>' for i, (n, _) in enumerate(tabs))
-    pn = "".join(f'<section class="pane{" on" if i == 0 else ""}">{h}</section>' for i, (_, h) in enumerate(tabs))
+    pn = "".join(f'<section class="pane">{h}</section>' for i, (_, h) in enumerate(tabs))
     lp = log.get("last_poll", "")
     sig = ntitle = nbody = ""
     if pos and pos.get("res") is None and pos.get("date") == today:
@@ -691,7 +714,7 @@ def render(log, st, A):
 <div class="top"><div class="brand"><i></i>0DTE · Gap Engine</div><div class="topr"><button class="bell" id="bell" hidden>🔔 알림 켜기</button><div class="pill"><b>모의매매</b> · 실거래 아님</div></div></div>
 <div class="hero-top"><div class="orb {orb}"><span></span></div><div>
 <div class="when">{now.month}월 {now.day}일 {WD[now.weekday()]}요일 · {now.strftime('%H:%M')} ET</div><h1>{head_html}</h1></div></div>
-<nav class="tabs">{tb}</nav>
-{pn}
+<nav class="tabs"><i class="tind"></i>{tb}</nav>
+<div class="panes">{pn}</div>
 <div class="foot">마지막 실행 {E(str(lp)[:16].replace('T', ' '))} ET · 손익은 모델가(BSM)<br>모의매매 · 투자 권유 아님</div>
 </div><script>{JS}</script></body></html>"""
