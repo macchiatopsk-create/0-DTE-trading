@@ -992,61 +992,10 @@
  },
  "pm": null,
  "gap": {
-  "date": "2026-11-05",
-  "orh": 683.64,
-  "orl": 677.6,
-  "state": "LOW_COVER",
-  "gap": -1.25,
-  "dir": "롱",
-  "sgn": -1,
+  "state": "NO_GAP",
+  "gap": -1.527,
   "prev_close": 691.82,
-  "open": 683.17,
-  "entry": 659.49,
-  "target": 691.82,
-  "room": 4.902,
-  "cover": -2.74,
-  "r50": 683.4,
-  "cur": 647.8,
-  "filled": false,
-  "trail": null,
-  "tfs": {
-   "5m": {
-    "cover": -0.95,
-    "entry": 674.99,
-    "ready": true,
-    "ok": false,
-    "over": false,
-    "room": 2.493,
-    "vw_entry": 678.63,
-    "vw_room": 1.944
-   },
-   "15m": {
-    "cover": -1.4,
-    "entry": 671.1,
-    "ready": true,
-    "ok": false,
-    "over": false,
-    "room": 3.087,
-    "vw_entry": 676.99,
-    "vw_room": 2.191
-   },
-   "1h": {
-    "cover": -2.74,
-    "entry": 659.49,
-    "ready": true,
-    "ok": false,
-    "over": false,
-    "room": 4.902,
-    "vw_entry": 667.76,
-    "vw_room": 3.603
-   }
-  },
-  "band_px": 677.04,
-  "band_t": "09:35",
-  "band_room": 2.183,
-  "mfe": 0.069,
-  "mfe_t": "09:30",
-  "mfe_px": 683.64
+  "open": 681.26
  },
  "macro": {
   "date": "2026-11-05",
@@ -7285,8 +7234,8 @@
  "mom_sig": {
   "d": "2026-11-05",
   "vchg": 3.19,
-  "state": "GO",
-  "why": "확인 (갭 -1.25% · VIX +3.2%)"
+  "state": "OFF",
+  "why": ""
  },
  "comb": {
   "books": {
@@ -10209,7 +10158,7 @@
   "v": 0.2627,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-06T09:20:22-05:00",
+ "last_poll": "2026-11-06T09:25:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10298,19 +10247,16 @@
   },
   "live": {
    "d": "2026-11-05",
-   "at": "09:20",
+   "at": "09:25",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
      "ok": false,
      "wait": false,
-     "why": "커버 -1.40 — 0.40 미만",
-     "gap": -1.25,
-     "cover": -1.4,
-     "rv": 1.529,
-     "entry": 671.1,
-     "target": 691.82,
-     "side": "call"
+     "why": "갭 -1.53% — 0.2~1.5% 밖",
+     "gap": -1.527,
+     "cover": null,
+     "rv": null
     },
     "SPY": {
      "tk": "SPY",
