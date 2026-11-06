@@ -2,8 +2,8 @@
  "open": {
   "date": "2026-11-06",
   "side": "call",
-  "mfe": -99.0,
-  "mfe_t": null,
+  "mfe": -0.304,
+  "mfe_t": "10:35",
   "contracts": {
    "30": 2,
    "40": 3,
@@ -11,8 +11,8 @@
    "60": 5,
    "70": 6
   },
-  "mfe_prem": -99.0,
-  "mfe_prem_t": null,
+  "mfe_prem": -31.5,
+  "mfe_prem_t": "10:35",
   "strike": 655.0,
   "premium": 4.16,
   "premium_q": 8.12,
@@ -1043,8 +1043,8 @@
  },
  "gap": {
   "state": "NO_GAP",
-  "gap": 1.629,
-  "prev_close": 647.8,
+  "gap": 1.588,
+  "prev_close": 648.06,
   "open": 658.35
  },
  "macro": {
@@ -10209,7 +10209,7 @@
   "v": 0.345,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-06T10:30:16-05:00",
+ "last_poll": "2026-11-06T10:35:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10324,7 +10324,7 @@
   },
   "live": {
    "d": "2026-11-06",
-   "at": "10:30",
+   "at": "10:35",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
