@@ -1042,14 +1042,14 @@
    "pm_pos": 0.85
   },
   "2026-11-09": {
-   "status": "WAIT · 3층 통과 (VIX 99% · PM 0.95) · VWAP -1σ 터치 대기 (현재 +1.51σ)",
+   "status": "WAIT · 3층 통과 (VIX 99% · PM 0.95) · VWAP -1σ 터치 대기 (현재 +1.47σ)",
    "score": 4,
-   "rsi": 86.0,
+   "rsi": 86.2,
    "direction": 1,
    "gap": 0.98,
-   "px": 674.35,
-   "vwap": 668.95,
-   "at": "10:15",
+   "px": 674.68,
+   "vwap": 669.25,
+   "at": "10:20",
    "vix_pct": 99.2,
    "vix_state": "LIVE",
    "pm_pos": 0.949
@@ -1077,12 +1077,12 @@
   "sgn": 1,
   "prev_close": 656.22,
   "open": 662.68,
-  "entry": 674.35,
+  "entry": 674.68,
   "target": 656.22,
-  "room": 2.689,
-  "cover": -1.81,
+  "room": 2.736,
+  "cover": -1.86,
   "r50": 662.35,
-  "cur": 674.35,
+  "cur": 674.68,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1107,14 +1107,14 @@
     "vw_room": 1.452
    },
    "1h": {
-    "cover": -1.81,
-    "entry": 674.35,
+    "cover": -1.86,
+    "entry": 674.68,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 2.689,
-    "vw_entry": 668.95,
-    "vw_room": 1.903
+    "room": 2.736,
+    "vw_entry": 669.25,
+    "vw_room": 1.947
    }
   },
   "band_px": 666.35,
@@ -5458,15 +5458,15 @@
    "prem_src": "실시간(모델가)",
    "iv_m": 0.2884,
    "or_stop": 662.02,
-   "ext": 674.35,
-   "mfe": 0.558,
-   "mfe_t": "10:15",
-   "mfe_prem": 57.3,
-   "mfe_prem_t": "10:15",
+   "ext": 674.72998046875,
+   "mfe": 0.607,
+   "mfe_t": "10:20",
+   "mfe_prem": 62.6,
+   "mfe_prem_t": "10:20",
    "filled": false,
    "fill_t": null,
    "res": null,
-   "trail_px": 672.33
+   "trail_px": 672.71
   },
   "trades": [
    {
@@ -10363,7 +10363,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-09T10:15:16-05:00",
+ "last_poll": "2026-11-09T10:20:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10507,7 +10507,7 @@
   },
   "live": {
    "d": "2026-11-09",
-   "at": "10:15",
+   "at": "10:20",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
