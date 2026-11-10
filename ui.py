@@ -197,6 +197,8 @@ def trade_list(trades, uid, limit=40, show_tk=True):
             det.append(("메운 시각", t["fill_t"]))
         if mp is not None:
             det.append(("옵션 최고", f"{mp:+.0f}% @ {t.get('mfe_prem_t') or ''}"))
+        if t.get("model_pnl_pct") is not None:
+            det.append(("모델가였을 때", f"${t.get('model_premium')} → ${t.get('model_exit_premium')} · {t['model_pnl_pct']:+.1f}%"))
         if t.get("pnl_q") is not None:
             det.append(("야후 호가(지연)", f"{t['pnl_q']:+.1f}% — 참고"))
         dh = "".join(f'<div><span>{a}</span><b>{b}</b></div>' for a, b in det)
@@ -204,6 +206,8 @@ def trade_list(trades, uid, limit=40, show_tk=True):
             dh += f'<div class="full"><span>비율별 계약 · 손익</span>{contracts_table(t.get("contracts"), t.get("per_contract", t.get("pnl_usd")))}</div>'
 
         tag = '<em>소급</em>' if (t.get("recon") or t.get("catchup")) else ""
+        if t.get("price_src"):
+            tag += '<em class="rp">실가</em>'
         h += (f'<div class="trow" data-t="{uid}{i}">'
               f'<div class="ico {"p" if put else "c"}">{"↘" if put else "↗"}</div>'
               f'<div class="tmid"><div class="tt">{t.get("date", "")[5:].replace("-", "/")} · '
@@ -556,7 +560,7 @@ background:rgba(255,255,255,.6);border:1px solid var(--line);cursor:pointer;tran
 .trow:active{transform:scale(.99);background:#fff}
 .ico{flex:0 0 36px;height:36px;border-radius:12px;display:grid;place-items:center;font-weight:700}
 .ico.p{background:rgba(225,29,72,.09);color:var(--dn)}.ico.c{background:rgba(5,150,105,.1);color:var(--up)}
-.tmid{flex:1;min-width:0}.tt{font:600 14px/1.35 var(--num)}.tt em{font-style:normal;font-size:11px;color:var(--wait);margin-left:4px}
+.tmid{flex:1;min-width:0}.tt{font:600 14px/1.35 var(--num)}.tt em{font-style:normal;font-size:11px;color:var(--wait);margin-left:4px}.tt em.rp{color:var(--up)}
 .ts{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpl{font:700 15px/1 var(--num)}.arr{color:var(--mut);font-size:18px;transition:transform .2s}
 .trow.on .arr{transform:rotate(90deg)}
