@@ -1053,6 +1053,11 @@
    "vix_pct": 99.2,
    "vix_state": "LIVE",
    "pm_pos": 0.949
+  },
+  "2026-11-10": {
+   "status": "WAIT_OPEN",
+   "bars": 1,
+   "at": "09:30"
   }
  },
  "vix": {
@@ -1061,63 +1066,68 @@
   "state": "LIVE",
   "asof": "2026-11-09"
  },
- "pm": null,
+ "pm": {
+  "pos": 0.382,
+  "pm_hi": 679.86,
+  "pm_lo": 669.01,
+  "ok": false
+ },
  "gap": {
-  "date": "2026-11-09",
-  "orh": 665.91,
-  "orl": 662.02,
-  "state": "LOW_COVER",
-  "gap": 0.984,
-  "dir": "숏",
-  "sgn": 1,
-  "prev_close": 656.22,
-  "open": 662.68,
-  "entry": 674.52,
-  "target": 656.22,
-  "room": 2.713,
-  "cover": -1.83,
-  "r50": 662.35,
-  "cur": 678.76,
+  "date": "2026-11-10",
+  "orh": 672.85,
+  "orl": 672.85,
+  "state": "WAIT",
+  "gap": -0.871,
+  "dir": "롱",
+  "sgn": -1,
+  "prev_close": 678.76,
+  "open": 672.85,
+  "entry": 672.85,
+  "target": 678.76,
+  "room": 0.878,
+  "cover": 0.0,
+  "r50": 672.85,
+  "cur": 672.85,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": -0.81,
-    "entry": 667.91,
-    "ready": true,
+    "cover": 0.0,
+    "entry": 672.85,
+    "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.75,
-    "vw_entry": 665.15,
-    "vw_room": 1.343
+    "room": 0.878,
+    "vw_entry": 672.85,
+    "vw_room": 0.878
    },
    "15m": {
-    "cover": -1.22,
-    "entry": 670.55,
-    "ready": true,
+    "cover": 0.0,
+    "entry": 672.85,
+    "ready": false,
     "ok": false,
     "over": false,
-    "room": 2.137,
-    "vw_entry": 665.89,
-    "vw_room": 1.452
+    "room": 0.878,
+    "vw_entry": 672.85,
+    "vw_room": 0.878
    },
    "1h": {
-    "cover": -1.83,
-    "entry": 674.52,
-    "ready": true,
+    "cover": 0.0,
+    "entry": 672.85,
+    "ready": false,
     "ok": false,
     "over": false,
-    "room": 2.713,
-    "vw_entry": 669.83,
-    "vw_room": 2.032
+    "room": 0.878,
+    "vw_entry": 672.85,
+    "vw_room": 0.878
    }
   },
-  "band_px": 666.35,
-  "band_t": "09:35",
-  "band_room": 1.52,
-  "mfe": 0.1,
-  "mfe_t": "09:30",
-  "mfe_px": 662.02
+  "band_px": null,
+  "band_t": null,
+  "band_room": null,
+  "mfe": 0.0,
+  "mfe_t": null,
+  "mfe_px": null
  },
  "macro": {
   "date": "2026-11-09",
@@ -5417,9 +5427,9 @@
   }
  },
  "vixchg": {
-  "d": "2026-11-09",
-  "v": -8.85,
-  "lvl": 23.37
+  "d": "2026-11-10",
+  "v": -0.8,
+  "lvl": 19.760000228881836
  },
  "mom_track": {
   "open": null,
@@ -7472,10 +7482,10 @@
   ]
  },
  "mom_sig": {
-  "d": "2026-11-09",
-  "vchg": -8.85,
-  "state": "NO",
-  "why": "VIX 변화 -8.8% — |5.0%| 밖"
+  "d": "2026-11-10",
+  "vchg": -0.8,
+  "state": "WAIT",
+  "why": "09:45 대기"
  },
  "comb": {
   "books": {
@@ -10428,14 +10438,15 @@
   "2026-11-04": "09:30",
   "2026-11-05": "09:30",
   "2026-11-06": "09:30",
-  "2026-11-09": "09:30"
+  "2026-11-09": "09:30",
+  "2026-11-10": "09:30"
  },
  "iv_base": {
   "d": "2026-11-09",
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T09:25:16-05:00",
+ "last_poll": "2026-11-10T09:30:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10578,39 +10589,39 @@
    }
   },
   "live": {
-   "d": "2026-11-09",
-   "at": "09:25",
+   "d": "2026-11-10",
+   "at": "09:30",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
      "ok": false,
-     "wait": false,
-     "why": "커버 -1.22 — 0.40 미만",
-     "gap": 0.984,
-     "cover": -1.22,
-     "rv": 1.362,
-     "entry": 670.55,
-     "target": 656.22,
-     "side": "put"
+     "wait": true,
+     "why": "09:45 판정 대기",
+     "gap": -0.957,
+     "cover": 0.0,
+     "rv": 0.33,
+     "entry": 672.85,
+     "target": 679.35,
+     "side": "call"
     },
     "SPY": {
      "tk": "SPY",
      "ok": false,
-     "wait": false,
-     "why": "커버 -0.71 — 0.40 미만",
-     "gap": 0.899,
-     "cover": -0.71,
-     "rv": 1.484,
-     "entry": 746.66,
-     "target": 735.34,
-     "side": "put"
+     "wait": true,
+     "why": "09:45 판정 대기",
+     "gap": -0.561,
+     "cover": 0.0,
+     "rv": 0.293,
+     "entry": 748.47,
+     "target": 752.69,
+     "side": "call"
     }
    }
   },
   "pc": {
-   "d": "2026-11-09",
-   "QQQ": 656.1,
-   "SPY": 735.29
+   "d": "2026-11-10",
+   "QQQ": 679.35,
+   "SPY": 752.69
   }
  }
 }
