@@ -1075,7 +1075,7 @@
   "asof": "2026-11-09"
  },
  "pm": {
-  "pos": 0.217,
+  "pos": 0.326,
   "pm_hi": 679.86,
   "pm_lo": 669.01,
   "ok": false
@@ -1085,22 +1085,22 @@
   "orh": 673.57,
   "orl": 669.92,
   "state": "ACTIVE",
-  "gap": -1.09,
+  "gap": -0.915,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 678.76,
-  "open": 671.36,
+  "open": 672.55,
   "entry": 676.5,
   "target": 678.76,
   "room": 0.334,
-  "cover": 0.69,
-  "r50": 676.15,
-  "cur": 671.91,
+  "cover": 0.64,
+  "r50": 676.75,
+  "cur": 671.77,
   "filled": true,
   "trail": 679.93,
   "tfs": {
    "5m": {
-    "cover": 0.33,
+    "cover": 0.21,
     "entry": 673.83,
     "ready": true,
     "ok": false,
@@ -1110,7 +1110,7 @@
     "vw_room": 0.934
    },
    "15m": {
-    "cover": 0.52,
+    "cover": 0.43,
     "entry": 675.23,
     "ready": true,
     "ok": true,
@@ -1120,20 +1120,20 @@
     "vw_room": 0.895
    },
    "1h": {
-    "cover": 0.69,
+    "cover": 0.64,
     "entry": 676.5,
     "ready": true,
     "ok": true,
     "over": false,
     "room": 0.334,
-    "vw_entry": 677.64,
-    "vw_room": 0.165
+    "vw_entry": 677.42,
+    "vw_room": 0.198
    }
   },
-  "band_px": 675.46,
+  "band_px": 675.6,
   "band_t": "10:35",
-  "band_room": 0.489,
-  "mfe": 1.428,
+  "band_room": 0.468,
+  "mfe": 1.249,
   "mfe_t": "10:00",
   "mfe_px": 680.95
  },
@@ -8070,7 +8070,7 @@
   "d": "2026-11-10",
   "vchg": -0.8,
   "state": "NO",
-  "why": "커버 0.52 ≥ 0.4 — 갭필 우주"
+  "why": "커버 0.43 ≥ 0.4 — 갭필 우주"
  },
  "comb": {
   "books": {
@@ -11031,7 +11031,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T14:20:16-05:00",
+ "last_poll": "2026-11-10T14:25:15-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11204,15 +11204,15 @@
   },
   "live": {
    "d": "2026-11-10",
-   "at": "14:20",
+   "at": "14:25",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
      "ok": false,
      "wait": false,
-     "why": "콜인데 rv 0.209 — 0.20 이상",
-     "gap": -1.176,
-     "cover": 0.48,
+     "why": "커버 0.39 — 0.40 미만",
+     "gap": -1.001,
+     "cover": 0.39,
      "rv": 0.209,
      "entry": 675.23,
      "target": 679.35,
