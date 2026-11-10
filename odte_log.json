@@ -5272,69 +5272,118 @@
    }
   },
   "15m|1m": {
-   "open": {
-    "date": "2026-11-10",
-    "tf": "15m",
-    "em": "1m",
-    "late": false,
-    "comb": null,
-    "dir": "롱",
-    "sgn": -1,
-    "gap": -0.915,
-    "cover": 0.43,
-    "entry": 675.23,
-    "target": 678.76,
-    "room": 0.523,
-    "at": "09:45",
-    "found_at": "09:45",
-    "opt_side": "call",
-    "strike": 670.0,
-    "premium": 5.36,
-    "contracts": {
-     "30": 1,
-     "40": 2,
-     "50": 2,
-     "60": 3,
-     "70": 3
-    },
-    "spot_rt": 675.14,
-    "premium_q": 5.69,
-    "basis": "rt",
-    "prem_src": "실시간(모델가)",
-    "band_px": null,
-    "band_t": null,
-    "mfe": 0.772,
-    "mfe_t": "10:02",
-    "mfe_prem": 95.3,
-    "mfe_prem_t": "10:02",
-    "filled": true,
-    "fill_t": "09:59",
-    "res": null,
-    "iv_m": 0.2272,
-    "vchg": -0.8,
-    "trail_px": 679.93
-   },
-   "trades": [],
+   "open": null,
+   "trades": [
+    {
+     "date": "2026-11-10",
+     "tf": "15m",
+     "em": "1m",
+     "late": false,
+     "comb": null,
+     "dir": "롱",
+     "sgn": -1,
+     "gap": -0.915,
+     "cover": 0.43,
+     "entry": 675.23,
+     "target": 678.76,
+     "room": 0.523,
+     "at": "09:45",
+     "found_at": "09:45",
+     "opt_side": "call",
+     "strike": 670.0,
+     "premium": 5.36,
+     "contracts": {
+      "30": 1,
+      "40": 2,
+      "50": 2,
+      "60": 3,
+      "70": 3
+     },
+     "spot_rt": 675.14,
+     "premium_q": 5.69,
+     "basis": "rt",
+     "prem_src": "실시간(모델가)",
+     "band_px": null,
+     "band_t": null,
+     "mfe": 0.772,
+     "mfe_t": "10:02",
+     "mfe_prem": 95.3,
+     "mfe_prem_t": "10:02",
+     "filled": true,
+     "fill_t": "09:59",
+     "res": "TRAIL(1분)",
+     "iv_m": 0.2272,
+     "vchg": -0.8,
+     "trail_px": 679.93,
+     "exit": 679.69,
+     "exit_at": "10:03",
+     "exit_premium": 9.6,
+     "pnl_pct": 79.1,
+     "per_contract": 424.0,
+     "ux": 0.661,
+     "exit_premium_q": null
+    }
+   ],
    "books": {
     "30": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 3424.0,
+     "trades": [
+      {
+       "d": "2026-11-10",
+       "nc": 1,
+       "usd": 424.0,
+       "pct": 79.1,
+       "res": "TRAIL(1분)"
+      }
+     ]
     },
     "40": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 3848.0,
+     "trades": [
+      {
+       "d": "2026-11-10",
+       "nc": 2,
+       "usd": 848.0,
+       "pct": 79.1,
+       "res": "TRAIL(1분)"
+      }
+     ]
     },
     "50": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 3848.0,
+     "trades": [
+      {
+       "d": "2026-11-10",
+       "nc": 2,
+       "usd": 848.0,
+       "pct": 79.1,
+       "res": "TRAIL(1분)"
+      }
+     ]
     },
     "60": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 4272.0,
+     "trades": [
+      {
+       "d": "2026-11-10",
+       "nc": 3,
+       "usd": 1272.0,
+       "pct": 79.1,
+       "res": "TRAIL(1분)"
+      }
+     ]
     },
     "70": {
-     "cap": 3000.0,
-     "trades": []
+     "cap": 4272.0,
+     "trades": [
+      {
+       "d": "2026-11-10",
+       "nc": 3,
+       "usd": 1272.0,
+       "pct": 79.1,
+       "res": "TRAIL(1분)"
+      }
+     ]
     }
    },
    "done": {
