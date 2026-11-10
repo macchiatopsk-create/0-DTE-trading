@@ -1056,8 +1056,8 @@
   },
   "2026-11-10": {
    "status": "WAIT_OPEN",
-   "bars": 5,
-   "at": "09:50"
+   "bars": 6,
+   "at": "09:55"
   }
  },
  "vix": {
@@ -1082,12 +1082,12 @@
   "sgn": -1,
   "prev_close": 678.76,
   "open": 672.55,
-  "entry": 674.25,
+  "entry": 676.43,
   "target": 678.76,
-  "room": 0.669,
-  "cover": 0.27,
-  "r50": 674.01,
-  "cur": 674.25,
+  "room": 0.344,
+  "cover": 0.62,
+  "r50": 674.49,
+  "cur": 676.43,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1112,12 +1112,12 @@
     "vw_room": 0.895
    },
    "1h": {
-    "cover": 0.27,
-    "entry": 674.25,
+    "cover": 0.62,
+    "entry": 676.43,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.669,
+    "room": 0.344,
     "vw_entry": null,
     "vw_room": null
    }
@@ -1125,9 +1125,9 @@
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.434,
-  "mfe_t": "09:40",
-  "mfe_px": 675.47
+  "mfe": 0.577,
+  "mfe_t": "09:55",
+  "mfe_px": 676.43
  },
  "macro": {
   "date": "2026-11-10",
@@ -2349,10 +2349,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.0,
-    "mfe_t": null,
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:45",
+    "mfe": 0.178,
+    "mfe_t": "09:55",
+    "mfe_prem": 22.0,
+    "mfe_prem_t": "09:55",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -3174,10 +3174,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.357,
-    "mfe_t": "09:45",
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "09:45",
+    "mfe": 0.549,
+    "mfe_t": "09:55",
+    "mfe_prem": 15.5,
+    "mfe_prem_t": "09:55",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -5177,10 +5177,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.0,
-    "mfe_t": null,
-    "mfe_prem": -14.7,
-    "mfe_prem_t": "09:50",
+    "mfe": 0.178,
+    "mfe_t": "09:55",
+    "mfe_prem": 22.0,
+    "mfe_prem_t": "09:55",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -5246,10 +5246,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.0,
-    "mfe_t": null,
-    "mfe_prem": 0.9,
-    "mfe_prem_t": "09:54",
+    "mfe": 0.187,
+    "mfe_t": "09:55",
+    "mfe_prem": 23.1,
+    "mfe_prem_t": "09:55",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -10666,7 +10666,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T09:50:15-05:00",
+ "last_poll": "2026-11-10T09:55:15-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10839,7 +10839,7 @@
   },
   "live": {
    "d": "2026-11-10",
-   "at": "09:50",
+   "at": "09:55",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
