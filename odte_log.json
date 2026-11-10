@@ -6430,7 +6430,7 @@
     "found_at": "09:45",
     "opt_side": "call",
     "strike": 690.0,
-    "premium": 5.35,
+    "premium": 6.04,
     "premium_q": 6.45,
     "basis": "rt",
     "spot_rt": 695.13,
@@ -6454,12 +6454,17 @@
     "trail_px": 697.33,
     "exit": 696.75,
     "exit_at": "10:50",
-    "exit_premium": 6.8,
-    "pnl_pct": 27.1,
-    "per_contract": 145.0,
+    "exit_premium": 7.01,
+    "pnl_pct": 13.9,
+    "per_contract": 83.96,
     "ux": 0.233,
     "exit_premium_q": 8.39,
-    "pnl_q": 30.1
+    "pnl_q": 30.1,
+    "model_premium": 5.35,
+    "model_exit_premium": 6.8,
+    "model_pnl_pct": 27.1,
+    "model_per_contract": 145.0,
+    "price_src": "실가(로빈후드)"
    },
    {
     "date": "2026-11-09",
@@ -6478,12 +6483,12 @@
     "found_at": "09:45",
     "opt_side": "call",
     "strike": 665.0,
-    "premium": 5.99,
+    "premium": 6.8,
     "premium_q": 2.52,
     "basis": "rt",
     "spot_rt": 670.61,
     "contracts": {
-     "30": 1,
+     "30": 0,
      "40": 1,
      "50": 1,
      "60": 1,
@@ -6503,17 +6508,22 @@
     "trail_px": 676.81,
     "exit": 676.32,
     "exit_at": "11:10",
-    "exit_premium": 11.21,
-    "pnl_pct": 87.1,
-    "per_contract": 522.0,
+    "exit_premium": 12.09,
+    "pnl_pct": 75.6,
+    "per_contract": 514.08,
     "ux": 0.851,
     "exit_premium_q": 12.22,
-    "pnl_q": 384.9
+    "pnl_q": 384.9,
+    "model_premium": 5.99,
+    "model_exit_premium": 11.21,
+    "model_pnl_pct": 87.1,
+    "model_per_contract": 522.0,
+    "price_src": "실가(로빈후드)"
    }
   ],
   "books": {
    "30": {
-    "cap": 2805.0,
+    "cap": 2221.96,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6662,21 +6672,21 @@
      {
       "d": "2026-11-02",
       "nc": 1,
-      "usd": 145.0,
-      "pct": 27.1,
+      "usd": 83.96,
+      "pct": 13.9,
       "res": "TRAIL"
      },
      {
       "d": "2026-11-09",
-      "nc": 1,
-      "usd": 522.0,
-      "pct": 87.1,
-      "res": "TRAIL"
+      "nc": 0,
+      "usd": 0.0,
+      "pct": 0.0,
+      "res": "SKIP_FUND"
      }
     ]
    },
    "40": {
-    "cap": 2401.0,
+    "cap": 2332.04,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6825,21 +6835,21 @@
      {
       "d": "2026-11-02",
       "nc": 1,
-      "usd": 145.0,
-      "pct": 27.1,
+      "usd": 83.96,
+      "pct": 13.9,
       "res": "TRAIL"
      },
      {
       "d": "2026-11-09",
       "nc": 1,
-      "usd": 522.0,
-      "pct": 87.1,
+      "usd": 514.08,
+      "pct": 75.6,
       "res": "TRAIL"
      }
     ]
    },
    "50": {
-    "cap": 2174.0,
+    "cap": 2105.04,
     "trades": [
      {
       "d": "2026-08-25",
@@ -6988,21 +6998,21 @@
      {
       "d": "2026-11-02",
       "nc": 1,
-      "usd": 145.0,
-      "pct": 27.1,
+      "usd": 83.96,
+      "pct": 13.9,
       "res": "TRAIL"
      },
      {
       "d": "2026-11-09",
       "nc": 1,
-      "usd": 522.0,
-      "pct": 87.1,
+      "usd": 514.08,
+      "pct": 75.6,
       "res": "TRAIL"
      }
     ]
    },
    "60": {
-    "cap": 1804.0,
+    "cap": 1735.04,
     "trades": [
      {
       "d": "2026-08-25",
@@ -7151,21 +7161,21 @@
      {
       "d": "2026-11-02",
       "nc": 1,
-      "usd": 145.0,
-      "pct": 27.1,
+      "usd": 83.96,
+      "pct": 13.9,
       "res": "TRAIL"
      },
      {
       "d": "2026-11-09",
       "nc": 1,
-      "usd": 522.0,
-      "pct": 87.1,
+      "usd": 514.08,
+      "pct": 75.6,
       "res": "TRAIL"
      }
     ]
    },
    "70": {
-    "cap": 1806.0,
+    "cap": 1737.04,
     "trades": [
      {
       "d": "2026-08-25",
@@ -7314,15 +7324,15 @@
      {
       "d": "2026-11-02",
       "nc": 1,
-      "usd": 145.0,
-      "pct": 27.1,
+      "usd": 83.96,
+      "pct": 13.9,
       "res": "TRAIL"
      },
      {
       "d": "2026-11-09",
       "nc": 1,
-      "usd": 522.0,
-      "pct": 87.1,
+      "usd": 514.08,
+      "pct": 75.6,
       "res": "TRAIL"
      }
     ]
