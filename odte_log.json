@@ -1057,12 +1057,12 @@
   "2026-11-10": {
    "status": "NO TRADE · 프리마켓 위치 0.33 <= 0.5 (롱 엣지 없음)",
    "score": -1,
-   "rsi": 44.2,
+   "rsi": 46.8,
    "direction": 0,
    "gap": -0.91,
-   "px": 679.12,
-   "vwap": 673.49,
-   "at": "10:00",
+   "px": 679.97,
+   "vwap": 676.93,
+   "at": "10:05",
    "vix_pct": 86.5,
    "vix_state": "LIVE",
    "pm_pos": 0.326
@@ -1090,14 +1090,14 @@
   "sgn": -1,
   "prev_close": 678.76,
   "open": 672.55,
-  "entry": 679.12,
+  "entry": 679.97,
   "target": 678.76,
-  "room": 0.053,
-  "cover": 1.06,
-  "r50": 675.86,
-  "cur": 679.12,
+  "room": 0.178,
+  "cover": 1.19,
+  "r50": 676.75,
+  "cur": 679.97,
   "filled": true,
-  "trail": 678.15,
+  "trail": 679.93,
   "tfs": {
    "5m": {
     "cover": 0.21,
@@ -1120,12 +1120,12 @@
     "vw_room": 0.895
    },
    "1h": {
-    "cover": 1.06,
-    "entry": 679.12,
+    "cover": 1.19,
+    "entry": 679.97,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.053,
+    "room": 0.178,
     "vw_entry": null,
     "vw_room": null
    }
@@ -1133,9 +1133,9 @@
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.984,
-  "mfe_t": "09:55",
-  "mfe_px": 679.17
+  "mfe": 1.249,
+  "mfe_t": "10:00",
+  "mfe_px": 680.95
  },
  "macro": {
   "date": "2026-11-10",
@@ -2357,10 +2357,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.576,
-    "mfe_t": "10:00",
-    "mfe_prem": 70.9,
-    "mfe_prem_t": "10:00",
+    "mfe": 0.702,
+    "mfe_t": "10:05",
+    "mfe_prem": 86.6,
+    "mfe_prem_t": "10:05",
     "filled": true,
     "fill_t": "09:55",
     "res": null,
@@ -3182,10 +3182,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.948,
-    "mfe_t": "10:00",
-    "mfe_prem": 48.2,
-    "mfe_prem_t": "10:00",
+    "mfe": 1.075,
+    "mfe_t": "10:05",
+    "mfe_prem": 58.6,
+    "mfe_prem_t": "10:05",
     "filled": true,
     "fill_t": "09:55",
     "res": null,
@@ -10773,7 +10773,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T10:00:16-05:00",
+ "last_poll": "2026-11-10T10:05:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -10946,7 +10946,7 @@
   },
   "live": {
    "d": "2026-11-10",
-   "at": "10:00",
+   "at": "10:05",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
