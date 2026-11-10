@@ -5303,16 +5303,16 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.621,
-    "mfe_t": "10:00",
-    "mfe_prem": 76.3,
-    "mfe_prem_t": "10:00",
+    "mfe": 0.748,
+    "mfe_t": "10:01",
+    "mfe_prem": 92.4,
+    "mfe_prem_t": "10:01",
     "filled": true,
     "fill_t": "09:59",
     "res": null,
     "iv_m": 0.2272,
     "vchg": -0.8,
-    "trail_px": 678.4
+    "trail_px": 679.28
    },
    "trades": [],
    "books": {
