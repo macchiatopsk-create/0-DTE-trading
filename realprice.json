@@ -270,6 +270,42 @@
    "real_iv": 0.3005,
    "model_iv": 0.2508,
    "ratio": 1.198
+  },
+  {
+   "d": "2026-11-10",
+   "tk": "QQQ",
+   "kind": "atm",
+   "K": 675.0,
+   "real_iv": 0.4425,
+   "model_iv": 0.2272,
+   "ratio": 1.947
+  },
+  {
+   "d": "2026-11-10",
+   "tk": "QQQ",
+   "kind": "itm",
+   "K": 681.0,
+   "real_iv": 0.4167,
+   "model_iv": 0.2272,
+   "ratio": 1.834
+  },
+  {
+   "d": "2026-11-10",
+   "tk": "SPY",
+   "kind": "atm",
+   "K": 749.0,
+   "real_iv": 0.3034,
+   "model_iv": 0.1976,
+   "ratio": 1.535
+  },
+  {
+   "d": "2026-11-10",
+   "tk": "SPY",
+   "kind": "itm",
+   "K": 755.0,
+   "real_iv": 0.2836,
+   "model_iv": 0.1976,
+   "ratio": 1.435
   }
  ],
  "trades": [
@@ -292,6 +328,66 @@
    "real_pnl": 75.6,
    "model_pnl": 87.1,
    "gap": -11.5
+  },
+  {
+   "d": "2026-11-10",
+   "track": "이전갭필 15m|1m",
+   "tk": "QQQ",
+   "side": "call",
+   "K": 670.0,
+   "real_pnl": 39.6,
+   "model_pnl": 79.1,
+   "gap": -39.5
+  },
+  {
+   "d": "2026-11-10",
+   "track": "이전갭필 15m|now",
+   "tk": "QQQ",
+   "side": "call",
+   "K": 670.0,
+   "real_pnl": 52.0,
+   "model_pnl": 81.8,
+   "gap": -29.8
+  },
+  {
+   "d": "2026-11-10",
+   "track": "이전갭필 15m|take",
+   "tk": "QQQ",
+   "side": "call",
+   "K": 670.0,
+   "real_pnl": 39.6,
+   "model_pnl": 68.7,
+   "gap": -29.1
+  },
+  {
+   "d": "2026-11-10",
+   "track": "이전갭필 15m|vwap",
+   "tk": "QQQ",
+   "side": "call",
+   "K": 667.0,
+   "real_pnl": 41.5,
+   "model_pnl": 54.7,
+   "gap": -13.2
+  },
+  {
+   "d": "2026-11-10",
+   "track": "이전갭필 1h|now",
+   "tk": "QQQ",
+   "side": "call",
+   "K": 671.0,
+   "real_pnl": -46.8,
+   "model_pnl": -52.1,
+   "gap": 5.3
+  },
+  {
+   "d": "2026-11-10",
+   "track": "이전갭필 1h|vwap",
+   "tk": "QQQ",
+   "side": "call",
+   "K": 672.0,
+   "real_pnl": -55.6,
+   "model_pnl": -57.3,
+   "gap": 1.7
   }
  ]
 }
