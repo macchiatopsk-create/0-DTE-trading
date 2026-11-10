@@ -1055,17 +1055,17 @@
    "pm_pos": 0.949
   },
   "2026-11-10": {
-   "status": "NO TRADE · 프리마켓 위치 0.33 <= 0.5 (롱 엣지 없음)",
+   "status": "NO TRADE · 프리마켓 위치 0.22 <= 0.5 (롱 엣지 없음)",
    "score": 1,
-   "rsi": 47.1,
+   "rsi": 44.2,
    "direction": 0,
-   "gap": -0.91,
-   "px": 679.83,
-   "vwap": 677.02,
-   "at": "10:10",
+   "gap": -1.09,
+   "px": 678.67,
+   "vwap": 677.84,
+   "at": "10:15",
    "vix_pct": 86.5,
    "vix_state": "LIVE",
-   "pm_pos": 0.326
+   "pm_pos": 0.217
   }
  },
  "vix": {
@@ -1075,7 +1075,7 @@
   "asof": "2026-11-09"
  },
  "pm": {
-  "pos": 0.326,
+  "pos": 0.217,
   "pm_hi": 679.86,
   "pm_lo": 669.01,
   "ok": false
@@ -1085,22 +1085,22 @@
   "orh": 673.57,
   "orl": 669.92,
   "state": "WAIT",
-  "gap": -0.915,
+  "gap": -1.09,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 678.76,
-  "open": 672.55,
-  "entry": 679.83,
+  "open": 671.36,
+  "entry": 678.67,
   "target": 678.76,
-  "room": 0.158,
-  "cover": 1.17,
-  "r50": 676.75,
-  "cur": 679.83,
+  "room": 0.013,
+  "cover": 0.99,
+  "r50": 676.15,
+  "cur": 678.67,
   "filled": true,
   "trail": 679.93,
   "tfs": {
    "5m": {
-    "cover": 0.21,
+    "cover": 0.33,
     "entry": 673.83,
     "ready": true,
     "ok": false,
@@ -1110,7 +1110,7 @@
     "vw_room": 0.934
    },
    "15m": {
-    "cover": 0.43,
+    "cover": 0.52,
     "entry": 675.23,
     "ready": true,
     "ok": true,
@@ -1120,12 +1120,12 @@
     "vw_room": 0.895
    },
    "1h": {
-    "cover": 1.17,
-    "entry": 679.83,
+    "cover": 0.99,
+    "entry": 678.67,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.158,
+    "room": 0.013,
     "vw_entry": null,
     "vw_room": null
    }
@@ -1133,7 +1133,7 @@
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 1.249,
+  "mfe": 1.428,
   "mfe_t": "10:00",
   "mfe_px": 680.95
  },
@@ -7900,7 +7900,7 @@
   "d": "2026-11-10",
   "vchg": -0.8,
   "state": "NO",
-  "why": "커버 0.43 ≥ 0.4 — 갭필 우주"
+  "why": "커버 0.52 ≥ 0.4 — 갭필 우주"
  },
  "comb": {
   "books": {
@@ -10861,7 +10861,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T10:10:16-05:00",
+ "last_poll": "2026-11-10T10:15:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11034,15 +11034,15 @@
   },
   "live": {
    "d": "2026-11-10",
-   "at": "10:10",
+   "at": "10:15",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
      "ok": false,
      "wait": false,
-     "why": "커버 0.39 — 0.40 미만",
-     "gap": -1.001,
-     "cover": 0.39,
+     "why": "콜인데 rv 0.209 — 0.20 이상",
+     "gap": -1.176,
+     "cover": 0.48,
      "rv": 0.209,
      "entry": 675.23,
      "target": 679.35,
