@@ -1056,13 +1056,13 @@
   },
   "2026-11-10": {
    "status": "NO TRADE · 프리마켓 위치 0.22 <= 0.5 (롱 엣지 없음)",
-   "score": 1,
-   "rsi": 44.2,
-   "direction": 0,
+   "score": -3,
+   "rsi": 43.6,
+   "direction": -1,
    "gap": -1.09,
-   "px": 678.67,
-   "vwap": 677.84,
-   "at": "10:15",
+   "px": 677.86,
+   "vwap": 677.94,
+   "at": "10:20",
    "vix_pct": 86.5,
    "vix_state": "LIVE",
    "pm_pos": 0.217
@@ -1090,12 +1090,12 @@
   "sgn": -1,
   "prev_close": 678.76,
   "open": 671.36,
-  "entry": 678.67,
+  "entry": 677.86,
   "target": 678.76,
-  "room": 0.013,
-  "cover": 0.99,
+  "room": 0.133,
+  "cover": 0.88,
   "r50": 676.15,
-  "cur": 678.67,
+  "cur": 677.86,
   "filled": true,
   "trail": 679.93,
   "tfs": {
@@ -1120,14 +1120,14 @@
     "vw_room": 0.895
    },
    "1h": {
-    "cover": 0.99,
-    "entry": 678.67,
+    "cover": 0.88,
+    "entry": 677.86,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.013,
-    "vw_entry": null,
-    "vw_room": null
+    "room": 0.133,
+    "vw_entry": 677.94,
+    "vw_room": 0.121
    }
   },
   "band_px": null,
@@ -10861,7 +10861,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T10:15:16-05:00",
+ "last_poll": "2026-11-10T10:20:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11034,7 +11034,7 @@
   },
   "live": {
    "d": "2026-11-10",
-   "at": "10:15",
+   "at": "10:20",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
