@@ -1056,13 +1056,13 @@
   },
   "2026-11-10": {
    "status": "NO TRADE · 프리마켓 위치 0.33 <= 0.5 (롱 엣지 없음)",
-   "score": -4,
-   "rsi": 39.4,
+   "score": -3,
+   "rsi": 42.8,
    "direction": -1,
    "gap": -0.91,
-   "px": 676.33,
-   "vwap": 677.64,
-   "at": "10:25",
+   "px": 676.57,
+   "vwap": 677.42,
+   "at": "10:30",
    "vix_pct": 86.5,
    "vix_state": "LIVE",
    "pm_pos": 0.326
@@ -1084,18 +1084,18 @@
   "date": "2026-11-10",
   "orh": 673.57,
   "orl": 669.92,
-  "state": "WAIT",
+  "state": "ACTIVE",
   "gap": -0.915,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 678.76,
   "open": 672.55,
-  "entry": 676.33,
+  "entry": 676.5,
   "target": 678.76,
-  "room": 0.359,
-  "cover": 0.61,
+  "room": 0.334,
+  "cover": 0.64,
   "r50": 676.75,
-  "cur": 676.33,
+  "cur": 676.57,
   "filled": true,
   "trail": 679.93,
   "tfs": {
@@ -1120,14 +1120,14 @@
     "vw_room": 0.895
    },
    "1h": {
-    "cover": 0.61,
-    "entry": 676.33,
-    "ready": false,
-    "ok": false,
+    "cover": 0.64,
+    "entry": 676.5,
+    "ready": true,
+    "ok": true,
     "over": false,
-    "room": 0.359,
-    "vw_entry": 677.64,
-    "vw_room": 0.165
+    "room": 0.334,
+    "vw_entry": 677.42,
+    "vw_room": 0.198
    }
   },
   "band_px": null,
@@ -3998,7 +3998,47 @@
    ]
   },
   "1h|now": {
-   "open": null,
+   "open": {
+    "date": "2026-11-10",
+    "tf": "1h",
+    "em": "now",
+    "late": false,
+    "comb": null,
+    "dir": "롱",
+    "sgn": -1,
+    "gap": -0.915,
+    "cover": 0.64,
+    "entry": 676.5,
+    "target": 678.76,
+    "room": 0.334,
+    "at": "10:30",
+    "found_at": "10:30",
+    "opt_side": "call",
+    "strike": 671.0,
+    "premium": 5.71,
+    "contracts": {
+     "30": 1,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "spot_rt": 676.57,
+    "premium_q": 8.54,
+    "basis": "rt",
+    "prem_src": "실시간(모델가)",
+    "band_px": null,
+    "band_t": null,
+    "mfe": 0.01,
+    "mfe_t": "10:30",
+    "mfe_prem": 0.0,
+    "mfe_prem_t": "10:30",
+    "filled": false,
+    "fill_t": null,
+    "res": null,
+    "iv_m": 0.2272,
+    "vchg": -0.8
+   },
    "trades": [
     {
      "date": "2026-09-09",
@@ -4538,7 +4578,8 @@
     "2026-10-13": true,
     "2026-10-20": true,
     "2026-10-23": true,
-    "2026-10-28": true
+    "2026-10-28": true,
+    "2026-11-10": true
    },
    "skips": [
     {
@@ -4638,7 +4679,47 @@
    ]
   },
   "1h|vwap": {
-   "open": null,
+   "open": {
+    "date": "2026-11-10",
+    "tf": "1h",
+    "em": "vwap",
+    "late": false,
+    "comb": null,
+    "dir": "롱",
+    "sgn": -1,
+    "gap": -0.915,
+    "cover": 0.64,
+    "entry": 677.42,
+    "target": 678.76,
+    "room": 0.198,
+    "at": "10:30",
+    "found_at": "10:30",
+    "opt_side": "call",
+    "strike": 672.0,
+    "premium": 4.81,
+    "contracts": {
+     "30": 1,
+     "40": 2,
+     "50": 2,
+     "60": 2,
+     "70": 2
+    },
+    "spot_rt": 676.57,
+    "premium_q": 7.83,
+    "basis": "rt",
+    "prem_src": "실시간(모델가)",
+    "band_px": null,
+    "band_t": null,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": 0.0,
+    "mfe_prem_t": "10:30",
+    "filled": false,
+    "fill_t": null,
+    "res": null,
+    "iv_m": 0.2272,
+    "vchg": -0.8
+   },
    "trades": [
     {
      "date": "2026-09-09",
@@ -5174,7 +5255,8 @@
     "2026-10-13": true,
     "2026-10-20": true,
     "2026-10-23": true,
-    "2026-10-28": true
+    "2026-10-28": true,
+    "2026-11-10": true
    },
    "skips": [
     {
@@ -10861,7 +10943,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T10:25:15-05:00",
+ "last_poll": "2026-11-10T10:30:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11034,7 +11116,7 @@
   },
   "live": {
    "d": "2026-11-10",
-   "at": "10:25",
+   "at": "10:30",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
