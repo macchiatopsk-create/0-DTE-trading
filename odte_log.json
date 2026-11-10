@@ -1075,7 +1075,7 @@
   "asof": "2026-11-09"
  },
  "pm": {
-  "pos": 0.326,
+  "pos": 0.217,
   "pm_hi": 679.86,
   "pm_lo": 669.01,
   "ok": false
@@ -1085,22 +1085,22 @@
   "orh": 673.57,
   "orl": 669.92,
   "state": "ACTIVE",
-  "gap": -0.915,
+  "gap": -1.09,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 678.76,
-  "open": 672.55,
+  "open": 671.36,
   "entry": 676.5,
   "target": 678.76,
   "room": 0.334,
-  "cover": 0.64,
-  "r50": 676.75,
-  "cur": 673.82,
+  "cover": 0.69,
+  "r50": 676.15,
+  "cur": 673.33,
   "filled": true,
   "trail": 679.93,
   "tfs": {
    "5m": {
-    "cover": 0.21,
+    "cover": 0.33,
     "entry": 673.83,
     "ready": true,
     "ok": false,
@@ -1110,7 +1110,7 @@
     "vw_room": 0.934
    },
    "15m": {
-    "cover": 0.43,
+    "cover": 0.52,
     "entry": 675.23,
     "ready": true,
     "ok": true,
@@ -1120,20 +1120,20 @@
     "vw_room": 0.895
    },
    "1h": {
-    "cover": 0.64,
+    "cover": 0.69,
     "entry": 676.5,
     "ready": true,
     "ok": true,
     "over": false,
     "room": 0.334,
-    "vw_entry": 677.42,
-    "vw_room": 0.198
+    "vw_entry": 677.64,
+    "vw_room": 0.165
    }
   },
-  "band_px": 675.6,
+  "band_px": 675.46,
   "band_t": "10:35",
-  "band_room": 0.468,
-  "mfe": 1.249,
+  "band_room": 0.489,
+  "mfe": 1.428,
   "mfe_t": "10:00",
   "mfe_px": 680.95
  },
@@ -3998,47 +3998,7 @@
    ]
   },
   "1h|now": {
-   "open": {
-    "date": "2026-11-10",
-    "tf": "1h",
-    "em": "now",
-    "late": false,
-    "comb": null,
-    "dir": "롱",
-    "sgn": -1,
-    "gap": -0.915,
-    "cover": 0.64,
-    "entry": 676.5,
-    "target": 678.76,
-    "room": 0.334,
-    "at": "10:30",
-    "found_at": "10:30",
-    "opt_side": "call",
-    "strike": 671.0,
-    "premium": 5.71,
-    "contracts": {
-     "30": 1,
-     "40": 1,
-     "50": 1,
-     "60": 1,
-     "70": 1
-    },
-    "spot_rt": 676.57,
-    "premium_q": 8.54,
-    "basis": "rt",
-    "prem_src": "실시간(모델가)",
-    "band_px": 675.46,
-    "band_t": "10:35",
-    "mfe": 0.114,
-    "mfe_t": "10:35",
-    "mfe_prem": 11.6,
-    "mfe_prem_t": "10:35",
-    "filled": false,
-    "fill_t": null,
-    "res": null,
-    "iv_m": 0.2272,
-    "vchg": -0.8
-   },
+   "open": null,
    "trades": [
     {
      "date": "2026-09-09",
@@ -4311,11 +4271,60 @@
      "ux": 0.03,
      "exit_premium_q": 7.39,
      "pnl_q": 4.5
+    },
+    {
+     "date": "2026-11-10",
+     "tf": "1h",
+     "em": "now",
+     "late": false,
+     "comb": null,
+     "dir": "롱",
+     "sgn": -1,
+     "gap": -0.915,
+     "cover": 0.64,
+     "entry": 676.5,
+     "target": 678.76,
+     "room": 0.334,
+     "at": "10:30",
+     "found_at": "10:30",
+     "opt_side": "call",
+     "strike": 671.0,
+     "premium": 5.71,
+     "contracts": {
+      "30": 1,
+      "40": 1,
+      "50": 1,
+      "60": 1,
+      "70": 1
+     },
+     "spot_rt": 676.57,
+     "premium_q": 8.54,
+     "basis": "rt",
+     "prem_src": "실시간(모델가)",
+     "band_px": 675.46,
+     "band_t": "10:35",
+     "mfe": 0.114,
+     "mfe_t": "10:35",
+     "mfe_prem": 11.6,
+     "mfe_prem_t": "10:35",
+     "filled": false,
+     "fill_t": null,
+     "res": "TIMECUT",
+     "iv_m": 0.2272,
+     "vchg": -0.8,
+     "exit": 673.33,
+     "exit_at": "11:30",
+     "exit_premium": 2.74,
+     "pnl_pct": -52.1,
+     "per_contract": -297.0,
+     "ux": -0.469,
+     "exit_premium_q": 4.26,
+     "pnl_q": -50.1
     }
    ],
    "books": {
     "30": {
-     "cap": 2152.0,
+     "cap": 1855.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -4360,11 +4369,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 1,
+       "usd": -297.0,
+       "pct": -52.1,
+       "res": "TIMECUT"
       }
      ]
     },
     "40": {
-     "cap": 2048.0,
+     "cap": 1751.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -4409,11 +4425,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 1,
+       "usd": -297.0,
+       "pct": -52.1,
+       "res": "TIMECUT"
       }
      ]
     },
     "50": {
-     "cap": 1785.0,
+     "cap": 1488.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -4458,11 +4481,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 1,
+       "usd": -297.0,
+       "pct": -52.1,
+       "res": "TIMECUT"
       }
      ]
     },
     "60": {
-     "cap": 1415.0,
+     "cap": 1118.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -4507,11 +4537,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 1,
+       "usd": -297.0,
+       "pct": -52.1,
+       "res": "TIMECUT"
       }
      ]
     },
     "70": {
-     "cap": 1152.0,
+     "cap": 855.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -4556,6 +4593,13 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 1,
+       "usd": -297.0,
+       "pct": -52.1,
+       "res": "TIMECUT"
       }
      ]
     }
@@ -4679,47 +4723,7 @@
    ]
   },
   "1h|vwap": {
-   "open": {
-    "date": "2026-11-10",
-    "tf": "1h",
-    "em": "vwap",
-    "late": false,
-    "comb": null,
-    "dir": "롱",
-    "sgn": -1,
-    "gap": -0.915,
-    "cover": 0.64,
-    "entry": 677.42,
-    "target": 678.76,
-    "room": 0.198,
-    "at": "10:30",
-    "found_at": "10:30",
-    "opt_side": "call",
-    "strike": 672.0,
-    "premium": 4.81,
-    "contracts": {
-     "30": 1,
-     "40": 2,
-     "50": 2,
-     "60": 2,
-     "70": 2
-    },
-    "spot_rt": 676.57,
-    "premium_q": 7.83,
-    "basis": "rt",
-    "prem_src": "실시간(모델가)",
-    "band_px": 675.46,
-    "band_t": "10:35",
-    "mfe": 0.0,
-    "mfe_t": null,
-    "mfe_prem": 12.9,
-    "mfe_prem_t": "10:35",
-    "filled": false,
-    "fill_t": null,
-    "res": null,
-    "iv_m": 0.2272,
-    "vchg": -0.8
-   },
+   "open": null,
    "trades": [
     {
      "date": "2026-09-09",
@@ -4992,11 +4996,60 @@
      "ux": 0.01,
      "exit_premium_q": 7.39,
      "pnl_q": 4.5
+    },
+    {
+     "date": "2026-11-10",
+     "tf": "1h",
+     "em": "vwap",
+     "late": false,
+     "comb": null,
+     "dir": "롱",
+     "sgn": -1,
+     "gap": -0.915,
+     "cover": 0.64,
+     "entry": 677.42,
+     "target": 678.76,
+     "room": 0.198,
+     "at": "10:30",
+     "found_at": "10:30",
+     "opt_side": "call",
+     "strike": 672.0,
+     "premium": 4.81,
+     "contracts": {
+      "30": 1,
+      "40": 2,
+      "50": 2,
+      "60": 2,
+      "70": 2
+     },
+     "spot_rt": 676.57,
+     "premium_q": 7.83,
+     "basis": "rt",
+     "prem_src": "실시간(모델가)",
+     "band_px": 675.46,
+     "band_t": "10:35",
+     "mfe": 0.0,
+     "mfe_t": null,
+     "mfe_prem": 12.9,
+     "mfe_prem_t": "10:35",
+     "filled": false,
+     "fill_t": null,
+     "res": "TIMECUT",
+     "iv_m": 0.2272,
+     "vchg": -0.8,
+     "exit": 673.33,
+     "exit_at": "11:30",
+     "exit_premium": 2.05,
+     "pnl_pct": -57.3,
+     "per_contract": -276.0,
+     "ux": -0.604,
+     "exit_premium_q": 4.1,
+     "pnl_q": -47.6
     }
    ],
    "books": {
     "30": {
-     "cap": 2439.0,
+     "cap": 2163.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -5041,11 +5094,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 1,
+       "usd": -276.0,
+       "pct": -57.3,
+       "res": "TIMECUT"
       }
      ]
     },
     "40": {
-     "cap": 2439.0,
+     "cap": 1887.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -5090,11 +5150,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 2,
+       "usd": -552.0,
+       "pct": -57.3,
+       "res": "TIMECUT"
       }
      ]
     },
     "50": {
-     "cap": 2049.0,
+     "cap": 1497.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -5139,11 +5206,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 2,
+       "usd": -552.0,
+       "pct": -57.3,
+       "res": "TIMECUT"
       }
      ]
     },
     "60": {
-     "cap": 1877.0,
+     "cap": 1325.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -5188,11 +5262,18 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 2,
+       "usd": -552.0,
+       "pct": -57.3,
+       "res": "TIMECUT"
       }
      ]
     },
     "70": {
-     "cap": 1621.0,
+     "cap": 1069.0,
      "trades": [
       {
        "d": "2026-09-09",
@@ -5237,6 +5318,13 @@
        "usd": 1.0,
        "pct": 0.1,
        "res": "TRAIL"
+      },
+      {
+       "d": "2026-11-10",
+       "nc": 2,
+       "usd": -552.0,
+       "pct": -57.3,
+       "res": "TIMECUT"
       }
      ]
     }
@@ -7982,7 +8070,7 @@
   "d": "2026-11-10",
   "vchg": -0.8,
   "state": "NO",
-  "why": "커버 0.43 ≥ 0.4 — 갭필 우주"
+  "why": "커버 0.52 ≥ 0.4 — 갭필 우주"
  },
  "comb": {
   "books": {
@@ -10943,7 +11031,7 @@
   "v": 0.3225,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-10T11:25:16-05:00",
+ "last_poll": "2026-11-10T11:30:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11116,15 +11204,15 @@
   },
   "live": {
    "d": "2026-11-10",
-   "at": "11:25",
+   "at": "11:30",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
      "ok": false,
      "wait": false,
-     "why": "커버 0.39 — 0.40 미만",
-     "gap": -1.001,
-     "cover": 0.39,
+     "why": "콜인데 rv 0.209 — 0.20 이상",
+     "gap": -1.176,
+     "cover": 0.48,
      "rv": 0.209,
      "entry": 675.23,
      "target": 679.35,
