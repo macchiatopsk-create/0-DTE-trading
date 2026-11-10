@@ -285,7 +285,10 @@ def vix_open_chg():
     09:45에 못 쓰는 날이 있다 (2026-11-05: 10:40에야 도착 → 모멘텀 신호를 '늦은 발견'으로 놓침)."""
     try:
         global VIX_OPEN_LAST
-        today_ = dt.datetime.now(NY).date()
+        now_ = dt.datetime.now(NY)
+        today_ = now_.date()
+        if now_.time() < dt.time(9, 30):
+            return None                # 09:30 전 값은 야간 시세 — 정규장 시가가 아님
         h = yf.Ticker("^VIX").history(period="5d")[["Open", "Close"]].dropna()
         prev = h[[x.date() < today_ for x in h.index]]
         if not len(prev):
@@ -293,9 +296,14 @@ def vix_open_chg():
         pc = float(prev["Close"].iloc[-1])
         op = None
         try:
+            # VIX는 03:00 ET부터 야간(GTH) 값이 나온다 → 09:30 ET 이후 첫 봉만 시가로 쓴다
+            # (2026-11-09: 03:00 첫 봉 25.08 → 변화 -2.18%로 잡힘. 09:30 시가 23.37 기준이면 -8.85%)
             m = yf.Ticker("^VIX").history(period="1d", interval="1m")[["Open"]].dropna()
-            if len(m) and m.index[0].date() == today_:
-                op = float(m["Open"].iloc[0])
+            if len(m):
+                ix = m.index.tz_convert(NY) if m.index.tz is not None else m.index.tz_localize(NY)
+                rth = m[[(x.date() == today_ and x.time() >= dt.time(9, 30)) for x in ix]]
+                if len(rth):
+                    op = float(rth["Open"].iloc[0])
         except Exception as e:
             print(f"  VIX 1분봉 조회 실패: {type(e).__name__}: {e}")
         if op is None and len(h) and h.index[-1].date() == today_:
@@ -1580,7 +1588,8 @@ def step():
                             mtr["open"] = dict(date=dstr, tf="mom", em="vix",
                                 comb=cent,
                                 dir=("롱" if sgn > 0 else "숏"), sgn=sgn, gap=gsig["gap"],
-                                cover=cov15, vchg=vchg, entry=ep, target="러너",
+                                cover=cov15, vchg=vchg, vlvl=(log.get("vixchg") or {}).get("lvl"),
+                                entry=ep, target="러너",
                                 room=None, at=now.strftime("%H:%M"),
                                 found_at=now.strftime("%H:%M"), opt_side=oside,
                                 strike=mopt["strike"], premium=_mp, premium_q=_mq, basis="rt",

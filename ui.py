@@ -191,6 +191,12 @@ def trade_list(trades, uid, limit=40, show_tk=True):
             det.append(("갭 · 커버", f"{t['gap']:+.2f}% · {t.get('cover', 0) or 0:.2f}"))
         if t.get("rv") is not None:
             det.append(("rv", f"{t['rv']:.2f}"))
+        if t.get("vlvl") is not None or t.get("vchg") is not None:
+            _vl = f"{t['vlvl']:.1f}" if t.get("vlvl") is not None else "—"
+            _vc = f"{t['vchg']:+.1f}%" if t.get("vchg") is not None else "—"
+            det.append(("VIX 시가 · 개장변화", f"{_vl} · {_vc}"))
+        if t.get("vix_note"):
+            det.append(("VIX 확인", E(t["vix_note"])))
         if t.get("target") not in (None, "러너"):
             det.append(("목표(전일 종가)", f"{t['target']}"))
         if t.get("fill_t"):
@@ -378,6 +384,25 @@ def legacy_gap(log, A):
 
 
 # ───────────────────────── 탭: 모멘텀 ─────────────────────────
+VIX_BANDS = ((None, 17), (17, 20), (20, None))
+
+
+def vix_band_table(trades):
+    """VIX 시가 구간별 성과 (실전 기록만, 판단용 참고)."""
+    rows = []
+    for lo, hi in VIX_BANDS:
+        sel = [t for t in trades if t.get("pnl_pct") is not None and t.get("vlvl") is not None
+               and (lo is None or t["vlvl"] >= lo) and (hi is None or t["vlvl"] < hi)]
+        n = len(sel); w = sum(1 for t in sel if t["pnl_pct"] > 0)
+        s = sum(t["pnl_pct"] for t in sel); pf = _pf(sel)
+        lab = f"VIX &lt; {hi}" if lo is None else (f"VIX ≥ {lo}" if hi is None else f"VIX {lo}~{hi}")
+        rows.append([(lab, ""), (f"{n}", ""), (f"{(w / n * 100 if n else 0):.0f}%", ""),
+                     (f"{s:+.0f}%", _cls(s)), ("—" if pf is None else f"{pf:.2f}", "")])
+    miss = sum(1 for t in trades if t.get("vlvl") is None)
+    note = f'<div class="mut sm">VIX 시가 = 09:30 정규장 시가. 건수 15건 미만은 방향만 참고.{f" VIX 미기록 {miss}건." if miss else ""}</div>'
+    return _tbl(["VIX 시가", "거래", "승률", "합계", "PF"], rows, "ret") + note
+
+
 def mom_tab(log, A, now):
     mtr = log.get("mom_track") or {}
     ms = log.get("mom_sig") or {}
@@ -396,6 +421,7 @@ def mom_tab(log, A, now):
     tl = mtr.get("trades", [])
     return (sig + ph + books_html(mtr.get("books"), A.GAP_SIZES, A.GAP_CAPITAL, "보관 트랙", tl, "bm")
             + f'<div class="card"><div class="ch"><span>성과</span></div>{stat_tiles(tl, mtr.get("books"), A.GAP_SIZES, A.GAP_CAPITAL)}</div>'
+            + f'<div class="card"><div class="ch"><span>VIX 구간별</span><span class="mut">진입일 VIX 시가</span></div>{vix_band_table(tl)}</div>'
             + f'<div class="card"><div class="ch"><span>거래 기록</span><span class="mut">누르면 상세</span></div>'
             + trade_list(tl, "m", show_tk=False) + '</div>')
 

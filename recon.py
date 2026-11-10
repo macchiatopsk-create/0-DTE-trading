@@ -529,7 +529,7 @@ def main(market=None, now=None):
                     ux = ((mm["exit_px"] - mm["ep"]) / mm["ep"] * 100) if sgn > 0 else ((mm["ep"] - mm["exit_px"]) / mm["ep"] * 100)
                     rec = dict(date=dstr, tf="mom", em="vix", recon=True, comb=None,
                                dir=("롱" if sgn > 0 else "숏"), sgn=sgn, gap=round(gp, 3), cover=round(xg["cover"], 2),
-                               vchg=round(vc, 2), entry=round(mm["ep"], 2), target="러너", room=None,
+                               vchg=round(vc, 2), vlvl=vopen.get(d), entry=round(mm["ep"], 2), target="러너", room=None,
                                at="09:45", found_at="recon", opt_side=oside, strike=K, premium=prem,
                                prem_src="소급(모델가)", iv=round(iv, 4), or_stop=round(mm["or_stop"], 2),
                                ext=round(mm["ep"], 2), mfe=0.0, mfe_t=None, mfe_prem=-99.0, mfe_prem_t=None,
