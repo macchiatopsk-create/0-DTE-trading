@@ -35,7 +35,8 @@ def patch(log, date, track, e, x):
     t = hit[0]
     if "model_premium" not in t:
         t["model_premium"] = t.get("premium")
-        t["model_exit_premium"] = t.get("exit_premium", t.get("eff_exit"))
+        # 3층은 eff_exit가 손익 기준 청산가 (exit_premium은 참고 호가)
+        t["model_exit_premium"] = t.get("eff_exit") if track == "l3" else t.get("exit_premium", t.get("eff_exit"))
         t["model_pnl_pct"] = t.get("pnl_pct")
         t["model_per_contract"] = t.get("per_contract", t.get("pnl_usd"))
     pnl = round(max((x / e - 1) * 100 - A.RT_SPREAD, -100.0), 1)
