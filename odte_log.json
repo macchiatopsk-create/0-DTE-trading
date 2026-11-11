@@ -7105,63 +7105,6 @@
     "model_per_contract": 145.0,
     "price_src": "실가(로빈후드)",
     "vlvl": 19.05
-   },
-   {
-    "date": "2026-11-09",
-    "tf": "mom",
-    "em": "vix",
-    "comb": null,
-    "dir": "롱",
-    "sgn": 1,
-    "gap": 0.984,
-    "cover": -1.22,
-    "vchg": -2.18,
-    "entry": 670.61,
-    "target": "러너",
-    "room": null,
-    "at": "09:45",
-    "found_at": "09:45",
-    "opt_side": "call",
-    "strike": 665.0,
-    "premium": 6.8,
-    "premium_q": 2.52,
-    "basis": "rt",
-    "spot_rt": 670.61,
-    "contracts": {
-     "30": 0,
-     "40": 1,
-     "50": 1,
-     "60": 1,
-     "70": 1
-    },
-    "prem_src": "실시간(모델가)",
-    "iv_m": 0.2884,
-    "or_stop": 662.02,
-    "ext": 678.8499755859375,
-    "mfe": 1.124,
-    "mfe_t": "11:00",
-    "mfe_prem": 119.9,
-    "mfe_prem_t": "11:00",
-    "filled": false,
-    "fill_t": null,
-    "res": "TRAIL",
-    "trail_px": 676.81,
-    "exit": 676.32,
-    "exit_at": "11:10",
-    "exit_premium": 12.09,
-    "pnl_pct": 75.6,
-    "per_contract": 514.08,
-    "ux": 0.851,
-    "exit_premium_q": 12.22,
-    "pnl_q": 384.9,
-    "model_premium": 5.99,
-    "model_exit_premium": 11.21,
-    "model_pnl_pct": 87.1,
-    "model_per_contract": 522.0,
-    "price_src": "실가(로빈후드)",
-    "vlvl": 23.37,
-    "vchg_rth": -8.85,
-    "vix_note": "앱은 03:00 야간 첫 값(25.08)으로 -2.18%로 봄 · 09:30 시가 23.37 기준 -8.85% → 규칙(|5%| 미만)상 진입 대상 아님 (11/5 코드 버그)"
    }
   ],
   "books": {
@@ -7318,18 +7261,11 @@
       "usd": 83.96,
       "pct": 13.9,
       "res": "TRAIL"
-     },
-     {
-      "d": "2026-11-09",
-      "nc": 0,
-      "usd": 0.0,
-      "pct": 0.0,
-      "res": "SKIP_FUND"
      }
     ]
    },
    "40": {
-    "cap": 2332.04,
+    "cap": 1817.96,
     "trades": [
      {
       "d": "2026-08-25",
@@ -7481,18 +7417,11 @@
       "usd": 83.96,
       "pct": 13.9,
       "res": "TRAIL"
-     },
-     {
-      "d": "2026-11-09",
-      "nc": 1,
-      "usd": 514.08,
-      "pct": 75.6,
-      "res": "TRAIL"
      }
     ]
    },
    "50": {
-    "cap": 2105.04,
+    "cap": 1590.96,
     "trades": [
      {
       "d": "2026-08-25",
@@ -7644,18 +7573,11 @@
       "usd": 83.96,
       "pct": 13.9,
       "res": "TRAIL"
-     },
-     {
-      "d": "2026-11-09",
-      "nc": 1,
-      "usd": 514.08,
-      "pct": 75.6,
-      "res": "TRAIL"
      }
     ]
    },
    "60": {
-    "cap": 1735.04,
+    "cap": 1220.96,
     "trades": [
      {
       "d": "2026-08-25",
@@ -7807,18 +7729,11 @@
       "usd": 83.96,
       "pct": 13.9,
       "res": "TRAIL"
-     },
-     {
-      "d": "2026-11-09",
-      "nc": 1,
-      "usd": 514.08,
-      "pct": 75.6,
-      "res": "TRAIL"
      }
     ]
    },
    "70": {
-    "cap": 1737.04,
+    "cap": 1222.96,
     "trades": [
      {
       "d": "2026-08-25",
@@ -7970,13 +7885,6 @@
       "usd": 83.96,
       "pct": 13.9,
       "res": "TRAIL"
-     },
-     {
-      "d": "2026-11-09",
-      "nc": 1,
-      "usd": 514.08,
-      "pct": 75.6,
-      "res": "TRAIL"
      }
     ]
    }
@@ -8013,7 +7921,7 @@
    "2026-11-02": true,
    "2026-11-03": "veto",
    "2026-11-05": "late",
-   "2026-11-09": true
+   "2026-11-09": "excluded"
   },
   "skips": [
    {
@@ -8093,6 +8001,73 @@
     "vchg": 3.19,
     "cover": -1.4,
     "at": "10:40"
+   },
+   {
+    "d": "2026-11-09",
+    "reason": "VIX변화 -8.8% (버그로 진입했다가 제외)",
+    "gap": 0.984,
+    "vchg": -8.85,
+    "cover": -1.22
+   }
+  ],
+  "excluded": [
+   {
+    "date": "2026-11-09",
+    "tf": "mom",
+    "em": "vix",
+    "comb": null,
+    "dir": "롱",
+    "sgn": 1,
+    "gap": 0.984,
+    "cover": -1.22,
+    "vchg": -2.18,
+    "entry": 670.61,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "09:45",
+    "opt_side": "call",
+    "strike": 665.0,
+    "premium": 6.8,
+    "premium_q": 2.52,
+    "basis": "rt",
+    "spot_rt": 670.61,
+    "contracts": {
+     "30": 0,
+     "40": 1,
+     "50": 1,
+     "60": 1,
+     "70": 1
+    },
+    "prem_src": "실시간(모델가)",
+    "iv_m": 0.2884,
+    "or_stop": 662.02,
+    "ext": 678.8499755859375,
+    "mfe": 1.124,
+    "mfe_t": "11:00",
+    "mfe_prem": 119.9,
+    "mfe_prem_t": "11:00",
+    "filled": false,
+    "fill_t": null,
+    "res": "TRAIL",
+    "trail_px": 676.81,
+    "exit": 676.32,
+    "exit_at": "11:10",
+    "exit_premium": 12.09,
+    "pnl_pct": 75.6,
+    "per_contract": 514.08,
+    "ux": 0.851,
+    "exit_premium_q": 12.22,
+    "pnl_q": 384.9,
+    "model_premium": 5.99,
+    "model_exit_premium": 11.21,
+    "model_pnl_pct": 87.1,
+    "model_per_contract": 522.0,
+    "price_src": "실가(로빈후드)",
+    "vlvl": 23.37,
+    "vchg_rth": -8.85,
+    "vix_note": "앱은 03:00 야간 첫 값(25.08)으로 -2.18%로 봄 · 09:30 시가 23.37 기준 -8.85% → 규칙(|5%| 미만)상 진입 대상 아님 (11/5 코드 버그)",
+    "excluded": "형님 결정 2026-11-10: VIX 시가 버그로 진입한 거래 — 규칙(|VIX 변화|<5%) 밖이라 원장에서 제외"
    }
   ]
  },
