@@ -1133,12 +1133,12 @@
   "2026-11-12": {
    "status": "NO TRADE · 프리마켓 위치 0.09 <= 0.5 (롱 엣지 없음)",
    "score": -2,
-   "rsi": 35.6,
+   "rsi": 38.4,
    "direction": 0,
    "gap": -1.47,
-   "px": 685.37,
-   "vwap": 684.61,
-   "at": "10:15",
+   "px": 685.93,
+   "vwap": 684.67,
+   "at": "10:20",
    "vix_pct": 65.7,
    "vix_state": "LIVE",
    "pm_pos": 0.091
@@ -1166,12 +1166,12 @@
   "sgn": -1,
   "prev_close": 690.38,
   "open": 680.21,
-  "entry": 685.37,
+  "entry": 685.93,
   "target": 690.38,
-  "room": 0.731,
-  "cover": 0.51,
+  "room": 0.649,
+  "cover": 0.56,
   "r50": 684.32,
-  "cur": 685.37,
+  "cur": 685.93,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1196,12 +1196,12 @@
     "vw_room": 0.844
    },
    "1h": {
-    "cover": 0.51,
-    "entry": 685.37,
+    "cover": 0.56,
+    "entry": 685.93,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.731,
+    "room": 0.649,
     "vw_entry": null,
     "vw_room": null
    }
@@ -1316,7 +1316,7 @@
    },
    {
     "d": "2024-12-09",
-    "dist": 3.07,
+    "dist": 3.06,
     "gap": -0.18,
     "ret": -0.6,
     "lo": -0.82,
@@ -1899,10 +1899,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.112,
-    "mfe_t": "10:15",
-    "mfe_prem": 22.8,
-    "mfe_prem_t": "10:15",
+    "mfe": 0.194,
+    "mfe_t": "10:20",
+    "mfe_prem": 32.3,
+    "mfe_prem_t": "10:20",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -3398,10 +3398,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.112,
-    "mfe_t": "10:15",
-    "mfe_prem": 22.8,
-    "mfe_prem_t": "10:15",
+    "mfe": 0.194,
+    "mfe_t": "10:20",
+    "mfe_prem": 32.3,
+    "mfe_prem_t": "10:20",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -11440,7 +11440,7 @@
   "v": 0.2844,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-12T10:15:15-05:00",
+ "last_poll": "2026-11-12T10:20:15-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11668,7 +11668,7 @@
   },
   "live": {
    "d": "2026-11-12",
-   "at": "10:15",
+   "at": "10:20",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
