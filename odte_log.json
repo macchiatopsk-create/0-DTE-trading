@@ -1132,13 +1132,13 @@
   },
   "2026-11-12": {
    "status": "NO TRADE · 프리마켓 위치 0.09 <= 0.5 (롱 엣지 없음)",
-   "score": -1,
-   "rsi": 40.1,
+   "score": -2,
+   "rsi": 39.3,
    "direction": 0,
    "gap": -1.47,
-   "px": 685.73,
+   "px": 685.77,
    "vwap": 685.56,
-   "at": "10:30",
+   "at": "10:35",
    "vix_pct": 65.7,
    "vix_state": "LIVE",
    "pm_pos": 0.091
@@ -1171,7 +1171,7 @@
   "room": 0.583,
   "cover": 0.61,
   "r50": 684.32,
-  "cur": 685.73,
+  "cur": 685.77,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1316,7 +1316,7 @@
    },
    {
     "d": "2024-12-09",
-    "dist": 3.06,
+    "dist": 3.07,
     "gap": -0.18,
     "ret": -0.6,
     "lo": -0.82,
@@ -4249,8 +4249,8 @@
     "band_t": null,
     "mfe": 0.0,
     "mfe_t": null,
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "10:30",
+    "mfe_prem": 0.6,
+    "mfe_prem_t": "10:35",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -5018,10 +5018,10 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.025,
-    "mfe_t": "10:30",
-    "mfe_prem": 0.0,
-    "mfe_prem_t": "10:30",
+    "mfe": 0.031,
+    "mfe_t": "10:35",
+    "mfe_prem": 0.5,
+    "mfe_prem_t": "10:35",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -11522,7 +11522,7 @@
   "v": 0.2844,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-12T10:30:16-05:00",
+ "last_poll": "2026-11-12T10:35:15-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11750,7 +11750,7 @@
   },
   "live": {
    "d": "2026-11-12",
-   "at": "10:30",
+   "at": "10:35",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
