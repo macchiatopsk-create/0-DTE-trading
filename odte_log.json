@@ -5917,15 +5917,16 @@
     "prem_src": "실시간(모델가)",
     "band_px": null,
     "band_t": null,
-    "mfe": 0.518,
-    "mfe_t": "10:57",
-    "mfe_prem": 69.6,
-    "mfe_prem_t": "10:57",
-    "filled": false,
-    "fill_t": null,
+    "mfe": 0.636,
+    "mfe_t": "10:58",
+    "mfe_prem": 84.3,
+    "mfe_prem_t": "10:58",
+    "filled": true,
+    "fill_t": "10:57",
     "res": null,
     "iv_m": 0.2111,
-    "vchg": 4.97
+    "vchg": 4.97,
+    "trail_px": 690.18
    },
    "trades": [
     {
