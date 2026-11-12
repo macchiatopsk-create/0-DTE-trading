@@ -1132,8 +1132,8 @@
   },
   "2026-11-12": {
    "status": "WAIT_OPEN",
-   "bars": 4,
-   "at": "09:45"
+   "bars": 5,
+   "at": "09:50"
   }
  },
  "vix": {
@@ -1158,12 +1158,12 @@
   "sgn": -1,
   "prev_close": 690.38,
   "open": 680.21,
-  "entry": 686.32,
+  "entry": 685.29,
   "target": 690.38,
-  "room": 0.592,
-  "cover": 0.6,
+  "room": 0.743,
+  "cover": 0.5,
   "r50": 684.22,
-  "cur": 686.32,
+  "cur": 685.29,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1188,12 +1188,12 @@
     "vw_room": null
    },
    "1h": {
-    "cover": 0.6,
-    "entry": 686.32,
+    "cover": 0.5,
+    "entry": 685.29,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.592,
+    "room": 0.743,
     "vw_entry": null,
     "vw_room": null
    }
@@ -5583,8 +5583,8 @@
     "band_t": null,
     "mfe": 0.0,
     "mfe_t": null,
-    "mfe_prem": -99.0,
-    "mfe_prem_t": null,
+    "mfe_prem": -16.9,
+    "mfe_prem_t": "09:50",
     "filled": false,
     "fill_t": null,
     "res": null,
@@ -11346,11 +11346,11 @@
   "2026-11-12": "09:30"
  },
  "iv_base": {
-  "d": "2026-11-09",
-  "v": 0.3225,
+  "d": "2026-11-12",
+  "v": 0.2844,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-12T09:45:16-05:00",
+ "last_poll": "2026-11-12T09:50:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -11578,7 +11578,7 @@
   },
   "live": {
    "d": "2026-11-12",
-   "at": "09:45",
+   "at": "09:50",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
@@ -11597,7 +11597,7 @@
      "ok": false,
      "wait": false,
      "why": "콜인데 rv 0.31 — 0.20 이상",
-     "gap": -0.777,
+     "gap": -0.767,
      "cover": 0.6,
      "rv": 0.31,
      "entry": 757.45,
