@@ -115,12 +115,12 @@ def books_html(books, sizes, cap0, note="", trades=None, uid="b"):
                 hr.append([(x.get("d", "")[5:].replace("-", "/"), ""), (nm, ""), (f"{x['nc']}", ""),
                            (_money(x.get("usd"), True), _cls(x.get("usd"))), (f"${x['bal']:,.0f}", "")])
         tb = _tbl(["날짜", "종목", "계약", "손익", "잔고"], hr) if hr else '<div class="empty">거래가 생기면 여기에 쌓입니다</div>'
-        h += (f'<div class="brow" data-t="{uid}{i}"><div class="bpill">{k}%</div>'
+        h += (f'<details class="bx"><summary class="brow"><div class="bpill">{k}%</div>'
               f'<div class="bmid"><div class="bcap">${r["cap"]:,.0f} <i class="{_cls(r["ret"])}">{r["ret"]:+.1f}%</i></div>'
               f'<div class="bsub">{sub}</div>'
               f'<div class="bbar"><i class="{_cls(r["pl"])}" style="width:{bw:.0f}%"></i></div></div>'
-              f'<div class="bpl {_cls(r["pl"])}">{_money(r["pl"], True)}</div><div class="arr">›</div></div>'
-              f'<div class="bdet" id="{uid}{i}"><div class="sgrid">{sg}</div>{tb}</div>')
+              f'<div class="bpl {_cls(r["pl"])}">{_money(r["pl"], True)}</div><div class="arr" aria-hidden="true">›</div></summary>'
+              f'<div class="bdet"><div class="sgrid">{sg}</div>{tb}</div></details>')
     return (f'<div class="card"><div class="ch"><span>계좌 ${cap0:,.0f} · 사용 비율별</span>'
             f'<span class="mut">{note} · 누르면 상세</span></div>{h}</div>')
 
@@ -214,14 +214,14 @@ def trade_list(trades, uid, limit=40, show_tk=True):
         tag = '<em>소급</em>' if (t.get("recon") or t.get("catchup")) else ""
         if t.get("price_src"):
             tag += '<em class="rp">실가</em>'
-        h += (f'<div class="trow" data-t="{uid}{i}">'
+        h += (f'<details class="tx"><summary class="trow">'
               f'<div class="ico {"p" if put else "c"}">{"↘" if put else "↗"}</div>'
               f'<div class="tmid"><div class="tt">{t.get("date", "")[5:].replace("-", "/")} · '
               f'{(tk + " ") if show_tk else ""}{(f"{k:.0f}" if isinstance(k, (int, float)) else "")}'
               f'{"P" if put else "C"} {tag}</div>'
               f'<div class="ts">{E(_res_ko(res))} · {at}→{ex}</div></div>'
-              f'<div class="tpl {_cls(pnl)}">{_pc(pnl)}</div><div class="arr">›</div></div>'
-              f'<div class="tdet" id="{uid}{i}">{dh}</div>')
+              f'<div class="tpl {_cls(pnl)}">{_pc(pnl)}</div><div class="arr" aria-hidden="true">›</div></summary>'
+              f'<div class="tdet">{dh}</div></details>')
     return h or '<div class="empty">아직 기록이 없습니다</div>'
 
 
@@ -536,7 +536,7 @@ h1 em{font-style:normal;background:var(--acc);-webkit-background-clip:text;backg
 .tabs{position:relative;display:flex;gap:4px;padding:4px;margin:0 0 16px;border-radius:999px;background:var(--card);border:1px solid var(--edge);
 backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 6px 24px rgba(79,70,229,.08)}
 .tab{position:relative;z-index:1;flex:1;padding:10px 6px;border-radius:999px;border:0;background:transparent;color:var(--mut);font:600 14px/1 inherit;cursor:pointer;transition:color .25s}
-.tab.on{color:#fff}
+.tab[aria-selected="true"]{color:#fff}
 .tind{position:absolute;z-index:0;top:4px;bottom:4px;left:0;border-radius:999px;background:var(--ink);box-shadow:0 6px 18px rgba(11,16,32,.25);will-change:transform,width}
 .panes{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
 overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -16px;transition:height .3s ease}
@@ -572,7 +572,7 @@ box-shadow:0 14px 40px rgba(129,140,248,.22)}
 .pbar i{display:block;height:100%;border-radius:99px;background:var(--acc);box-shadow:0 0 12px rgba(129,140,248,.6)}
 .plab{display:flex;justify-content:space-between;font:500 11.5px/1.3 var(--num);color:var(--mut);margin-top:6px}
 .brow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
-.brow:first-of-type{border-top:0}
+.bx:first-of-type>.brow{border-top:0}
 .bpill{flex:0 0 54px;text-align:center;padding:9px 0;border-radius:14px;background:rgba(15,23,42,.045);font:700 14px/1 var(--num)}
 .bmid{flex:1;min-width:0}.bcap{font:600 15px/1.3 var(--num)}.bsub{font-size:12px;color:var(--mut)}
 .bbar{height:4px;border-radius:9px;background:rgba(15,23,42,.06);margin-top:6px;overflow:hidden}
@@ -589,9 +589,11 @@ background:rgba(255,255,255,.6);border:1px solid var(--line);cursor:pointer;tran
 .tmid{flex:1;min-width:0}.tt{font:600 14px/1.35 var(--num)}.tt em{font-style:normal;font-size:11px;color:var(--wait);margin-left:4px}.tt em.rp{color:var(--up)}
 .ts{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpl{font:700 15px/1 var(--num)}.arr{color:var(--mut);font-size:18px;transition:transform .2s}
-.trow.on .arr{transform:rotate(90deg)}
-.tdet{display:none;grid-template-columns:1fr 1fr;gap:8px 12px;padding:4px 10px 14px;font-size:12.5px}
-.tdet.on{display:grid}.tdet span{display:block;color:var(--mut);font-size:11px}.tdet b{font-weight:500}
+details[open]>summary .arr{transform:rotate(90deg)}
+summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:none}
+summary:focus-visible,.tab:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.tdet{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding:4px 10px 14px;font-size:12.5px}
+.tdet span{display:block;color:var(--mut);font-size:11px}.tdet b{font-weight:500}
 .fold summary{list-style:none;cursor:pointer;font-weight:650;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .fold summary::-webkit-details-marker{display:none}
 .fold summary:after{content:'›';color:var(--mut);font-size:20px;transition:transform .2s}
@@ -614,9 +616,9 @@ background:rgba(255,255,255,.6);border:1px solid var(--line);cursor:pointer;tran
 .gate b{flex:0 0 92px}.gate span{color:var(--mut)}
 .split{display:flex;height:10px;border-radius:99px;overflow:hidden;margin:4px 0}
 .split i.up{background:var(--up)}.split i.dn{background:var(--dn)}
-.brow{cursor:pointer}.brow .arr{margin-left:-4px}.brow.on .arr{transform:rotate(90deg)}
+.brow{cursor:pointer}.brow .arr{margin-left:-4px}
 .bcap i{font-style:normal;font-size:12.5px;font-weight:700;margin-left:6px}
-.bdet{display:none;padding:4px 0 14px}.bdet.on{display:block}
+.bdet{padding:4px 0 14px}
 .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .sgrid div{background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
 .sgrid span{display:block;font-size:11px;color:var(--mut)}.sgrid b{font:600 13.5px/1.3 var(--num)}
@@ -655,23 +657,26 @@ JS = """
     var A=tabs[a],B=tabs[b],x=A.offsetLeft+(B.offsetLeft-A.offsetLeft)*t,w=A.offsetWidth+(B.offsetWidth-A.offsetWidth)*t;
     ind.style.width=w+'px';ind.style.transform='translateX('+x+'px)'}
   function fit(i){if(panes[i])box.style.height=panes[i].offsetHeight+'px'}
-  function mark(i){cur=i;tabs.forEach(function(t,k){t.classList.toggle('on',k===i)});fit(i);
+  function mark(i){cur=i;tabs.forEach(function(t,k){t.setAttribute('aria-selected',k===i?'true':'false');t.tabIndex=k===i?0:-1});fit(i);
     try{localStorage.setItem('odte_tab',i)}catch(e){}}
   function go(i,smooth){box.scrollTo({left:i*box.clientWidth,behavior:(smooth&&!reduce)?'smooth':'auto'});mark(i);place(i)}
   tabs.forEach(function(t,i){t.addEventListener('click',function(){
     if(i!==cur&&window.scrollY>box.offsetTop-80)window.scrollTo({top:Math.max(0,box.offsetTop-90),behavior:reduce?'auto':'smooth'});
-    go(i,true)})});
+    go(i,true)});
+    t.addEventListener('keydown',function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;
+      var j=e.key==='Home'?0:e.key==='End'?tabs.length-1:d?(i+d+tabs.length)%tabs.length:-1;
+      if(j<0)return;e.preventDefault();go(j,true);tabs[j].focus()})});
+  var snapEv=('onscrollsnapchange' in window);
+  if(snapEv)box.addEventListener('scrollsnapchange',function(e){var i=panes.indexOf(e.snapTargetInline);if(i>=0&&i!==cur)mark(i)});
   box.addEventListener('scroll',function(){
     cancelAnimationFrame(raf);raf=requestAnimationFrame(function(){place(box.scrollLeft/box.clientWidth)});
     box.classList.add('moving');clearTimeout(tmr);tmr=setTimeout(function(){box.classList.remove('moving');
-      var i=Math.round(box.scrollLeft/box.clientWidth);if(i!==cur)mark(i);else fit(i)},90)},{passive:true});
+      var i=Math.round(box.scrollLeft/box.clientWidth);if(!snapEv&&i!==cur)mark(i);else fit(cur)},90)},{passive:true});
   // 펼침·접힘으로 높이가 바뀌면 다시 맞춘다
   if('ResizeObserver' in window){var ro=new ResizeObserver(function(){fit(cur)});panes.forEach(function(p){ro.observe(p)})}
   window.addEventListener('resize',function(){go(cur,false)});
   var s0=0;try{var s=+localStorage.getItem('odte_tab');if(s>=0&&s<tabs.length)s0=s}catch(e){}
   go(s0,false);
-  document.querySelectorAll('.trow,.brow').forEach(function(r){r.addEventListener('click',function(){
-    var d=document.getElementById(r.getAttribute('data-t'));if(d){d.classList.toggle('on');r.classList.toggle('on')}})});
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
   var b=document.body,sig=b.getAttribute('data-sig')||'',bell=document.getElementById('bell');
   var canN=('Notification' in window);
@@ -716,8 +721,9 @@ def render(log, st, A):
         head_html = '판정 기록<br><em>없음</em>'
     tabs = [("갭필", gap_tab(log, A, now)), ("모멘텀", mom_tab(log, A, now)),
             ("3층", l3_tab(log, A, st, now)), ("매크로", macro_tab(log))]
-    tb = "".join(f'<button class="tab{" on" if i == 0 else ""}">{n}</button>' for i, (n, _) in enumerate(tabs))
-    pn = "".join(f'<section class="pane">{h}</section>' for i, (_, h) in enumerate(tabs))
+    tb = "".join(f'<button type="button" class="tab" role="tab" id="tab{i}" aria-selected="{"true" if i == 0 else "false"}"'
+                 f' tabindex="{0 if i == 0 else -1}">{n}</button>' for i, (n, _) in enumerate(tabs))
+    pn = "".join(f'<section class="pane" role="tabpanel" aria-labelledby="tab{i}">{h}</section>' for i, (_, h) in enumerate(tabs))
     lp = log.get("last_poll", "")
     sig = ntitle = nbody = ""
     if pos and pos.get("res") is None and pos.get("date") == today:
@@ -738,13 +744,14 @@ def render(log, st, A):
 <meta name="apple-mobile-web-app-title" content="0DTE">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png" type="image/png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" integrity="sha384-ei/b2Mz3F5J8nqTvpKS89CkzDCuD7Cc+/F+OsaPUKItzHgLNKnGq3rjtYq/B7RnO" crossorigin="anonymous" referrerpolicy="no-referrer">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body data-sig="{E(sig)}" data-nt="{E(ntitle)}" data-nb="{E(nbody)}"><div class="wrap">
 <div class="top"><div class="brand"><i></i>0DTE · Gap Engine</div><div class="topr"><button class="bell" id="bell" hidden>🔔 알림 켜기</button><div class="pill"><b>모의매매</b> · 실거래 아님</div></div></div>
 <div class="hero-top"><div class="orb {orb}"><span></span></div><div>
 <div class="when">{now.month}월 {now.day}일 {WD[now.weekday()]}요일 · {now.strftime('%H:%M')} ET</div><h1>{head_html}</h1></div></div>
-<nav class="tabs"><i class="tind"></i>{tb}</nav>
+<div class="tabs" role="tablist" aria-label="트랙"><i class="tind" aria-hidden="true"></i>{tb}</div>
 <div class="panes">{pn}</div>
 <div class="foot">마지막 실행 {E(str(lp)[:16].replace('T', ' '))} ET · 손익은 모델가(BSM)<br>모의매매 · 투자 권유 아님</div>
 </div><script>{JS}</script></body></html>"""
