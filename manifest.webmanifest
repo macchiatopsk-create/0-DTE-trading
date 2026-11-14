@@ -1,12 +1,12 @@
 {
- "name": "0DTE Mock · QQQ",
+ "name": "0DTE 갭필 엔진 (모의매매)",
  "short_name": "0DTE",
  "start_url": ".",
  "scope": ".",
  "display": "standalone",
- "background_color": "#06090d",
- "theme_color": "#06090d",
- "description": "QQQ VWAP 밴드 0DTE 모의매매",
+ "background_color": "#f4f6ff",
+ "theme_color": "#f4f6ff",
+ "description": "QQQ·SPY 0DTE 갭필·모멘텀·3층 모의매매 기록",
  "icons": [
   {
    "src": "icon-192.png",
