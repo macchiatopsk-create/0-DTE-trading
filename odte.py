@@ -151,8 +151,17 @@ PAGES_URL = "https://macchiatopsk-create.github.io/0-DTE-trading/"
 
 
 def notify(title, msg, tags=None, prio=4):
-    """휴대폰 알림 (ntfy.sh, 무료). 저장소 시크릿 NTFY_TOPIC이 없으면 아무것도 안 한다.
-    토픽 이름은 공개 레포에 쓰지 않는다 — 아는 사람은 누구나 구독할 수 있어서."""
+    """휴대폰 알림. 시크릿이 없으면 아무것도 안 한다.
+    - PUSH_CONFIG: 앱(웹) 푸시 — 폰에서 앱 화면 '🔔 알림 켜기'가 만든 설정값 (webpush.py)
+    - NTFY_TOPIC: ntfy 앱 알림. 토픽 이름은 공개 레포에 쓰지 않는다 — 아는 사람은 누구나 구독할 수 있어서."""
+    pc = os.environ.get("PUSH_CONFIG", "").strip()
+    if pc:
+        try:
+            import webpush
+            n = webpush.send(pc, title, msg, PAGES_URL)
+            print(f"  앱 푸시 {n}대: {title}")
+        except Exception as e:
+            print(f"  앱 푸시 실패: {type(e).__name__}: {e}")
     topic = os.environ.get("NTFY_TOPIC", "").strip()
     if not topic:
         return

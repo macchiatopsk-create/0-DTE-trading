@@ -28,6 +28,7 @@ jobs:
     timeout-minutes: 300      # 1분 확인 루프가 최대 14:06까지 이 잡 안에서 돈다
     env:
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}   # 휴대폰 알림(ntfy) 토픽 — 저장소 시크릿. 없으면 알림만 안 감
+      PUSH_CONFIG: ${{ secrets.PUSH_CONFIG }} # 앱(웹) 푸시 설정 — 폰 앱 화면 '🔔 알림 켜기'가 만든 값. 없으면 안 감
     outputs:
       mode: ${{ steps.mode.outputs.mode }}
     steps:
@@ -50,7 +51,7 @@ jobs:
         with:
           python-version: "3.12"
       - if: steps.mode.outputs.mode == 'live'
-        run: pip install yfinance pandas pandas_market_calendars
+        run: pip install yfinance pandas pandas_market_calendars cryptography
       - name: align (5분 경계 +15초에 맞춰 실행 — 09:45 판정을 09:45에)
         if: steps.mode.outputs.mode == 'live'
         run: |
