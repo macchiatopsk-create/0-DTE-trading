@@ -667,6 +667,8 @@ def _replay_poll(log, kind, tr, pos, g, d, T, cur, iv):
         log.setdefault("trades", []).append(rec)
         log["open"] = None
         print(f"  [3층] 따라잡기 청산 {pos['date']} {hm} {reason} {pct:+.1f}%")
+        notify(f"3층 종료 QQQ {pos['strike']:.0f}C {pct:+.1f}%", f"{reason} · {hm} (소급)",
+               ["white_check_mark" if pct > 0 else "x"])
         return True
 
     sgn = pos["sgn"]
@@ -1601,6 +1603,11 @@ def step():
                                 filled=False, fill_t=None, res=None)
                             print(f"  [모멘텀] 진입 커버{cov15:.2f} VIX{vchg:+.1f}% @{ep} "
                                   f"{oside.upper()} {mopt['strike']:.0f} @${mopt['premium']}")
+                            _ct = " · ".join(f"{k}% {v}" for k, v in sorted((ent or {}).items(), key=lambda x: int(x[0])) if v)
+                            notify(f"모멘텀 진입 QQQ {mopt['strike']:.0f}{'P' if oside == 'put' else 'C'} @${_mp:.2f}",
+                                   f"갭 {gsig['gap']:+.2f}% · 커버 {cov15:.2f} · VIX {vchg:+.1f}%\n"
+                                   f"트레일 {MOM_TRAIL}% · OR 손절 {mtr['open']['or_stop']} · 14:00 컷"
+                                   + (f"\n계약 {_ct}" if _ct else ""), ["rocket"], 5)
             # ── 관리·청산 ──
             mo = mtr.get("open")
             if mo and mo.get("res") is None and mo.get("date") == nstr:
@@ -1663,6 +1670,9 @@ def step():
                         comb_settle(comb_state(log), rec, per, "모멘텀")
                     mtr["trades"].append(rec); mtr["open"] = None
                     print(f"  [모멘텀] 청산 {res} {pct:+.1f}% 기초 {ux:+.3f}%")
+                    notify(f"모멘텀 종료 QQQ {mo['strike']:.0f}{'P' if mo['opt_side'] == 'put' else 'C'} {pct:+.1f}%",
+                           f"{res} · {mo['at']}→{now.strftime('%H:%M')} · ${mo['premium']}→${ex}",
+                           ["white_check_mark" if pct > 0 else "x"])
         log["mom_sig"] = msig
     except Exception as e:
         import traceback
@@ -1764,6 +1774,9 @@ def step():
             log.setdefault("trades", []).append(tr)
             log["open"] = None
             print(f"  청산: {reason} 유효단가 {open_pos['premium']}→{eff_exit} ({pnl_pct:+.1f}% / ${pnl_usd:+.2f})")
+            notify(f"3층 종료 QQQ {open_pos['strike']:.0f}C {pnl_pct:+.1f}%",
+                   f"{reason} · {open_pos.get('entry_time', '')}→{now.strftime('%H:%M')} · ${open_pos['premium']}→${eff_exit}",
+                   ["white_check_mark" if pnl_pct > 0 else "x"])
             save_log(log); return log, st
         log["open"] = open_pos
         print("  보유 중 — 조건 미달")
@@ -1824,6 +1837,10 @@ def step():
                                pm_pos=(pmv["pos"] if pmv else None), iv_m=base_iv)
             status = f"진입 · BUY CALL {opt['strike']:.0f} @ ${_lp} (잔고 ${cap:.0f})"
             print(f"  {status}")
+            _ct = " · ".join(f"{k}% {v}" for k, v in sorted((_ent or {}).items(), key=lambda x: int(x[0])) if v)
+            notify(f"3층 진입 QQQ {opt['strike']:.0f}C @${_lp:.2f}",
+                   f"VWAP -1σ 터치 · 기초 {st['px']:.2f} · 손절 {log['open']['stop_px']}"
+                   + (f"\n계약 {_ct}" if _ct else ""), ["rocket"], 5)
     log["days"][dstr] = dict(status=status, score=st["score"], rsi=round(st["rsi"], 1),
                              direction=st["direction"], gap=round(st["gap"], 2),
                              px=round(st["px"], 2), vwap=round(st["vwap"], 2),
