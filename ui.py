@@ -633,7 +633,13 @@ summary:focus-visible,.tab:focus-visible{outline:2px solid var(--ink);outline-of
 .tbl.hrow th,.tbl.hrow td{text-align:center;padding:8px 4px}.tbl.hrow td{font-weight:700;font-size:14px}.tbl.ret td{font-weight:600}
 .tdet .full{grid-column:1/-1}
 .topr{display:flex;gap:8px;align-items:center}
-.bell{border:0;border-radius:999px;padding:7px 12px;font:600 12px/1 inherit;color:#fff;background:var(--ink);cursor:pointer}
+.pdlg{margin:auto;border:0;border-radius:22px;padding:20px;max-width:min(420px,calc(100vw - 32px));background:#fff;color:var(--ink);box-shadow:0 20px 60px rgba(11,16,32,.25)}
+.pdlg::backdrop{background:rgba(11,16,32,.35)}
+.pdlg h3{margin:0 0 8px;font-size:17px}.pdlg ol{padding-left:20px;margin:10px 0;font-size:13.5px;line-height:1.7}
+.pdlg textarea{width:100%;box-sizing:border-box;font:11px/1.4 var(--num);border:1px solid var(--line);border-radius:12px;padding:8px;word-break:break-all}
+.pdbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.pdb{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:600 12px/1 inherit;cursor:pointer}
+.bell{white-space:nowrap;border:0;border-radius:999px;padding:7px 12px;font:600 12px/1 inherit;color:#fff;background:var(--ink);cursor:pointer}
 .live{display:inline-flex;align-items:center;gap:6px;margin-right:6px;padding:3px 9px 3px 7px;border-radius:999px;background:#e11d48;color:#fff;font:700 11px/1.2 var(--num);letter-spacing:.06em}
 .live i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.2s ease-in-out infinite}
 @keyframes blink{50%{opacity:.25}}
@@ -680,9 +686,34 @@ JS = """
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
   var b=document.body,sig=b.getAttribute('data-sig')||'',bell=document.getElementById('bell');
   var canN=('Notification' in window);
-  if(canN&&Notification.permission==='default'&&bell){bell.hidden=false;bell.onclick=function(){
-    Notification.requestPermission().then(function(p){if(p!=='default')bell.hidden=true})}}
-  function pop(t,body){try{if(!canN||Notification.permission!=='granted')return;
+  // ── 앱 푸시 설정: 이 기기에서 키를 만들고 구독 → 설정 코드를 GitHub 시크릿 PUSH_CONFIG에 붙여넣는다 ──
+  var pushCode=null;try{pushCode=localStorage.getItem('odte_push')}catch(e){}
+  var dlg=document.getElementById('pushdlg'),$=function(i){return document.getElementById(i)};
+  var ios=/iP(hone|ad|od)/.test(navigator.userAgent),standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
+  function showCode(c){$('pdcode').value=c;$('pdcode').hidden=false;$('pdsteps').hidden=false;$('pdgo').textContent='새로 만들기'}
+  function msg(t){$('pdmsg').textContent=t}
+  if(bell&&dlg&&dlg.showModal){bell.hidden=false;bell.textContent=pushCode?'🔔 켜짐':'🔔 알림';
+    bell.onclick=function(){msg(pushCode?'이 기기는 설정 코드가 만들어져 있습니다. GitHub에 등록했으면 끝입니다.':
+      (ios&&!standalone?'iPhone은 Safari 공유 버튼 → "홈 화면에 추가" 후, 홈 화면 아이콘으로 열어서 눌러주세요.':'아래 버튼을 누르고 알림을 허용해주세요.'));
+      if(pushCode)showCode(pushCode);dlg.showModal()}}
+  if($('pdgo'))$('pdgo').onclick=function(){
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)||!canN){
+      msg(ios&&!standalone?'iPhone은 Safari 공유 버튼 → "홈 화면에 추가" 후, 홈 화면 아이콘으로 열어서 다시 눌러주세요.':'이 브라우저는 앱 알림을 지원하지 않습니다.');return}
+    msg('권한 요청 중…');
+    Notification.requestPermission().then(function(p){
+      if(p!=='granted'){msg('알림 권한이 꺼져 있습니다. 폰 설정에서 이 앱 알림을 허용한 뒤 다시 눌러주세요.');return}
+      msg('키 만드는 중…');var kp,pub,d,reg;
+      return navigator.serviceWorker.ready.then(function(r){reg=r;return crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign'])})
+      .then(function(k){kp=k;return crypto.subtle.exportKey('raw',k.publicKey)}).then(function(r){pub=new Uint8Array(r);return crypto.subtle.exportKey('jwk',kp.privateKey)})
+      .then(function(j){d=j.d;return reg.pushManager.getSubscription()}).then(function(o){return o?o.unsubscribe():null})
+      .then(function(){return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:pub})})
+      .then(function(sub){var c=btoa(JSON.stringify({s:sub.toJSON(),k:d}));pushCode=c;try{localStorage.setItem('odte_push',c)}catch(e){}
+        bell.textContent='🔔 켜짐';showCode(c);msg('설정 코드가 만들어졌습니다. 아래 순서대로 GitHub에 한 번만 등록하면 끝입니다.')})
+    }).catch(function(e){msg('실패: '+(e&&e.message||e))})};
+  if($('pdcopy'))$('pdcopy').onclick=function(){var t=$('pdcode');
+    (navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(function(){$('pdcopy').textContent='복사됨'})
+    .catch(function(){t.select();try{document.execCommand('copy');$('pdcopy').textContent='복사됨'}catch(e){}})};
+  function pop(t,body){try{if(pushCode||!canN||Notification.permission!=='granted')return;
     var o={body:body,icon:'icon-192.png',badge:'icon-192.png',tag:sig};
     if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(function(r){r.showNotification(t,o)}).catch(function(){new Notification(t,o)})}
     else new Notification(t,o)}catch(e){}}
@@ -695,6 +726,18 @@ JS = """
 """
 
 WD = "월화수목금토일"
+
+
+PUSH_DLG = (
+    '<dialog id="pushdlg" class="pdlg" aria-labelledby="pdh"><form method="dialog">'
+    '<h3 id="pdh">폰 알림 켜기</h3><p id="pdmsg" class="mut"></p>'
+    '<ol id="pdsteps" hidden><li>아래 설정 코드를 복사 <button type="button" id="pdcopy" class="pdb">복사</button></li>'
+    '<li><a href="https://github.com/macchiatopsk-create/0-DTE-trading/settings/secrets/actions/new" target="_blank" rel="noopener">GitHub 시크릿 등록</a>'
+    ' — 이름 <b>PUSH_CONFIG</b>, 값에 붙여넣기</li><li>끝. 다음 거래부터 진입·종료 때 이 앱으로 알림이 옵니다</li></ol>'
+    '<textarea id="pdcode" readonly hidden rows="4" aria-label="설정 코드"></textarea>'
+    '<p class="mut sm">설정 코드는 이 기기에서 만든 비밀값입니다. GitHub 시크릿에만 넣고 다른 곳에 붙이지 마세요.</p>'
+    '<div class="pdbtns"><button type="button" id="pdgo" class="bell">이 기기에서 알림 켜기</button>'
+    '<button value="close" class="pdb">닫기</button></div></form></dialog>')
 
 
 def render(log, st, A):
@@ -754,4 +797,4 @@ def render(log, st, A):
 <div class="tabs" role="tablist" aria-label="트랙"><i class="tind" aria-hidden="true"></i>{tb}</div>
 <div class="panes">{pn}</div>
 <div class="foot">마지막 실행 {E(str(lp)[:16].replace('T', ' '))} ET · 손익은 모델가(BSM)<br>모의매매 · 투자 권유 아님</div>
-</div><script>{JS}</script></body></html>"""
+</div>{PUSH_DLG}<script>{JS}</script></body></html>"""

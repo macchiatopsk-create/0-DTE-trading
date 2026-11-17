@@ -1,0 +1,32 @@
+name: push-test
+# 휴대폰 알림이 오는지 확인용 (수동 실행). 매매·원장과 무관.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      PUSH_CONFIG: ${{ secrets.PUSH_CONFIG }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install cryptography
+      - name: send
+        run: |
+          python - <<'PY'
+          import os, webpush
+          pc = os.environ.get("PUSH_CONFIG", "").strip()
+          print("PUSH_CONFIG 설정됨" if pc else "PUSH_CONFIG 없음")
+          if pc:
+              n = webpush.send(pc, "0DTE 알림 테스트", "앱 푸시 연결 확인 · 거래 진입·종료 때 이렇게 옵니다",
+                               "https://macchiatopsk-create.github.io/0-DTE-trading/")
+              print(f"앱 푸시 {n}대 성공")
+              if n == 0:
+                  raise SystemExit(1)
+          PY

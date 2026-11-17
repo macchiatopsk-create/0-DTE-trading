@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}   # 휴대폰 알림(ntfy) 토픽 — 저장소 시크릿. 없으면 알림만 안 감
+      PUSH_CONFIG: ${{ secrets.PUSH_CONFIG }} # 앱(웹) 푸시 설정 — 폰 앱 화면 '🔔 알림 켜기'가 만든 값. 없으면 안 감
     timeout-minutes: 15
     outputs:
       ok: ${{ steps.guard.outputs.ok }}
@@ -37,7 +38,7 @@ jobs:
         with:
           python-version: "3.12"
       - if: steps.guard.outputs.ok == 'true'
-        run: pip install yfinance pandas pandas_market_calendars
+        run: pip install yfinance pandas pandas_market_calendars cryptography
       - if: steps.guard.outputs.ok == 'true'
         run: python recon.py
       - name: persist
