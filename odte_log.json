@@ -1,5 +1,37 @@
 {
- "open": null,
+ "open": {
+  "date": "2026-11-17",
+  "side": "call",
+  "mfe": -99.0,
+  "mfe_t": null,
+  "contracts": {
+   "30": 2,
+   "40": 3,
+   "50": 4,
+   "60": 5,
+   "70": 6
+  },
+  "mfe_prem": -99.0,
+  "mfe_prem_t": null,
+  "strike": 656.0,
+  "premium": 5.51,
+  "premium_q": 7.16,
+  "basis": "rt",
+  "iv": 0.3066,
+  "symbol": "QQQ261117C00656000",
+  "spot_rt": 660.91,
+  "entry_time": "10:05",
+  "entry_px": 660.91,
+  "score": -2,
+  "gap": 0.18,
+  "rsi": 49.1,
+  "stop_px": 659.31,
+  "version": "itm-2.0",
+  "vix_pct": 92.4,
+  "vix_state": "LIVE",
+  "pm_pos": 0.662,
+  "iv_m": 0.3268
+ },
  "trades": [
   {
    "date": "2026-08-12",
@@ -1170,14 +1202,14 @@
    "pm_pos": 0.225
   },
   "2026-11-17": {
-   "status": "WAIT · 3층 통과 (VIX 92% · PM 0.66) · VWAP -1σ 터치 대기 (현재 +4.19σ)",
-   "score": 0,
-   "rsi": 58.0,
+   "status": "진입 · BUY CALL 656 @ $5.51 (잔고 $3604)",
+   "score": -2,
+   "rsi": 49.1,
    "direction": 0,
    "gap": 0.18,
-   "px": 662.53,
-   "vwap": 661.36,
-   "at": "10:00",
+   "px": 660.91,
+   "vwap": 661.37,
+   "at": "10:05",
    "vix_pct": 92.4,
    "vix_state": "LIVE",
    "pm_pos": 0.662
@@ -11946,7 +11978,7 @@
   "v": 0.3268,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-17T10:00:16-05:00",
+ "last_poll": "2026-11-17T10:05:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -12255,7 +12287,7 @@
   },
   "live": {
    "d": "2026-11-17",
-   "at": "10:00",
+   "at": "10:05",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
