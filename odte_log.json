@@ -1231,8 +1231,8 @@
   },
   "2026-11-18": {
    "status": "WAIT_OPEN",
-   "bars": 1,
-   "at": "09:30"
+   "bars": 2,
+   "at": "09:35"
   }
  },
  "vix": {
@@ -1242,67 +1242,67 @@
   "asof": "2026-11-17"
  },
  "pm": {
-  "pos": 0.51,
+  "pos": 0.5,
   "pm_hi": 665.18,
   "pm_lo": 656.95,
   "ok": true
  },
  "gap": {
   "date": "2026-11-18",
-  "orh": 661.07,
-  "orl": 661.07,
+  "orh": 662.65,
+  "orl": 659.81,
   "state": "WAIT",
-  "gap": 0.614,
+  "gap": 0.615,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 657.03,
   "open": 661.07,
-  "entry": 661.07,
+  "entry": 659.67,
   "target": 657.03,
-  "room": 0.61,
-  "cover": 0.0,
-  "r50": 661.07,
-  "cur": 661.07,
+  "room": 0.4,
+  "cover": 0.35,
+  "r50": 660.37,
+  "cur": 659.67,
   "filled": false,
   "trail": null,
   "tfs": {
    "5m": {
-    "cover": 0.0,
-    "entry": 661.07,
-    "ready": false,
+    "cover": 0.35,
+    "entry": 659.67,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.61,
-    "vw_entry": 661.07,
-    "vw_room": 0.611
+    "room": 0.4,
+    "vw_entry": null,
+    "vw_room": null
    },
    "15m": {
-    "cover": 0.0,
-    "entry": 661.07,
+    "cover": 0.35,
+    "entry": 659.67,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.61,
-    "vw_entry": 661.07,
-    "vw_room": 0.611
+    "room": 0.4,
+    "vw_entry": null,
+    "vw_room": null
    },
    "1h": {
-    "cover": 0.0,
-    "entry": 661.07,
+    "cover": 0.35,
+    "entry": 659.67,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 0.61,
-    "vw_entry": 661.07,
-    "vw_room": 0.611
+    "room": 0.4,
+    "vw_entry": null,
+    "vw_room": null
    }
   },
   "band_px": null,
   "band_t": null,
   "band_room": null,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.211,
+  "mfe_t": "09:35",
+  "mfe_px": 659.67
  },
  "macro": {
   "date": "2026-11-18",
@@ -12085,7 +12085,7 @@
   "v": 0.3268,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-18T09:30:16-05:00",
+ "last_poll": "2026-11-18T09:35:15-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -12394,17 +12394,17 @@
   },
   "live": {
    "d": "2026-11-18",
-   "at": "09:30",
+   "at": "09:35",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
      "ok": false,
      "wait": true,
      "why": "09:45 판정 대기",
-     "gap": 0.626,
-     "cover": 0.0,
-     "rv": 0.247,
-     "entry": 661.07,
+     "gap": 0.627,
+     "cover": 0.34,
+     "rv": 0.163,
+     "entry": 659.67,
      "target": 656.95,
      "side": "put"
     },
@@ -12412,8 +12412,8 @@
      "tk": "SPY",
      "ok": false,
      "wait": false,
-     "why": "갭 +0.16% — 0.2~1.5% 밖",
-     "gap": 0.157,
+     "why": "갭 +0.13% — 0.2~1.5% 밖",
+     "gap": 0.133,
      "cover": null,
      "rv": null
     }
