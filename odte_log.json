@@ -2,8 +2,8 @@
  "open": {
   "date": "2026-11-18",
   "side": "call",
-  "mfe": -99.0,
-  "mfe_t": null,
+  "mfe": 0.252,
+  "mfe_t": "10:30",
   "contracts": {
    "30": 1,
    "40": 2,
@@ -11,8 +11,8 @@
    "60": 4,
    "70": 5
   },
-  "mfe_prem": -99.0,
-  "mfe_prem_t": null,
+  "mfe_prem": 25.0,
+  "mfe_prem_t": "10:30",
   "strike": 653.0,
   "premium": 5.73,
   "premium_q": 8.19,
@@ -30,7 +30,10 @@
   "vix_pct": 97.2,
   "vix_state": "LIVE",
   "pm_pos": 0.5,
-  "iv_m": 0.3245
+  "iv_m": 0.3245,
+  "tp1_prem": 7.16,
+  "tp1_prem_q": 8.12,
+  "tp1_time": "10:30"
  },
  "trades": [
   {
@@ -1291,18 +1294,18 @@
   "date": "2026-11-18",
   "orh": 662.65,
   "orl": 659.81,
-  "state": "WAIT",
+  "state": "LOW_COVER",
   "gap": 0.615,
   "dir": "숏",
   "sgn": 1,
   "prev_close": 657.03,
   "open": 661.07,
-  "entry": 658.24,
+  "entry": 659.76,
   "target": 657.03,
-  "room": 0.185,
-  "cover": 0.7,
+  "room": 0.413,
+  "cover": 0.32,
   "r50": 657.43,
-  "cur": 658.24,
+  "cur": 659.9,
   "filled": true,
   "trail": 654.78,
   "tfs": {
@@ -1327,14 +1330,14 @@
     "vw_room": 0.249
    },
    "1h": {
-    "cover": 0.7,
-    "entry": 658.24,
-    "ready": false,
+    "cover": 0.32,
+    "entry": 659.76,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 0.185,
-    "vw_entry": null,
-    "vw_room": null
+    "room": 0.413,
+    "vw_entry": 659.53,
+    "vw_room": 0.379
    }
   },
   "band_px": 660.74,
@@ -12235,7 +12238,7 @@
   "v": 0.3245,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-18T10:25:15-05:00",
+ "last_poll": "2026-11-18T10:30:17-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -12570,7 +12573,7 @@
   },
   "live": {
    "d": "2026-11-18",
-   "at": "10:25",
+   "at": "10:30",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
