@@ -699,17 +699,24 @@ JS = """
   if($('pdgo'))$('pdgo').onclick=function(){
     if(!('serviceWorker' in navigator)||!('PushManager' in window)||!canN){
       msg(ios&&!standalone?'iPhone은 Safari 공유 버튼 → "홈 화면에 추가" 후, 홈 화면 아이콘으로 열어서 다시 눌러주세요.':'이 브라우저는 앱 알림을 지원하지 않습니다.');return}
-    msg('권한 요청 중…');
-    Notification.requestPermission().then(function(p){
-      if(p!=='granted'){msg('알림 권한이 꺼져 있습니다. 폰 설정에서 이 앱 알림을 허용한 뒤 다시 눌러주세요.');return}
-      msg('키 만드는 중…');var kp,pub,d,reg;
-      return navigator.serviceWorker.ready.then(function(r){reg=r;return crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign'])})
-      .then(function(k){kp=k;return crypto.subtle.exportKey('raw',k.publicKey)}).then(function(r){pub=new Uint8Array(r);return crypto.subtle.exportKey('jwk',kp.privateKey)})
-      .then(function(j){d=j.d;return reg.pushManager.getSubscription()}).then(function(o){return o?o.unsubscribe():null})
-      .then(function(){return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:pub})})
-      .then(function(sub){var c=btoa(JSON.stringify({s:sub.toJSON(),k:d}));pushCode=c;try{localStorage.setItem('odte_push',c)}catch(e){}
-        bell.textContent='🔔 켜짐';showCode(c);msg('설정 코드가 만들어졌습니다. 아래 순서대로 GitHub에 한 번만 등록하면 끝입니다.')})
-    }).catch(function(e){msg('실패: '+(e&&e.message||e))})};
+    var go=$('pdgo');go.disabled=true;var stepN='';
+    function st(n,t){stepN=n;msg(n+' '+t)}
+    function tmo(p,ms){return Promise.race([p,new Promise(function(_,rj){setTimeout(function(){rj(new Error('응답 없음 ('+ms/1000+'초)'))},ms)})])}
+    function perm(){return new Promise(function(ok){var r=Notification.requestPermission(ok);if(r&&r.then)r.then(ok)})}
+    function swReg(){return navigator.serviceWorker.getRegistration().then(function(r){return r||navigator.serviceWorker.register('sw.js')})
+      .then(function(r){return r.active?r:tmo(navigator.serviceWorker.ready,15000)})}
+    var kp,pub,d,reg;st('1/4','알림 권한 요청…');
+    perm().then(function(p){
+      if(p!=='granted')throw new Error('알림 권한이 꺼져 있습니다 ('+p+'). 폰 설정에서 이 앱 알림을 허용한 뒤 다시 눌러주세요.');
+      st('2/4','서비스워커 준비…');return tmo(swReg(),20000)})
+    .then(function(r){reg=r;st('3/4','키 만드는 중…');return crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign'])})
+    .then(function(k){kp=k;return crypto.subtle.exportKey('raw',k.publicKey)}).then(function(r){pub=new Uint8Array(r);return crypto.subtle.exportKey('jwk',kp.privateKey)})
+    .then(function(j){d=j.d;return reg.pushManager.getSubscription()}).then(function(o){return o?o.unsubscribe():null})
+    .then(function(){st('4/4','푸시 구독 중… (최대 30초)');return tmo(reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:pub}),30000)})
+    .then(function(sub){var c=btoa(JSON.stringify({s:sub.toJSON(),k:d}));pushCode=c;try{localStorage.setItem('odte_push',c)}catch(e){}
+      bell.textContent='🔔 켜짐';showCode(c);msg('설정 코드가 만들어졌습니다. 아래 순서대로 GitHub에 한 번만 등록하면 끝입니다.')})
+    .catch(function(e){msg('실패 ['+stepN+'] '+(e&&e.message||e)+' — 화면을 새로고침한 뒤 다시 눌러주세요. 계속 안 되면 이 문구를 알려주세요.')})
+    .then(function(){go.disabled=false})};
   if($('pdcopy'))$('pdcopy').onclick=function(){var t=$('pdcode');
     (navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(function(){$('pdcopy').textContent='복사됨'})
     .catch(function(){t.select();try{document.execCommand('copy');$('pdcopy').textContent='복사됨'}catch(e){}})};
