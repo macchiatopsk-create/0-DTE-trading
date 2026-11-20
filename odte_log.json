@@ -1,5 +1,37 @@
 {
- "open": null,
+ "open": {
+  "date": "2026-11-20",
+  "side": "call",
+  "mfe": -99.0,
+  "mfe_t": null,
+  "contracts": {
+   "30": 1,
+   "40": 2,
+   "50": 2,
+   "60": 3,
+   "70": 3
+  },
+  "mfe_prem": -99.0,
+  "mfe_prem_t": null,
+  "strike": 627.0,
+  "premium": 6.17,
+  "premium_q": 14.5,
+  "basis": "rt",
+  "iv": 0.8774,
+  "symbol": "QQQ261120C00627000",
+  "spot_rt": 632.54,
+  "entry_time": "10:20",
+  "entry_px": 632.54,
+  "score": -4,
+  "gap": -0.97,
+  "rsi": 25.6,
+  "stop_px": 632.22,
+  "version": "itm-2.0",
+  "vix_pct": 97.6,
+  "vix_state": "LIVE",
+  "pm_pos": 0.536,
+  "iv_m": 0.3831
+ },
  "trades": [
   {
    "date": "2026-08-12",
@@ -1359,14 +1391,14 @@
    "pm_pos": 0.742
   },
   "2026-11-20": {
-   "status": "WAIT · 3층 통과 (VIX 98% · PM 0.54) · VWAP -1σ 터치 대기 (현재 -0.60σ)",
+   "status": "진입 · BUY CALL 627 @ $6.17 (잔고 $3192)",
    "score": -4,
-   "rsi": 31.3,
+   "rsi": 25.6,
    "direction": -1,
    "gap": -0.97,
-   "px": 636.43,
-   "vwap": 637.66,
-   "at": "10:15",
+   "px": 632.54,
+   "vwap": 637.41,
+   "at": "10:20",
    "vix_pct": 97.6,
    "vix_state": "LIVE",
    "pm_pos": 0.536
@@ -1394,12 +1426,12 @@
   "sgn": -1,
   "prev_close": 645.1,
   "open": 638.81,
-  "entry": 636.43,
+  "entry": 632.54,
   "target": 645.1,
-  "room": 1.361,
-  "cover": -0.38,
+  "room": 1.986,
+  "cover": -1.0,
   "r50": 641.05,
-  "cur": 636.43,
+  "cur": 632.54,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1424,14 +1456,14 @@
     "vw_room": 1.424
    },
    "1h": {
-    "cover": -0.38,
-    "entry": 636.43,
+    "cover": -1.0,
+    "entry": 632.54,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.361,
-    "vw_entry": 637.66,
-    "vw_room": 1.167
+    "room": 1.986,
+    "vw_entry": 637.41,
+    "vw_room": 1.206
    }
   },
   "band_px": 636.18,
@@ -12495,7 +12527,7 @@
   "v": 0.3831,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-20T10:15:16-05:00",
+ "last_poll": "2026-11-20T10:20:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -12885,7 +12917,7 @@
   },
   "live": {
    "d": "2026-11-20",
-   "at": "10:15",
+   "at": "10:20",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
