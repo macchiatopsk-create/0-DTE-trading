@@ -1360,8 +1360,8 @@
   },
   "2026-11-20": {
    "status": "WAIT_OPEN",
-   "bars": 5,
-   "at": "09:50"
+   "bars": 6,
+   "at": "09:55"
   }
  },
  "vix": {
@@ -1386,12 +1386,12 @@
   "sgn": -1,
   "prev_close": 645.1,
   "open": 638.81,
-  "entry": 635.94,
+  "entry": 639.89,
   "target": 645.1,
-  "room": 1.44,
-  "cover": -0.46,
-  "r50": 638.81,
-  "cur": 635.94,
+  "room": 0.814,
+  "cover": 0.17,
+  "r50": 639.5,
+  "cur": 639.89,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1416,22 +1416,22 @@
     "vw_room": 1.424
    },
    "1h": {
-    "cover": -0.46,
-    "entry": 635.94,
+    "cover": 0.17,
+    "entry": 639.89,
     "ready": false,
     "ok": false,
     "over": false,
-    "room": 1.44,
-    "vw_entry": 636.13,
-    "vw_room": 1.41
+    "room": 0.814,
+    "vw_entry": null,
+    "vw_room": null
    }
   },
   "band_px": 636.18,
   "band_t": "09:35",
   "band_room": 1.402,
-  "mfe": 0.0,
-  "mfe_t": null,
-  "mfe_px": null
+  "mfe": 0.214,
+  "mfe_t": "09:50",
+  "mfe_px": 640.18
  },
  "macro": {
   "date": "2026-11-20",
@@ -7096,48 +7096,7 @@
   "lvl": 28.6299991607666
  },
  "mom_track": {
-  "open": {
-   "date": "2026-11-20",
-   "tf": "mom",
-   "em": "vix",
-   "comb": null,
-   "dir": "숏",
-   "sgn": -1,
-   "gap": -0.975,
-   "cover": -0.57,
-   "vchg": 0.67,
-   "vlvl": 28.6299991607666,
-   "entry": 635.46,
-   "target": "러너",
-   "room": null,
-   "at": "09:45",
-   "found_at": "09:45",
-   "opt_side": "put",
-   "strike": 641.0,
-   "premium": 6.0,
-   "premium_q": 7.29,
-   "basis": "rt",
-   "spot_rt": 635.46,
-   "contracts": {
-    "30": 1,
-    "40": 2,
-    "50": 3,
-    "60": 3,
-    "70": 3
-   },
-   "prem_src": "실시간(모델가)",
-   "iv_m": 0.3292,
-   "or_stop": 638.81,
-   "ext": 634.6427001953125,
-   "mfe": 0.0,
-   "mfe_t": null,
-   "mfe_prem": 0.0,
-   "mfe_prem_t": "09:45",
-   "filled": false,
-   "fill_t": null,
-   "res": null,
-   "trail_px": 636.55
-  },
+  "open": null,
   "trades": [
    {
     "date": "2026-08-25",
@@ -8295,11 +8254,61 @@
     "model_pnl_pct": 110.7,
     "model_per_contract": 586.0,
     "price_src": "실가(로빈후드)"
+   },
+   {
+    "date": "2026-11-20",
+    "tf": "mom",
+    "em": "vix",
+    "comb": null,
+    "dir": "숏",
+    "sgn": -1,
+    "gap": -0.975,
+    "cover": -0.57,
+    "vchg": 0.67,
+    "vlvl": 28.6299991607666,
+    "entry": 635.46,
+    "target": "러너",
+    "room": null,
+    "at": "09:45",
+    "found_at": "09:45",
+    "opt_side": "put",
+    "strike": 641.0,
+    "premium": 6.0,
+    "premium_q": 7.29,
+    "basis": "rt",
+    "spot_rt": 635.46,
+    "contracts": {
+     "30": 1,
+     "40": 2,
+     "50": 3,
+     "60": 3,
+     "70": 3
+    },
+    "prem_src": "실시간(모델가)",
+    "iv_m": 0.3292,
+    "or_stop": 638.81,
+    "ext": 634.6427001953125,
+    "mfe": 0.0,
+    "mfe_t": null,
+    "mfe_prem": 0.0,
+    "mfe_prem_t": "09:45",
+    "filled": false,
+    "fill_t": null,
+    "res": "STOP(OR)",
+    "trail_px": 636.55,
+    "exit": 639.89,
+    "exit_at": "09:55",
+    "exit_premium": 2.67,
+    "pnl_pct": -55.5,
+    "per_contract": -333.0,
+    "ux": -0.697,
+    "exit_premium_q": 8.13,
+    "pnl_q": 11.5
    }
   ],
   "books": {
    "30": {
-    "cap": 3849.76,
+    "cap": 3516.76,
     "trades": [
      {
       "d": "2026-08-25",
@@ -8466,11 +8475,18 @@
       "usd": 514.8,
       "pct": 79.2,
       "res": "TRAIL"
+     },
+     {
+      "d": "2026-11-20",
+      "nc": 1,
+      "usd": -333.0,
+      "pct": -55.5,
+      "res": "STOP(OR)"
      }
     ]
    },
    "40": {
-    "cap": 3445.76,
+    "cap": 2779.76,
     "trades": [
      {
       "d": "2026-08-25",
@@ -8637,11 +8653,18 @@
       "usd": 514.8,
       "pct": 79.2,
       "res": "TRAIL"
+     },
+     {
+      "d": "2026-11-20",
+      "nc": 2,
+      "usd": -666.0,
+      "pct": -55.5,
+      "res": "STOP(OR)"
      }
     ]
    },
    "50": {
-    "cap": 3733.56,
+    "cap": 2734.56,
     "trades": [
      {
       "d": "2026-08-25",
@@ -8808,11 +8831,18 @@
       "usd": 1029.6,
       "pct": 79.2,
       "res": "TRAIL"
+     },
+     {
+      "d": "2026-11-20",
+      "nc": 3,
+      "usd": -999.0,
+      "pct": -55.5,
+      "res": "STOP(OR)"
      }
     ]
    },
    "60": {
-    "cap": 3363.56,
+    "cap": 2364.56,
     "trades": [
      {
       "d": "2026-08-25",
@@ -8979,11 +9009,18 @@
       "usd": 1029.6,
       "pct": 79.2,
       "res": "TRAIL"
+     },
+     {
+      "d": "2026-11-20",
+      "nc": 3,
+      "usd": -999.0,
+      "pct": -55.5,
+      "res": "STOP(OR)"
      }
     ]
    },
    "70": {
-    "cap": 3365.56,
+    "cap": 2366.56,
     "trades": [
      {
       "d": "2026-08-25",
@@ -9150,6 +9187,13 @@
       "usd": 1029.6,
       "pct": 79.2,
       "res": "TRAIL"
+     },
+     {
+      "d": "2026-11-20",
+      "nc": 3,
+      "usd": -999.0,
+      "pct": -55.5,
+      "res": "STOP(OR)"
      }
     ]
    }
@@ -12443,7 +12487,7 @@
   "v": 0.3831,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-20T09:50:16-05:00",
+ "last_poll": "2026-11-20T09:55:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -12833,7 +12877,7 @@
   },
   "live": {
    "d": "2026-11-20",
-   "at": "09:50",
+   "at": "09:55",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
