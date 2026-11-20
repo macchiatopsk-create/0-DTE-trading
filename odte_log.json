@@ -1430,18 +1430,18 @@
   "date": "2026-11-20",
   "orh": 638.81,
   "orl": 634.97,
-  "state": "WAIT",
+  "state": "LOW_COVER",
   "gap": -0.975,
   "dir": "롱",
   "sgn": -1,
   "prev_close": 645.1,
   "open": 638.81,
-  "entry": 630.67,
+  "entry": 632.23,
   "target": 645.1,
-  "room": 2.288,
-  "cover": -1.29,
+  "room": 2.036,
+  "cover": -1.05,
   "r50": 641.05,
-  "cur": 630.67,
+  "cur": 631.04,
   "filled": false,
   "trail": null,
   "tfs": {
@@ -1466,14 +1466,14 @@
     "vw_room": 1.424
    },
    "1h": {
-    "cover": -1.29,
-    "entry": 630.67,
-    "ready": false,
+    "cover": -1.05,
+    "entry": 632.23,
+    "ready": true,
     "ok": false,
     "over": false,
-    "room": 2.288,
-    "vw_entry": 635.94,
-    "vw_room": 1.44
+    "room": 2.036,
+    "vw_entry": 633.2,
+    "vw_room": 1.879
    }
   },
   "band_px": 636.18,
@@ -12572,7 +12572,7 @@
   "v": 0.3831,
   "src": "VXN(1분 첫 봉)"
  },
- "last_poll": "2026-11-20T10:25:16-05:00",
+ "last_poll": "2026-11-20T10:30:16-05:00",
  "gap_v2": {
   "open": null,
   "trades": [],
@@ -12962,7 +12962,7 @@
   },
   "live": {
    "d": "2026-11-20",
-   "at": "10:25",
+   "at": "10:30",
    "checks": {
     "QQQ": {
      "tk": "QQQ",
