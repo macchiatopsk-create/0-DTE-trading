@@ -128,14 +128,16 @@ jobs:
             echo "장외 — 연쇄 종료"; exit 0
           fi
           echo "대기 ${s}s 후 재발사"; sleep "$s"
-          for i in 1 2 3 4; do
-            code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+          # curl이 실패(시간 초과 등)해도 bash -e로 스크립트가 죽지 않게 '|| code=...'로 받는다
+          # (2026-11-23: 10:08 ET curl 시간 초과(exit 28) 한 번에 재시도 없이 연쇄가 끊겨 장 마감까지 정지)
+          for i in 1 2 3 4 5 6 7 8; do
+            code=$(curl -s --connect-timeout 10 --max-time 25 -o /dev/null -w '%{http_code}' -X POST \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${{ github.repository }}/actions/workflows/odte.yml/dispatches" \
-              -d '{"ref":"main"}')
+              -d '{"ref":"main"}') || code="curl$?"
             if [ "$code" = "204" ]; then echo "self-chain 재발사 OK"; exit 0; fi
-            echo "재발사 실패($code) — 재시도 $i"; sleep 8
+            echo "재발사 실패($code) — 재시도 $i"; sleep $((i * 5))
           done
-          echo "::warning::self-chain 재발사 실패 — 다음 예약 틱이 살릴 때까지 공백"
+          echo "::error::self-chain 재발사 8회 실패 — 다음 예약 틱이 살릴 때까지 공백"; exit 1
 
