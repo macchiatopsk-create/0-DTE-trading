@@ -651,7 +651,39 @@ summary:focus-visible,.tab:focus-visible{outline:2px solid var(--ink);outline-of
 @keyframes flash{0%{transform:scale(1)}30%{transform:scale(1.02);box-shadow:0 0 0 8px rgba(129,140,248,.35)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.live i,.flash{animation:none}}
 .foot{text-align:center;color:var(--mut);font-size:11.5px;margin-top:24px;line-height:1.7}
+/* ── 다크 테마 (html[data-theme=dark]) ── */
+html[data-theme=dark]{color-scheme:dark;--bg:#070a14;--card:rgba(20,24,46,.62);--edge:rgba(255,255,255,.09);--line:rgba(255,255,255,.08);
+--tx:#e8ebff;--mut:#8f97bd;--up:#34d399;--dn:#fb7185;--wait:#fbbf24;--ink:#e8ebff;--surf:rgba(255,255,255,.045);--surf2:rgba(255,255,255,.07)}
+html[data-theme=dark] body:before{opacity:.32}
+html[data-theme=dark] .card{box-shadow:0 10px 30px rgba(0,0,0,.35)}
+html[data-theme=dark] .card.hero{background:linear-gradient(rgba(14,18,38,.92),rgba(14,18,38,.92)) padding-box,var(--acc) border-box;box-shadow:0 14px 40px rgba(129,140,248,.25)}
+html[data-theme=dark] .tk,html[data-theme=dark] .tile,html[data-theme=dark] .trow,html[data-theme=dark] .sgrid div,
+html[data-theme=dark] .tblw,html[data-theme=dark] .fold.old,html[data-theme=dark] .fold .card{background:var(--surf)}
+html[data-theme=dark] .tk.go{background:linear-gradient(#11152d,#11152d) padding-box,var(--acc) border-box}
+html[data-theme=dark] .trow:active{background:var(--surf2)}
+html[data-theme=dark] .tk-st,html[data-theme=dark] .bpill,html[data-theme=dark] .pbar,html[data-theme=dark] .bbar,html[data-theme=dark] .tbl th{background:var(--surf2)}
+html[data-theme=dark] .chip{background:rgba(129,140,248,.18);color:#c7d2fe}
+html[data-theme=dark] .tk-w,html[data-theme=dark] .jm,html[data-theme=dark] .rules p{color:#b6bddc}
+html[data-theme=dark] .tind{background:var(--acc);box-shadow:0 6px 22px rgba(129,140,248,.45)}
+html[data-theme=dark] .tab[aria-selected="true"]{color:#070a14}
+html[data-theme=dark] .bell,html[data-theme=dark] .tk.go .tk-st{background:var(--acc);color:#070a14}
+html[data-theme=dark] .tk-ic{background:#1f2547;color:var(--tx)}
+html[data-theme=dark] .donebadge{background:#2a3160}
+html[data-theme=dark] .gate i{background:#3b4266}
+html[data-theme=dark] .orb:after{inset:6px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55) 0,rgba(20,24,46,.55) 30%,#0b0f22 68%)}
+html[data-theme=dark] .pdlg{background:#12162b;color:var(--tx)}
+html[data-theme=dark] .pdb{background:#1b2040;color:var(--tx)}
+html[data-theme=dark] .pdlg textarea{background:#0b0f20;color:var(--tx)}
+.thm{flex:0 0 34px;height:34px;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--tx);font-size:16px;line-height:1;cursor:pointer;
+backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;padding:9px 16px;border-radius:999px;background:var(--ink);color:var(--bg);
+font:600 13px/1 inherit;transition:.25s;pointer-events:none;z-index:9}
+.toast.on{opacity:1;transform:translate(-50%,0)}
 """
+
+THEME_HEAD = """<script>(function(){var m='auto';try{m=localStorage.getItem('odte_theme')||'auto'}catch(e){}
+var h=new Date().getHours(),t=(m==='light'||m==='dark')?m:((h>=19||h<7)?'dark':'light');
+document.documentElement.setAttribute('data-theme',t);document.documentElement.setAttribute('data-mode',m)})();</script>"""
 
 JS = """
 (function(){
@@ -681,6 +713,17 @@ JS = """
   // 펼침·접힘으로 높이가 바뀌면 다시 맞춘다
   if('ResizeObserver' in window){var ro=new ResizeObserver(function(){fit(cur)});panes.forEach(function(p){ro.observe(p)})}
   window.addEventListener('resize',function(){go(cur,false)});
+  // ── 테마: 자동(19~07시 다크) · 라이트 · 다크 ──
+  var R=document.documentElement,thm=document.getElementById('thm'),MODES=['auto','light','dark'],
+      ICON={auto:'🕘',light:'☀️',dark:'🌙'},NAME={auto:'자동 (저녁 7시~아침 7시 다크)',light:'라이트',dark:'다크'};
+  function effT(m){var h=new Date().getHours();return (m==='light'||m==='dark')?m:((h>=19||h<7)?'dark':'light')}
+  function applyT(m){var t=effT(m);R.setAttribute('data-theme',t);R.setAttribute('data-mode',m);if(thm){thm.textContent=ICON[m];thm.title='테마: '+NAME[m]}
+    var mc=document.querySelector('meta[name=theme-color]');if(mc)mc.setAttribute('content',t==='dark'?'#070a14':'#f4f6ff')}
+  function toast(t){var d=document.getElementById('toast');if(!d){d=document.createElement('div');d.id='toast';d.className='toast';d.setAttribute('role','status');document.body.appendChild(d)}
+    d.textContent=t;d.classList.add('on');clearTimeout(d._t);d._t=setTimeout(function(){d.classList.remove('on')},1600)}
+  var mode=R.getAttribute('data-mode')||'auto';applyT(mode);
+  if(thm)thm.onclick=function(){mode=MODES[(MODES.indexOf(mode)+1)%3];try{localStorage.setItem('odte_theme',mode)}catch(e){}applyT(mode);toast('테마: '+NAME[mode])};
+  setInterval(function(){if(mode==='auto')applyT(mode)},60000);
   var s0=0;try{var s=+localStorage.getItem('odte_tab');if(s>=0&&s<tabs.length)s0=s}catch(e){}
   go(s0,false);
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
@@ -784,7 +827,7 @@ def render(log, st, A):
         sig = f'done|{today}|{done_today.get("tk")}|{done_today.get("pnl_pct")}'
         ntitle = f'갭필 종료 · {done_today.get("tk", "QQQ")} {done_today["pnl_pct"]:+.1f}%'
         nbody = f'{_res_ko(done_today.get("res"))} · {done_today.get("at", "")}→{done_today.get("exit_at", "")}'
-    return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+    return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">{THEME_HEAD}
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>0DTE 갭필</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -798,7 +841,7 @@ def render(log, st, A):
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" integrity="sha384-ei/b2Mz3F5J8nqTvpKS89CkzDCuD7Cc+/F+OsaPUKItzHgLNKnGq3rjtYq/B7RnO" crossorigin="anonymous" referrerpolicy="no-referrer">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body data-sig="{E(sig)}" data-nt="{E(ntitle)}" data-nb="{E(nbody)}"><div class="wrap">
-<div class="top"><div class="brand"><i></i>0DTE · Gap Engine</div><div class="topr"><button class="bell" id="bell" hidden>🔔 알림 켜기</button><div class="pill"><b>모의매매</b> · 실거래 아님</div></div></div>
+<div class="top"><div class="brand"><i></i>0DTE · Gap Engine</div><div class="topr"><button type="button" class="thm" id="thm" aria-label="테마 바꾸기">🕘</button><button class="bell" id="bell" hidden>🔔 알림 켜기</button><div class="pill"><b>모의매매</b> · 실거래 아님</div></div></div>
 <div class="hero-top"><div class="orb {orb}"><span></span></div><div>
 <div class="when">{now.month}월 {now.day}일 {WD[now.weekday()]}요일 · {now.strftime('%H:%M')} ET</div><h1>{head_html}</h1></div></div>
 <div class="tabs" role="tablist" aria-label="트랙"><i class="tind" aria-hidden="true"></i>{tb}</div>
