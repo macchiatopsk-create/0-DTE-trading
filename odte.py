@@ -2572,10 +2572,10 @@ def write_pwa():
     with open(os.path.join(BASE, "icon.svg"), "w", encoding="utf-8") as f:
         f.write(icon)
     manifest = {
-        "name": "0DTE Mock · QQQ", "short_name": "0DTE",
+        "name": "0DTE 갭필 엔진 (모의매매)", "short_name": "0DTE",
         "start_url": ".", "scope": ".", "display": "standalone",
-        "background_color": "#06090d", "theme_color": "#06090d",
-        "description": "QQQ VWAP 밴드 0DTE 모의매매",
+        "background_color": "#f4f6ff", "theme_color": "#f4f6ff",
+        "description": "QQQ·SPY 0DTE 갭필·모멘텀·3층 모의매매 기록",
         "icons": [
             {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
             {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
@@ -2584,7 +2584,8 @@ def write_pwa():
     }
     with open(os.path.join(BASE, "manifest.webmanifest"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=1)
-    # 설치 요건 충족용 최소 서비스워커 (네트워크 우선, 오프라인 시 캐시)
+    # 서비스워커: 네트워크 우선·오프라인 캐시 + 앱 푸시(webpush.py) 수신. 이 함수가 매 실행 sw.js를 다시 쓰므로
+    # sw.js를 바꿀 땐 여기를 고칠 것 (2026-11-18~23: 파일만 고쳐서 다음 실행에 푸시 핸들러가 지워졌음)
     sw = """self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => self.clients.claim());
 self.addEventListener('fetch', e => {
@@ -2595,6 +2596,23 @@ self.addEventListener('fetch', e => {
       return r;
     }).catch(() => caches.match(e.request))
   );
+});
+// 앱 푸시 (서버: webpush.py) — 화면이 닫혀 있어도 알림을 띄우고, 누르면 앱을 연다
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || '0DTE', {
+    body: d.body || '', icon: 'icon-192.png', badge: 'icon-192.png',
+    tag: d.tag || undefined, renotify: !!d.tag, data: { url: d.url || './' }
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || './';
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(ws => {
+    for (const w of ws) { if ('focus' in w) return w.focus(); }
+    return self.clients.openWindow(url);
+  }));
 });"""
     with open(os.path.join(BASE, "sw.js"), "w", encoding="utf-8") as f:
         f.write(sw)
