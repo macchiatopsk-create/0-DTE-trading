@@ -721,7 +721,7 @@ JS = """
     (navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(function(){$('pdcopy').textContent='복사됨'})
     .catch(function(){t.select();try{document.execCommand('copy');$('pdcopy').textContent='복사됨'}catch(e){}})};
   function pop(t,body){try{if(pushCode||!canN||Notification.permission!=='granted')return;
-    var o={body:body,icon:'icon-192.png',badge:'icon-192.png',tag:sig};
+    var o={body:body,icon:'icon-192.png',badge:'badge-96.png',tag:sig};
     if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(function(r){r.showNotification(t,o)}).catch(function(){new Notification(t,o)})}
     else new Notification(t,o)}catch(e){}}
   var last=null;try{last=localStorage.getItem('odte_sig')}catch(e){}
@@ -792,7 +792,7 @@ def render(log, st, A):
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="0DTE">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png" type="image/png">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" integrity="sha384-ei/b2Mz3F5J8nqTvpKS89CkzDCuD7Cc+/F+OsaPUKItzHgLNKnGq3rjtYq/B7RnO" crossorigin="anonymous" referrerpolicy="no-referrer">

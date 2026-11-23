@@ -2291,7 +2291,7 @@ def render_legacy(log, st):
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ZERO-DAY">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -2579,7 +2579,7 @@ def write_pwa():
         "icons": [
             {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
             {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-            {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+            {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
         ],
     }
     with open(os.path.join(BASE, "manifest.webmanifest"), "w", encoding="utf-8") as f:
@@ -2602,7 +2602,7 @@ self.addEventListener('push', e => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : '' }; }
   e.waitUntil(self.registration.showNotification(d.title || '0DTE', {
-    body: d.body || '', icon: 'icon-192.png', badge: 'icon-192.png',
+    body: d.body || '', icon: 'icon-192.png', badge: 'badge-96.png',
     tag: d.tag || undefined, renotify: !!d.tag, data: { url: d.url || './' }
   }));
 });
