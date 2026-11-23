@@ -651,6 +651,13 @@ summary:focus-visible,.tab:focus-visible{outline:2px solid var(--ink);outline-of
 @keyframes flash{0%{transform:scale(1)}30%{transform:scale(1.02);box-shadow:0 0 0 8px rgba(129,140,248,.35)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.live i,.flash{animation:none}}
 .foot{text-align:center;color:var(--mut);font-size:11.5px;margin-top:24px;line-height:1.7}
+.today{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 18px}
+.tchip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:var(--card);border:1px solid var(--edge);
+font:600 12.5px/1.2 var(--num);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.tchip i{font-style:normal;color:var(--mut);font-weight:500}
+.tchip.up b{color:var(--up)}.tchip.dn b{color:var(--dn)}.tchip.wait b{color:var(--wait)}
+.tchip.live{border-color:rgba(225,29,72,.35)}.tchip.live b{color:var(--dn)}
+.tchip.old{opacity:.7}
 /* ── 다크 테마 (html[data-theme=dark]) ── */
 html[data-theme=dark]{color-scheme:dark;--bg:#070a14;--card:rgba(20,24,46,.62);--edge:rgba(255,255,255,.09);--line:rgba(255,255,255,.08);
 --tx:#e8ebff;--mut:#8f97bd;--up:#34d399;--dn:#fb7185;--wait:#fbbf24;--ink:#e8ebff;--surf:rgba(255,255,255,.045);--surf2:rgba(255,255,255,.07)}
@@ -790,28 +797,108 @@ PUSH_DLG = (
     '<button value="close" class="pdb">닫기</button></div></form></dialog>')
 
 
+def _pc1(x):
+    return f"{x:+.1f}%" if isinstance(x, (int, float)) else "—"
+
+
+def today_brief(log, A, now):
+    """맨 위 한 줄 요약 — 갭필 v2·모멘텀·3층 오늘 상황을 다 본다 (예전엔 갭필 v2만 봐서 다른 트랙이 거래해도 '진입 없음')."""
+    today = str(now.date())
+    tr = log.get(A.V2_KEY) or {}
+    mtr = log.get("mom_track") or {}
+    ms = log.get("mom_sig") or {}
+    l3d = (log.get("days") or {}).get(today) or {}
+    l3st = str(l3d.get("status", ""))
+    opens, dones, chips = [], [], []
+
+    def lab(t, tk="QQQ"):
+        side = t.get("opt_side") or t.get("side") or "call"
+        k = t.get("strike")
+        return f'{t.get("tk", tk)} {k:.0f}{"P" if side == "put" else "C"}' if isinstance(k, (int, float)) else t.get("tk", tk)
+
+    # 갭필 v2
+    p = tr.get("open")
+    d = next((t for t in reversed(tr.get("trades", [])) if t.get("date") == today), None)
+    vday = (tr.get("days") or {}).get(today)
+    if p and p.get("res") is None and p.get("date") == today:
+        opens.append(("갭필", lab(p))); chips.append(("갭필", "보유 " + lab(p), "live"))
+    elif d:
+        dones.append(("갭필", lab(d), d.get("pnl_pct"))); chips.append(("갭필", _pc1(d.get("pnl_pct")), _cls(d.get("pnl_pct"))))
+    elif vday:
+        chips.append(("갭필", "스킵", ""))
+    else:
+        chips.append(("갭필", "09:45 판정", "wait"))
+    # 모멘텀
+    p = mtr.get("open")
+    d = next((t for t in reversed(mtr.get("trades", [])) if t.get("date") == today), None)
+    if p and p.get("res") is None and p.get("date") == today:
+        opens.append(("모멘텀", lab(p))); chips.append(("모멘텀", "보유 " + lab(p), "live"))
+    elif d:
+        dones.append(("모멘텀", lab(d), d.get("pnl_pct"))); chips.append(("모멘텀", _pc1(d.get("pnl_pct")), _cls(d.get("pnl_pct"))))
+    elif ms.get("d") == today:
+        chips.append(("모멘텀", {"VETO": "VIX 역행", "WAIT": "대기", "GO": "조건 충족", "ERR": "오류"}.get(ms.get("state"), "대상 아님"),
+                      "wait" if ms.get("state") == "WAIT" else ""))
+    else:
+        chips.append(("모멘텀", "09:45 판정", "wait"))
+    # 3층
+    p = log.get("open")
+    d = next((t for t in reversed(log.get("trades", [])) if t.get("date") == today and str(t.get("version", "")).startswith("itm")), None)
+    l3wait = l3st.startswith("WAIT") and now.time() < dt.time(11, 30)
+    if p and p.get("date") == today:
+        opens.append(("3층", lab(p))); chips.append(("3층", "보유 " + lab(p), "live"))
+    elif d:
+        dones.append(("3층", lab(d), d.get("pnl_pct"))); chips.append(("3층", _pc1(d.get("pnl_pct")), _cls(d.get("pnl_pct"))))
+    elif l3wait:
+        chips.append(("3층", "-1σ 대기", "wait"))
+    elif l3st:
+        chips.append(("3층", "미통과" if ("NO" in l3st and "GO" in l3st) or "NO TRADE" in l3st else "진입 없음", ""))
+    else:
+        chips.append(("3층", "10:05~", "wait"))
+
+    wk = now.weekday() >= 5
+    pre = not wk and now.time() < dt.time(9, 45)
+    orb = "idle"
+    if opens:
+        orb = ""
+        head = (f'<em>{opens[0][0]} {opens[0][1]}</em><br>보유 중' if len(opens) == 1
+                else f'<em>{len(opens)}건</em> 보유 중<br>' + " · ".join(n for n, _ in opens))
+    elif dones:
+        if len(dones) == 1:
+            n, l, x = dones[0]
+            head = f'오늘 {n} {l}<br><em>{_pc1(x)}</em>'
+        else:
+            w = sum(1 for *_, x in dones if isinstance(x, (int, float)) and x > 0)
+            head = f'오늘 거래 <em>{len(dones)}건</em><br>{w}승 {len(dones) - w}패'
+        if l3wait:
+            orb = "wait"
+    elif wk:
+        head = '주말<br><em>월요일 09:45</em> 판정'
+    elif pre:
+        head, orb = '<em>09:45</em> 판정<br>대기 중', "wait"
+    elif l3wait:
+        head, orb = '3층 <em>대기 중</em><br>11:25까지 -1σ 터치', "wait"
+    old = sum(1 for g in (log.get("gap_tracks") or {}).values() for t in g.get("trades", []) if t.get("date") == today)
+    if opens or dones or wk or pre or l3wait:
+        pass
+    elif old:
+        head = f'이전 갭필만 <em>{old}건</em><br>주력 트랙은 진입 없음'
+    elif vday or ms.get("d") == today or l3st:
+        head = '오늘은<br><em>진입 없음</em>'
+    else:
+        head = '판정 기록<br><em>없음</em>'
+    strip = "" if wk else ('<div class="today">' + "".join(
+        f'<span class="tchip {c}"><i>{n}</i><b>{E(v)}</b></span>' for n, v, c in chips)
+        + (f'<span class="tchip old"><i>이전 갭필</i><b>{old}건</b></span>' if old else "") + '</div>')
+    return orb, head, strip
+
+
 def render(log, st, A):
     now = dt.datetime.now(A.NY)
     tr = log.get(A.V2_KEY) or {}
     today = str(now.date())
     pos = tr.get("open")
-    day = (tr.get("days") or {}).get(today)
     done_today = next((t for t in reversed(tr.get("trades", [])) if t.get("date") == today), None)
-    orb = "idle"
-    if pos and pos.get("res") is None:
-        head_html = f'<em>{pos.get("tk", "QQQ")} {"풋" if pos.get("opt_side") == "put" else "콜"}</em><br>보유 중'
-        orb = ""
-    elif done_today:
-        head_html = f'오늘 거래 끝<br><em>{done_today["pnl_pct"]:+.1f}%</em>'
-    elif day:
-        head_html = '오늘은<br><em>진입 없음</em>'
-    elif now.weekday() < 5 and now.time() < dt.time(9, 45):
-        head_html = '<em>09:45</em> 판정<br>대기 중'
-        orb = "wait"
-    elif now.weekday() >= 5:
-        head_html = '주말<br><em>월요일 09:45</em> 판정'
-    else:
-        head_html = '판정 기록<br><em>없음</em>'
+    orb, head_html, strip_html = today_brief(log, A, now)
     tabs = [("갭필", gap_tab(log, A, now)), ("모멘텀", mom_tab(log, A, now)),
             ("3층", l3_tab(log, A, st, now)), ("매크로", macro_tab(log))]
     tb = "".join(f'<button type="button" class="tab" role="tab" id="tab{i}" aria-selected="{"true" if i == 0 else "false"}"'
@@ -844,6 +931,7 @@ def render(log, st, A):
 <div class="top"><div class="brand"><i></i>0DTE · Gap Engine</div><div class="topr"><button type="button" class="thm" id="thm" aria-label="테마 바꾸기">🕘</button><button class="bell" id="bell" hidden>🔔 알림 켜기</button><div class="pill"><b>모의매매</b> · 실거래 아님</div></div></div>
 <div class="hero-top"><div class="orb {orb}"><span></span></div><div>
 <div class="when">{now.month}월 {now.day}일 {WD[now.weekday()]}요일 · {now.strftime('%H:%M')} ET</div><h1>{head_html}</h1></div></div>
+{strip_html}
 <div class="tabs" role="tablist" aria-label="트랙"><i class="tind" aria-hidden="true"></i>{tb}</div>
 <div class="panes">{pn}</div>
 <div class="foot">마지막 실행 {E(str(lp)[:16].replace('T', ' '))} ET · 손익은 모델가(BSM)<br>모의매매 · 투자 권유 아님</div>
